@@ -8,7 +8,7 @@ import {
 import { ThemeProvider } from "./context/ThemeContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Home from "./pages/Home";
+import Home from "./pages/home";
 import Settings from "./pages/Settings";
 import Shop from "./pages/Shop";
 import Inventory from "./pages/Inventory";
