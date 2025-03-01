@@ -3,8 +3,40 @@ import { Link, useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const profileRef = useRef(null);
   const navigate = useNavigate();
+
+  // Fetch profile data
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch("/api/profile", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch profile");
+        }
+
+        const data = await response.json();
+        setProfileData(data.profile);
+        console.log("✅ Profile data fetched:", data);
+      } catch (err) {
+        setError(err.message);
+        console.error("❌ Profile fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -14,8 +46,7 @@ const Header = () => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Logout
@@ -23,7 +54,7 @@ const Header = () => {
     try {
       const response = await fetch("http://localhost:3000/api/auth/logout", {
         method: "POST",
-        credentials: "include"
+        credentials: "include",
       });
       if (response.ok) {
         localStorage.removeItem("accessToken");
@@ -38,6 +69,34 @@ const Header = () => {
 
   return (
     <header className="glass p-4 h-16 flex justify-between items-center border-b border-gray-700">
+      {/* Profile Section */}
+      <div className="flex items-center gap-4">
+        {loading && (
+          <div className="w-10 h-10 rounded-full bg-gray-600 animate-pulse" />
+        )}
+        {profileData && (
+          <div className="flex items-center gap-2">
+            <img
+              src={`https://ui-avatars.com/api/?name=${profileData.username}&background=0D8ABC&color=fff`}
+              alt="Profile"
+              className="w-10 h-10 rounded-full"
+            />
+            <div>
+              <p className="text-sm font-medium text-white">
+                {profileData.username}
+              </p>
+              <p className="text-xs text-gray-300">{profileData.email}</p>
+            </div>
+          </div>
+        )}
+        {error && (
+          <div className="text-red-500 text-sm">
+            Error loading profile: {error}
+          </div>
+        )}
+      </div>
+
+      {/* Navigation and Actions */}
       <div className="flex items-center gap-6">
         <div className="flex items-center">
           <img
@@ -62,6 +121,7 @@ const Header = () => {
         </nav>
       </div>
 
+      {/* Right Side Actions */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1">
           <span role="img" aria-label="Gem" title="Gems">
