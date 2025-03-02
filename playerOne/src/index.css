@@ -1,43 +1,89 @@
 @import "tailwindcss";
 
-
 :root {
-  @apply bg-gray-900; /* Base dark background */
+  /* Default theme variables - will be overridden by ThemeContext */
+  --color-primary: #6d28d9;
+  --color-secondary: #a855f7;
+  --color-accent: #38bdf8;
+  --bg-primary: #111827; 
+  --bg-secondary: #1f2937;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --border-color: #374151;
+
+  /* Fixed variables */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 body {
-  @apply m-0 min-h-screen w-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900;
-  font-family: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  @apply m-0 min-h-screen w-full;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: "Press Start 2P", "Pixelated MS Sans Serif", "VT323", "Pixel", "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  background-image: 
+    radial-gradient(circle at 25px 25px, color-mix(in srgb, var(--color-primary) 15%, transparent) 2%, transparent 0%),
+    radial-gradient(circle at 75px 75px, color-mix(in srgb, var(--color-accent) 10%, transparent) 2%, transparent 0%);
+  background-size: 100px 100px;
 }
 
-
-/* Textures */
-.bg-texture-cyan {
-  background-image: radial-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
+/* Pixel Art Effects */
+.pixel-border {
+  border-style: solid;
+  border-width: 4px;
+  border-image: linear-gradient(45deg, var(--color-primary), var(--color-secondary)) 1;
+  image-rendering: pixelated;
 }
 
-.bg-texture-yellow {
-  background-image: radial-gradient(rgba(255, 255, 0, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
+.pixel-shadow {
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
-.bg-texture-purple {
-  background-image: radial-gradient(rgba(128, 0, 128, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
+.pixel-art {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
-.bg-texture-white {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
+/* Glass Effects */
 .glass {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+
+.glass-primary {
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
 @keyframes fade-in {
@@ -49,22 +95,109 @@ body {
   animation: fade-in 0.3s ease-out;
 }
 
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Button Styles */
+.btn {
+  @apply px-4 py-2 rounded font-medium transition-all duration-200;
+  background-color: var(--color-primary);
+  color: var(--text-primary);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--color-primary) 50%, black);
+  position: relative;
+  top: 0;
 }
 
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out;
+.btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 color-mix(in srgb, var(--color-primary) 50%, black);
 }
 
-.glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+.btn:active {
+  top: 4px;
+  box-shadow: 0 0 0 color-mix(in srgb, var(--color-primary) 50%, black);
 }
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--color-secondary) 50%, black);
+}
+
+.btn-secondary:hover {
+  box-shadow: 0 6px 0 color-mix(in srgb, var(--color-secondary) 50%, black);
+}
+
+.btn-secondary:active {
+  box-shadow: 0 0 0 color-mix(in srgb, var(--color-secondary) 50%, black);
+}
+
+.btn-accent {
+  background-color: var(--color-accent);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--color-accent) 50%, black);
+}
+
+.btn-accent:hover {
+  box-shadow: 0 6px 0 color-mix(in srgb, var(--color-accent) 50%, black);
+}
+
+.btn-accent:active {
+  box-shadow: 0 0 0 color-mix(in srgb, var(--color-accent) 50%, black);
+}
+
+/* Card Styles */
+.card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* Input Styles */
+.input {
+  @apply w-full px-4 py-3 rounded-lg border transition-all;
+  background-color: color-mix(in srgb, var(--bg-secondary) 70%, black);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+/* Progress Bar */
+.progress-bar {
+  height: 8px;
+  background-color: color-mix(in srgb, var(--color-primary) 20%, var(--bg-secondary));
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--color-primary);
+  transition: width 0.3s ease-in-out;
+}
+
+/* Utility Classes */
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-secondary); }
+.text-accent { color: var(--color-accent); }
+.bg-primary { background-color: var(--bg-primary); }
+.bg-secondary { background-color: var(--bg-secondary); }
+.border-themed { border-color: var(--border-color); }
+
+/* Gradient backgrounds */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+}
+
+.text-gradient {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+}
+
 .pointer-events-visible {
   pointer-events: auto;
 }

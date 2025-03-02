@@ -1,4 +1,3 @@
-// src/components/MainContent.jsx
 import React from "react";
 import { PlusIcon, SearchIcon, ChevronRightIcon } from "@heroicons/react/outline";
 import HabitItem from "./HabitItem";
