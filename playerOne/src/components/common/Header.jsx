@@ -1,11 +1,16 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import ThemeContext from "../../context/ThemeContext";
+import { motion } from "framer-motion";
 
 const Header = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { logout } = useAuth();
+  const { currentTheme } = useContext(ThemeContext);
   const profileRef = useRef(null);
   const navigate = useNavigate();
 
@@ -26,10 +31,8 @@ const Header = () => {
 
         const data = await response.json();
         setProfileData(data.profile);
-        console.log("✅ Profile data fetched:", data);
       } catch (err) {
         setError(err.message);
-        console.error("❌ Profile fetch error:", err);
       } finally {
         setLoading(false);
       }
@@ -52,70 +55,104 @@ const Header = () => {
   // Logout
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (response.ok) {
-        localStorage.removeItem("accessToken");
-        navigate("/");
-      } else {
-        console.error("Logout failed");
-      }
+      await logout();
     } catch (error) {
       console.error("Error during logout:", error);
     }
   };
 
+  // Get avatar based on theme
+  const getAvatar = () => {
+    if (!profileData) return null;
+    
+    if (currentTheme.id === 'sololeveling') {
+      return (
+        <div className="w-10 h-10 rounded flex items-center justify-center text-xs font-semibold" 
+             style={{ 
+               background: `linear-gradient(135deg, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
+               borderRadius: '0.125rem'
+             }}>
+          {profileData.username.substring(0, 2).toUpperCase()}
+        </div>
+      );
+    }
+    
+    if (currentTheme.id === 'cyberpunk') {
+      return (
+        <div className="w-10 h-10 flex items-center justify-center border-2" 
+             style={{ 
+               borderColor: currentTheme.primaryColor,
+               borderRadius: 0
+             }}>
+          <span className="text-xs font-mono text-primaryColor">{profileData.username.substring(0, 2).toUpperCase()}</span>
+        </div>
+      );
+    }
+    
+    return (
+      <img
+        src={`https://ui-avatars.com/api/?name=${profileData.username}&background=random&color=fff`}
+        alt="Profile"
+        className="w-10 h-10 rounded-full"
+        style={{ borderRadius: currentTheme.id === 'forest' ? '1rem' : currentTheme.radius }}
+      />
+    );
+  };
+
   return (
-    <header className="glass p-4 h-16 flex justify-between items-center border-b border-gray-700">
+    <header className="glass p-4 h-16 flex justify-between items-center border-b border-borderColor">
       {/* Profile Section */}
       <div className="flex items-center gap-4">
         {loading && (
-          <div className="w-10 h-10 rounded-full bg-gray-600 animate-pulse" />
+          <div className="w-10 h-10 rounded-full bg-bgTertiary animate-pulse" 
+               style={{ borderRadius: currentTheme.radius }} />
         )}
         {profileData && (
           <div className="flex items-center gap-2">
-            <img
-              src={`https://ui-avatars.com/api/?name=${profileData.username}&background=0D8ABC&color=fff`}
-              alt="Profile"
-              className="w-10 h-10 rounded-full"
-            />
+            {getAvatar()}
             <div>
-              <p className="text-sm font-medium text-white">
+              <p className="text-sm font-medium text-textPrimary">
                 {profileData.username}
               </p>
-              <p className="text-xs text-gray-300">{profileData.email}</p>
+              <p className="text-xs text-textSecondary">
+                {profileData.email}
+              </p>
             </div>
           </div>
         )}
         {error && (
           <div className="text-red-500 text-sm">
-            Error loading profile: {error}
+            Error loading profile
           </div>
         )}
       </div>
 
-      {/* Navigation and Actions */}
+      {/* Logo & Navigation */}
       <div className="flex items-center gap-6">
         <div className="flex items-center">
-          <img
-            src="https://via.placeholder.com/40"
-            alt="Logo"
-            className="w-10 h-10 rounded-full"
-          />
-          <span className="ml-2 text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+          <motion.div 
+            className="w-10 h-10 rounded-full flex items-center justify-center"
+            style={{ 
+              background: `linear-gradient(135deg, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
+              borderRadius: currentTheme.id === 'cyberpunk' ? 0 : currentTheme.id === 'forest' ? '1rem' : '9999px' 
+            }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <span className="text-white font-bold">P1</span>
+          </motion.div>
+          <span className="ml-2 text-2xl font-bold text-gradient">
             PlayerOne
           </span>
         </div>
         <nav className="flex gap-4">
-          <Link to="/Home" className="text-white hover:text-gray-300">
+          <Link to="/home" className="text-textPrimary hover:text-primaryColor transition-colors">
             Home
           </Link>
-          <Link to="/inventory" className="text-white hover:text-gray-300">
+          <Link to="/inventory" className="text-textPrimary hover:text-primaryColor transition-colors">
             Inventory
           </Link>
-          <Link to="/shop" className="text-white hover:text-gray-300">
+          <Link to="/shop" className="text-textPrimary hover:text-primaryColor transition-colors">
             Shop
           </Link>
         </nav>
@@ -123,33 +160,21 @@ const Header = () => {
 
       {/* Right Side Actions */}
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-1">
-          <span role="img" aria-label="Gem" title="Gems">
-            💎
-          </span>
-          <span className="text-white">123</span>
-          <span role="img" aria-label="Coin" title="Coins">
-            🪙
-          </span>
-          <span className="text-white">456</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 bg-bgSecondary px-3 py-1 rounded" style={{ borderRadius: currentTheme.radius }}>
+            <span role="img" aria-label="Gem" title="Gems">
+              💎
+            </span>
+            <span className="text-textPrimary">123</span>
+          </div>
+          <div className="flex items-center gap-1 bg-bgSecondary px-3 py-1 rounded" style={{ borderRadius: currentTheme.radius }}>
+            <span role="img" aria-label="Coin" title="Coins">
+              🪙
+            </span>
+            <span className="text-textPrimary">456</span>
+          </div>
         </div>
-        <button className="hover:text-gray-300" title="Sync Data">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 4v6h6M20 20v-6h-6M5.64 18.36a9 9 0 1112.72 0"
-            />
-          </svg>
-        </button>
-        <button className="hover:text-gray-300" title="Notifications">
+        <button className="hover:text-primaryColor transition-colors" title="Notifications">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-6 w-6"
@@ -167,7 +192,7 @@ const Header = () => {
         </button>
         <div className="relative" ref={profileRef}>
           <button
-            className="hover:text-gray-300"
+            className="hover:text-primaryColor transition-colors"
             title="Profile"
             onClick={() => setShowProfileDropdown((prev) => !prev)}
           >
@@ -187,43 +212,34 @@ const Header = () => {
             </svg>
           </button>
           {showProfileDropdown && (
-            <div className="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg z-50">
+            <motion.div 
+              className="absolute right-0 mt-2 w-48 card shadow-lg z-50"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{ borderRadius: currentTheme.radius }}
+            >
               <ul className="py-2">
                 <li>
-                  <Link to="/profile" className="block px-4 py-2 hover:bg-gray-600">
+                  <Link to="/profile" className="block px-4 py-2 hover:bg-bgTertiary transition-colors">
                     Profile
                   </Link>
                 </li>
                 <li>
-                  <Link to="/stats" className="block px-4 py-2 hover:bg-gray-600">
-                    Stats
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/achievements" className="block px-4 py-2 hover:bg-gray-600">
-                    Achievements
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/settings" className="block px-4 py-2 hover:bg-gray-600">
+                  <Link to="/settings" className="block px-4 py-2 hover:bg-bgTertiary transition-colors">
                     Settings
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/subscription" className="block px-4 py-2 hover:bg-gray-600">
-                    Subscription
                   </Link>
                 </li>
                 <li>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-600"
+                    className="w-full text-left px-4 py-2 hover:bg-bgTertiary transition-colors"
                   >
                     Log Out
                   </button>
                 </li>
               </ul>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>

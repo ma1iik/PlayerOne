@@ -1,23 +1,22 @@
-// playerOne/src/pages/Register.jsx
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-
-console.log("🟢 Register Component Rendered!");
+import ThemeContext from "../context/ThemeContext";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { currentTheme } = useContext(ThemeContext);
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    console.log("🟢 Register Attempt:", username, email);
     
     if (!username || !email || !password) {
       setErrorMessage("Please fill in all fields");
@@ -34,10 +33,9 @@ const Register = () => {
     setErrorMessage("");
     
     try {
-      await register(username, email, password);
+      await register(username, email, password, rememberMe);
       navigate("/home");
     } catch (error) {
-      console.error("❌ Registration error:", error);
       setErrorMessage(error.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
@@ -45,65 +43,89 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-gray-900 to-gray-800">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-primary">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="glass rounded-xl p-8 w-full max-w-md space-y-6"
+        style={{ borderRadius: currentTheme.radius }}
       >
-        <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold text-center text-gradient">
           Join Now
         </h1>
 
         {errorMessage && (
-          <p className="text-red-500 text-sm text-center bg-red-500/10 p-2 rounded">
-            {errorMessage}
-          </p>
+          <div className="bg-opacity-10 bg-red-500 p-3 rounded" style={{ borderRadius: currentTheme.radius }}>
+            <p className="text-red-500 text-sm text-center">
+              {errorMessage}
+            </p>
+          </div>
         )}
 
-        <form onSubmit={handleRegister} className="space-y-4">
-          <input
-            className="w-full px-4 py-3 bg-gray-800/50 rounded-lg border border-gray-700 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition-all text-gray-100 placeholder-gray-400"
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            disabled={isLoading}
-            required
-          />
-          <input
-            className="w-full px-4 py-3 bg-gray-800/50 rounded-lg border border-gray-700 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition-all text-gray-100 placeholder-gray-400"
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={isLoading}
-            required
-          />
-          <input
-            className="w-full px-4 py-3 bg-gray-800/50 rounded-lg border border-gray-700 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition-all text-gray-100 placeholder-gray-400"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={isLoading}
-            required
-          />
+        <form onSubmit={handleRegister} className="space-y-5">
+          <div>
+            <input
+              className="input w-full"
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              disabled={isLoading}
+              required
+            />
+          </div>
+          
+          <div>
+            <input
+              className="input w-full"
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
+              required
+            />
+          </div>
+          
+          <div>
+            <input
+              className="input w-full"
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
+              required
+            />
+          </div>
+          
+          <div className="flex items-center">
+            <input
+              id="remember-me"
+              type="checkbox"
+              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
+            <label htmlFor="remember-me" className="ml-2 block text-sm text-textSecondary">
+              Remember me
+            </label>
+          </div>
 
           <button
             type="submit"
-            className="w-full py-3 px-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg hover:scale-[1.02] transition-transform duration-200 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 disabled:opacity-70 disabled:hover:scale-100"
+            className="btn w-full py-3"
             disabled={isLoading}
           >
             {isLoading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
 
-        <p className="text-center text-gray-400">
+        <p className="text-center text-textSecondary text-sm">
           Already registered?{" "}
           <a
             href="/"
-            className="text-pink-400 hover:text-pink-300 transition-colors"
+            className="text-accent hover:underline transition-colors"
           >
             Sign in here
           </a>

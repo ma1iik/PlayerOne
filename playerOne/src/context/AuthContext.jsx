@@ -1,10 +1,7 @@
-// playerOne/src/context/AuthContext.jsx
-
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../services/authService";
 
-// Create context
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -45,11 +42,11 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Login handler
-  const login = async (email, password) => {
+  const login = async (email, password, rememberMe = false) => {
     setLoading(true);
     setError(null);
     try {
-      const userData = await authService.login(email, password);
+      const userData = await authService.login(email, password, rememberMe);
       setUser(userData);
       return userData;
     } catch (err) {
@@ -61,11 +58,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Register handler
-  const register = async (username, email, password) => {
+  const register = async (username, email, password, rememberMe = false) => {
     setLoading(true);
     setError(null);
     try {
-      const userData = await authService.register(username, email, password);
+      const userData = await authService.register(username, email, password, rememberMe);
       setUser(userData);
       return userData;
     } catch (err) {

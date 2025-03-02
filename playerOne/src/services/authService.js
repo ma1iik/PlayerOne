@@ -4,9 +4,10 @@ class AuthService {
   constructor() {
     this.accessToken = localStorage.getItem('accessToken');
     this.refreshPromise = null;
+    this.rememberMe = localStorage.getItem('rememberMe') === 'true';
   }
 
-  async login(email, password) {
+  async login(email, password, remember = false) {
     try {
       const response = await fetch(`${API_URL}/auth/local`, {
         method: 'POST',
@@ -22,13 +23,21 @@ class AuthService {
 
       const data = await response.json();
       this.setToken(data.accessToken);
+      this.setRememberMe(remember);
+      
+      if (remember) {
+        localStorage.setItem('savedEmail', email);
+      } else {
+        localStorage.removeItem('savedEmail');
+      }
+      
       return data.user;
     } catch (error) {
       throw error;
     }
   }
 
-  async register(username, email, password) {
+  async register(username, email, password, remember = false) {
     try {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
@@ -44,6 +53,12 @@ class AuthService {
 
       const data = await response.json();
       this.setToken(data.accessToken);
+      this.setRememberMe(remember);
+      
+      if (remember) {
+        localStorage.setItem('savedEmail', email);
+      }
+      
       return data.user;
     } catch (error) {
       throw error;
@@ -57,6 +72,10 @@ class AuthService {
         credentials: 'include',
       });
       this.clearToken();
+      
+      if (!this.rememberMe) {
+        localStorage.removeItem('savedEmail');
+      }
     } catch (error) {
       this.clearToken();
       throw error;
@@ -147,6 +166,15 @@ class AuthService {
   clearToken() {
     this.accessToken = null;
     localStorage.removeItem('accessToken');
+  }
+  
+  setRememberMe(value) {
+    this.rememberMe = value;
+    localStorage.setItem('rememberMe', value);
+  }
+  
+  getSavedEmail() {
+    return localStorage.getItem('savedEmail') || '';
   }
 
   isAuthenticated() {
