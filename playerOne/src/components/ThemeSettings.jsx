@@ -21,7 +21,7 @@ const ThemeSettings = () => {
           cardFooterClass: 'border-t border-purple-600 bg-opacity-30 bg-purple-900',
           nameClass: 'sl-glow-text font-orbitron tracking-wide',
           previewClass: 'border border-purple-600',
-          activeIndicatorClass: 'bg-purple-700 text-purple-100 border border-purple-500 sl-glow-text font-bold',
+          activeIndicatorClass: 'bg-purple-700',
           cardShadow: '0 0 15px rgba(126, 34, 206, 0.5)'
         };
       case 'neon-orange':
@@ -31,7 +31,7 @@ const ThemeSettings = () => {
           cardFooterClass: 'border-t border-orange-500 bg-opacity-30 bg-orange-900',
           nameClass: 'sl-glow-text font-orbitron tracking-wide',
           previewClass: 'border border-orange-500',
-          activeIndicatorClass: 'bg-orange-600 text-orange-100 border border-orange-400 sl-glow-text font-bold',
+          activeIndicatorClass: 'bg-orange-600',
           cardShadow: '0 0 15px rgba(245, 158, 11, 0.5)'
         };
       default:
@@ -41,7 +41,7 @@ const ThemeSettings = () => {
           cardFooterClass: '',
           nameClass: 'font-medium',
           previewClass: '',
-          activeIndicatorClass: 'bg-primary text-white',
+          activeIndicatorClass: 'bg-primary',
           cardShadow: ''
         };
     }
@@ -151,22 +151,16 @@ const ThemeSettings = () => {
                         : theme.name}
                     </span>
                     
-                    {currentTheme.id === theme.id ? (
-                      <div 
-                        className={`px-2 py-1 text-xs rounded-sm flex items-center ${themeStyle.activeIndicatorClass}`}
-                        style={{ borderRadius: theme.radius }}
-                      >
-                        {theme.id.includes('neon') ? 'ACTIVATED' : 'Active'}
-                      </div>
-                    ) : (
-                      <div 
-                        className="w-5 h-5 flex items-center justify-center"
-                        style={{
-                          borderRadius: theme.radius === '0' ? '0' : '50%',
-                          border: `2px solid ${theme.borderColor}`
-                        }}
-                      ></div>
-                    )}
+                    {/* Active theme indicator - filled with theme-specific color */}
+                    <div 
+                      className="w-5 h-5 flex items-center justify-center transition-all duration-300 relative overflow-hidden"
+                      style={{
+                        borderRadius: theme.radius === '0' ? '0' : '50%',
+                        border: `2px solid ${theme.borderColor}`,
+                        backgroundColor: currentTheme.id === theme.id ? theme.primaryColor : 'transparent'
+                      }}
+                    >
+                    </div>
                   </div>
                 </motion.div>
               );
