@@ -25,22 +25,22 @@ export const THEMES = {
   LIGHT: {
     id: "light",
     name: "Light Mode",
-    primaryColor: "#6d28d9",
-    secondaryColor: "#8b5cf6",
-    accentColor: "#0284c7",
-    bgPrimary: "#f8fafc",
-    bgSecondary: "#f1f5f9",
-    bgTertiary: "#e2e8f0",
-    textPrimary: "#0f172a",
-    textSecondary: "#475569",
-    borderColor: "#e2e8f0",
-    cardBg: "#ffffff",
-    inputBg: "#f8fafc",
-    inputBorder: "#e2e8f0",
-    shadowColor: "rgba(15, 23, 42, 0.05)",
+    primaryColor: "#3b82f6", // blue-500
+    secondaryColor: "#60a5fa", // blue-400
+    accentColor: "#2563eb", // blue-600
+    bgPrimary: "#f9fafb", // gray-50 (main background)
+    bgSecondary: "#ffffff", // white (card backgrounds)
+    bgTertiary: "#f3f4f6", // gray-100 (hover states)
+    textPrimary: "#1f2937", // gray-800
+    textSecondary: "#6b7280", // gray-500
+    borderColor: "#e5e7eb", // gray-200 - matching the task borders
+    cardBg: "#ffffff", // white
+    inputBg: "#f9fafb", // gray-50
+    inputBorder: "#e5e7eb", // gray-200
+    shadowColor: "rgba(0, 0, 0, 0.05)",
     radius: "0.5rem",
     borderWidth: "1px",
-    shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+    shadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
     font: "'Inter', sans-serif"
   },
   NEON_VIOLET: {

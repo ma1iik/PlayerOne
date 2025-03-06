@@ -1,4 +1,3 @@
-// playerOne/src/pages/Settings.jsx
 import React, { useState } from "react";
 import { CogIcon, BellIcon, LockClosedIcon, UserIcon, SunIcon } from "@heroicons/react/outline";
 import ThemeSettings from "../components/ThemeSettings";
@@ -29,9 +28,12 @@ const Settings = () => {
     <div className="flex flex-1 bg-bg-primary font-sans p-6">
       <div className="card w-full max-w-4xl mx-auto shadow-lg pixel-shadow">
         {/* Settings Header */}
-        <div className="p-4 border-b border-border-themed flex items-center gap-2">
-          <CogIcon className="w-6 h-6 text-color-primary" />
-          <h2 className="text-xl font-semibold">Settings</h2>
+        <div className="p-4 flex flex-col items-center">
+          <div className="flex items-center gap-2 mb-2">
+            <CogIcon className="w-6 h-6 text-primary" />
+            <h2 className="text-xl font-semibold">Settings</h2>
+          </div>
+          <div className="h-px bg-gray-200 w-15/16"></div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
