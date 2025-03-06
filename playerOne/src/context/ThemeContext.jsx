@@ -19,7 +19,8 @@ export const THEMES = {
     shadowColor: "rgba(15, 23, 42, 0.7)", 
     radius: "0.5rem", 
     borderWidth: "1px",
-    shadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)"
+    shadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+    font: "'Inter', sans-serif"
   },
   LIGHT: {
     id: "light",
@@ -39,27 +40,50 @@ export const THEMES = {
     shadowColor: "rgba(15, 23, 42, 0.05)",
     radius: "0.5rem",
     borderWidth: "1px",
-    shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+    shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+    font: "'Inter', sans-serif"
   },
-  SOLOLEVELING: {
-    id: "sololeveling",
-    name: "Solo Leveling",
-    primaryColor: "#7e22ce", // More vibrant purple
-    secondaryColor: "#a855f7", // Lighter purple
-    accentColor: "#f59e0b", // Neon yellow-orange
-    bgPrimary: "#0a0a10", // Darker background
-    bgSecondary: "#131320", // Dark with hint of purple
+  NEON_VIOLET: {
+    id: "neon-violet",
+    name: "Neon Violet",
+    primaryColor: "#7e22ce", 
+    secondaryColor: "#a855f7",
+    accentColor: "#c084fc",
+    bgPrimary: "#0a0a10", 
+    bgSecondary: "#131320", 
     bgTertiary: "#1e1e35", 
-    textPrimary: "#e0f2fe", // Brighter text for contrast
-    textSecondary: "#a5b4fc", // Purple tinted secondary text
-    borderColor: "#4f46e5", // Neon border
-    cardBg: "#15151c", // Darker card background
-    inputBg: "#0c0c14", // Very dark input background
-    inputBorder: "#7e22ce", // Purple border for inputs
-    shadowColor: "rgba(126, 34, 206, 0.5)", // Purple shadow
-    radius: "0", // Sharp edges for the edgy look
+    textPrimary: "#e0f2fe", 
+    textSecondary: "#a5b4fc", 
+    borderColor: "#4f46e5", 
+    cardBg: "#15151c", 
+    inputBg: "#0c0c14", 
+    inputBorder: "#7e22ce", 
+    shadowColor: "rgba(126, 34, 206, 0.5)", 
+    radius: "0", 
     borderWidth: "1px",
-    shadow: "0 0 15px rgba(126, 34, 206, 0.3), 0 0 5px rgba(245, 158, 11, 0.2)" // Purple + orange glow
+    shadow: "0 0 15px rgba(126, 34, 206, 0.3), 0 0 5px rgba(126, 34, 206, 0.2)",
+    font: "'Orbitron', 'Rajdhani', sans-serif"
+  },
+  NEON_ORANGE: {
+    id: "neon-orange",
+    name: "Neon Orange",
+    primaryColor: "#f59e0b", 
+    secondaryColor: "#fbbf24", 
+    accentColor: "#fcd34d", 
+    bgPrimary: "#0a0a10", 
+    bgSecondary: "#131320", 
+    bgTertiary: "#1a1a25", 
+    textPrimary: "#fef3c7", 
+    textSecondary: "#fde68a", 
+    borderColor: "#f59e0b", 
+    cardBg: "#15151c", 
+    inputBg: "#0c0c14",
+    inputBorder: "#f59e0b",
+    shadowColor: "rgba(245, 158, 11, 0.5)",
+    radius: "0", 
+    borderWidth: "1px",
+    shadow: "0 0 15px rgba(245, 158, 11, 0.3), 0 0 5px rgba(245, 158, 11, 0.2)", 
+    font: "'Orbitron', 'Rajdhani', sans-serif"
   },
   CYBERPUNK: {
     id: "cyberpunk",
@@ -79,7 +103,8 @@ export const THEMES = {
     shadowColor: "rgba(244, 63, 94, 0.4)",
     radius: "0",
     borderWidth: "1px",
-    shadow: "0 0 20px rgba(244, 63, 94, 0.3)"
+    shadow: "0 0 20px rgba(244, 63, 94, 0.3)",
+    font: "'Audiowide', 'Rajdhani', sans-serif"
   }
 };
 
@@ -90,6 +115,30 @@ export const ThemeProvider = ({ children }) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    // Load fonts dynamically based on theme requirements
+    const loadThemeFonts = () => {
+      const fontLinks = document.querySelectorAll('link[data-theme-font]');
+      fontLinks.forEach(link => link.remove());
+
+      // Add links for the necessary fonts
+      const fonts = [
+        { name: 'Orbitron', url: 'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap' },
+        { name: 'Rajdhani', url: 'https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap' },
+        { name: 'Audiowide', url: 'https://fonts.googleapis.com/css2?family=Audiowide&display=swap' },
+        { name: 'Inter', url: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap' }
+      ];
+
+      fonts.forEach(font => {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = font.url;
+        link.setAttribute('data-theme-font', font.name);
+        document.head.appendChild(link);
+      });
+    };
+
+    loadThemeFonts();
+
     const savedThemeId = localStorage.getItem("themeId");
     if (savedThemeId) {
       const theme = Object.values(THEMES).find(t => t.id === savedThemeId);
@@ -111,7 +160,14 @@ export const ThemeProvider = ({ children }) => {
       }
     });
     
-    document.body.className = `theme-${currentTheme.id}`;
+    // Set the font family on body
+    document.body.style.fontFamily = currentTheme.font;
+    
+    // Set theme-specific class for CSS targeting
+    const themeClasses = Object.values(THEMES).map(t => `theme-${t.id}`);
+    document.body.classList.remove(...themeClasses);
+    document.body.classList.add(`theme-${currentTheme.id}`);
+    
     localStorage.setItem("themeId", currentTheme.id);
   }, [currentTheme, isLoaded]);
 
