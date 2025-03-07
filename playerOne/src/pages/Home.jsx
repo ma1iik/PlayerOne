@@ -89,7 +89,7 @@ const Home = () => {
   };
 
   return (
-    <div className="flex h-screen font-sans" style={{ backgroundColor: currentTheme.bgPrimary }}>
+    <div className="flex h-full w-full overflow-hidden" style={{ backgroundColor: currentTheme.bgPrimary }}>
       {/* Profile Panel */}
       <ProfilePanel
         profile={profile}
@@ -112,7 +112,7 @@ const Home = () => {
 
       {/* Add Item Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ backdropFilter: "blur(4px)" }}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" style={{ backdropFilter: "blur(4px)" }}>
           <div className={`w-full max-w-md ${isNeonTheme ? 'sl-scan-line' : ''}`}
                style={{ 
                  backgroundColor: currentTheme.bgSecondary,

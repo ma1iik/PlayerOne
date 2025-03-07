@@ -62,7 +62,7 @@ const MainContent = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col h-screen overflow-hidden">
+    <div className="flex-1 flex flex-col overflow-hidden">
       {/* Header with fixed horizontal padding that matches grid */}
       <div className="px-24 py-4" 
            style={{ 
