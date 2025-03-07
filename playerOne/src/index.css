@@ -349,3 +349,29 @@ body {
   }
 }
 
+/* Add this to your CSS */
+.sl-scan-line-custom {
+  position: relative;
+  overflow: hidden;
+}
+
+.sl-scan-line-custom:after {
+  content: '';
+  position: absolute;
+  height: 5px;
+  left: 0;
+  right: 0;
+  top: -10%;
+  background: linear-gradient(to right, 
+    transparent, 
+    var(--scan-line-color, var(--primaryColor)), 
+    transparent
+  );
+  opacity: 0.5;
+  animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+  0% { top: -10%; }
+  100% { top: 110%; }
+}
