@@ -34,6 +34,16 @@ const ThemeSettings = () => {
           activeIndicatorClass: 'bg-orange-600',
           cardShadow: '0 0 15px rgba(245, 158, 11, 0.5)'
         };
+      case 'cyberpunk':
+        return {
+          cardWrapperClass: '',
+          cardHeaderClass: 'border-b border-red-500',
+          cardFooterClass: 'border-t border-red-500 bg-opacity-30 bg-gray-900',
+          nameClass: 'font-audiowide tracking-wide',
+          previewClass: 'border border-red-500',
+          activeIndicatorClass: 'bg-red-500',
+          cardShadow: '0 0 15px rgba(244, 63, 94, 0.5)'
+        };
       default:
         return {
           cardWrapperClass: '',
@@ -54,9 +64,9 @@ const ThemeSettings = () => {
     }}>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className={`text-xl font-bold text-textPrimary flex items-center gap-2 ${
+        <h3 className={`text-xl font-bold flex items-center gap-2 ${
           currentTheme.id.includes('neon') ? 'sl-glow-text' : ''
-        }`}>
+        }`} style={{ color: currentTheme.textPrimary }}>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83" />
           </svg>
@@ -69,14 +79,12 @@ const ThemeSettings = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 text-sm font-medium transition-colors ${
-                activeTab === tab.id
-                  ? currentTheme.id.includes('neon')
-                    ? 'bg-primaryColor text-white active-tab'
-                    : 'bg-primaryColor text-white'
-                  : 'bg-bgTertiary text-textSecondary hover:text-textPrimary'
-              }`}
-              style={{ borderRadius: currentTheme.radius }}
+              className={`px-4 py-2 text-sm font-medium transition-colors`}
+              style={{ 
+                backgroundColor: activeTab === tab.id ? currentTheme.primaryColor : currentTheme.bgTertiary,
+                color: activeTab === tab.id ? '#ffffff' : currentTheme.textSecondary,
+                borderRadius: currentTheme.radius
+              }}
             >
               {currentTheme.id.includes('neon') ? (
                 <span className={activeTab === tab.id ? 'sl-glow-text' : ''}>{tab.label}</span>
@@ -99,11 +107,12 @@ const ThemeSettings = () => {
                 <motion.div
                   key={theme.id}
                   className={`relative overflow-hidden cursor-pointer group transition-all duration-200 ${
-                    currentTheme.id === theme.id ? 'ring-2 ring-primaryColor' : ''
+                    currentTheme.id === theme.id ? 'ring-2' : ''
                   } ${themeStyle.cardWrapperClass}`}
                   style={{ 
                     borderRadius: theme.radius,
-                    boxShadow: currentTheme.id === theme.id ? themeStyle.cardShadow : 'none'
+                    boxShadow: currentTheme.id === theme.id ? themeStyle.cardShadow : 'none',
+                    ringColor: theme.primaryColor
                   }}
                   onClick={() => setTheme(theme.id)}
                   whileHover={{ scale: 1.01 }}
@@ -151,7 +160,7 @@ const ThemeSettings = () => {
                         : theme.name}
                     </span>
                     
-                    {/* Active theme indicator - filled with theme-specific color */}
+                    {/* Active theme indicator */}
                     <div 
                       className="w-5 h-5 flex items-center justify-center transition-all duration-300 relative overflow-hidden"
                       style={{
@@ -178,49 +187,51 @@ const ThemeSettings = () => {
             borderRadius: currentTheme.radius,
             boxShadow: currentTheme.shadow
           }}>
-            <h4 className={`text-lg font-medium ${currentTheme.id.includes('neon') ? 'sl-glow-text selected' : ''}`}>
+            <h4 className={`text-lg font-medium ${currentTheme.id.includes('neon') ? 'sl-glow-text selected' : ''}`}
+               style={{ color: currentTheme.textPrimary }}>
               {currentTheme.id.includes('neon') ? '[ UI ELEMENTS ]' : 'UI Elements'}
             </h4>
             
             <div className="space-y-4">
               {/* Buttons */}
               <div>
-                <p className={`text-sm mb-2 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : 'text-textSecondary'}`}>
+                <p className={`text-sm mb-2 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}
+                   style={{ color: currentTheme.id.includes('neon') ? currentTheme.textPrimary : currentTheme.textSecondary }}>
                   Buttons
                 </p>
                 <div className="flex flex-wrap gap-3">
                   <button 
-                    className={`btn ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}
+                    className={currentTheme.id.includes('neon') ? 'sl-glow-text px-4 py-2 border border-current' : 'px-4 py-2'}
                     style={{ 
                       backgroundColor: currentTheme.id.includes('neon') ? 'transparent' : currentTheme.primaryColor, 
-                      color: "white",
+                      color: currentTheme.id.includes('neon') ? currentTheme.primaryColor : "#ffffff",
                       borderRadius: currentTheme.radius
                     }}
                   >
                     Primary
                   </button>
                   <button 
-                    className={`btn ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}
+                    className={currentTheme.id.includes('neon') ? 'sl-glow-text px-4 py-2 border border-current' : 'px-4 py-2'}
                     style={{ 
                       backgroundColor: currentTheme.id.includes('neon') ? 'transparent' : currentTheme.secondaryColor, 
-                      color: "white",
+                      color: currentTheme.id.includes('neon') ? currentTheme.secondaryColor : "#ffffff",
                       borderRadius: currentTheme.radius
                     }}
                   >
                     Secondary
                   </button>
                   <button 
-                    className={`btn ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}
+                    className={currentTheme.id.includes('neon') ? 'sl-glow-text px-4 py-2 border border-current' : 'px-4 py-2'}
                     style={{ 
                       backgroundColor: currentTheme.id.includes('neon') ? 'transparent' : currentTheme.accentColor, 
-                      color: "white",
+                      color: currentTheme.id.includes('neon') ? currentTheme.accentColor : "#ffffff",
                       borderRadius: currentTheme.radius
                     }}
                   >
                     Accent
                   </button>
                   <button 
-                    className={`px-4 py-2 font-medium transition-colors border ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}
+                    className="px-4 py-2 font-medium transition-colors border"
                     style={{ 
                       borderColor: currentTheme.borderColor,
                       color: currentTheme.textPrimary,
@@ -234,7 +245,8 @@ const ThemeSettings = () => {
               
               {/* Cards */}
               <div>
-                <p className={`text-sm mb-2 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : 'text-textSecondary'}`}>
+                <p className={`text-sm mb-2 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}
+                   style={{ color: currentTheme.id.includes('neon') ? currentTheme.textPrimary : currentTheme.textSecondary }}>
                   Cards
                 </p>
                 <div className="flex flex-wrap gap-4">
@@ -280,39 +292,44 @@ const ThemeSettings = () => {
               
               {/* Form Elements */}
               <div>
-                <p className={`text-sm mb-2 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : 'text-textSecondary'}`}>
+                <p className={`text-sm mb-2 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}
+                   style={{ color: currentTheme.id.includes('neon') ? currentTheme.textPrimary : currentTheme.textSecondary }}>
                   Form Elements
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <div className="w-64">
-                    <label className={`block text-sm mb-1 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}>
+                    <label className={`block text-sm mb-1 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}
+                           style={{ color: currentTheme.textPrimary }}>
                       Input Field
                     </label>
                     <input
                       type="text"
-                      className="input"
+                      className="w-full px-4 py-2"
                       placeholder="Type something..."
                       style={{
                         backgroundColor: currentTheme.inputBg,
                         color: currentTheme.textPrimary,
                         borderColor: currentTheme.inputBorder,
                         borderRadius: currentTheme.radius,
-                        borderWidth: currentTheme.borderWidth
+                        borderWidth: currentTheme.borderWidth,
+                        borderStyle: 'solid'
                       }}
                     />
                   </div>
                   <div className="w-64">
-                    <label className={`block text-sm mb-1 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}>
+                    <label className={`block text-sm mb-1 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}
+                           style={{ color: currentTheme.textPrimary }}>
                       Select Element
                     </label>
                     <select
-                      className="input"
+                      className="w-full px-4 py-2"
                       style={{
                         backgroundColor: currentTheme.inputBg,
                         color: currentTheme.textPrimary,
                         borderColor: currentTheme.inputBorder,
                         borderRadius: currentTheme.radius,
-                        borderWidth: currentTheme.borderWidth
+                        borderWidth: currentTheme.borderWidth,
+                        borderStyle: 'solid'
                       }}
                     >
                       <option>Option 1</option>
@@ -331,10 +348,10 @@ const ThemeSettings = () => {
                   borderRadius: currentTheme.radius
                 }}>
                   <div className="font-mono text-sm space-y-2">
-                    <p className="sl-glow-text selected">SYSTEM INITIALIZED</p>
-                    <p className="text-textSecondary">&gt; Loading interface components...</p>
-                    <p className="text-textSecondary">&gt; Connecting to visual subsystems...</p>
-                    <p className="sl-glow-text">ACCESS GRANTED</p>
+                    <p className="sl-glow-text selected" style={{ color: currentTheme.textPrimary }}>SYSTEM INITIALIZED</p>
+                    <p style={{ color: currentTheme.textSecondary }}>&gt; Loading interface components...</p>
+                    <p style={{ color: currentTheme.textSecondary }}>&gt; Connecting to visual subsystems...</p>
+                    <p className="sl-glow-text" style={{ color: currentTheme.textPrimary }}>ACCESS GRANTED</p>
                     <p style={{ color: currentTheme.primaryColor }}>&gt; {currentTheme.name} theme activated</p>
                   </div>
                 </div>
