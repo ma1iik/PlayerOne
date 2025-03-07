@@ -299,7 +299,7 @@ const Shop = () => {
   };
 
   return (
-    <div className="flex flex-col flex-1 font-sans p-6"
+    <div className="flex flex-col flex-1 font-sans p-6 overflow-y-auto"
          style={{ 
            backgroundColor: currentTheme.bgPrimary,
            backgroundImage: isNeonTheme ? 
@@ -315,12 +315,14 @@ const Shop = () => {
       <div className="w-full max-w-7xl mx-auto">
         {/* Header */}
         <div className="p-4 flex items-center justify-between" 
-             style={{ 
-               backgroundColor: currentTheme.bgSecondary, 
-               borderBottom: `1px solid ${currentTheme.borderColor}`,
-               borderRadius: `${currentTheme.radius} ${currentTheme.radius} 0 0`,
-               boxShadow: isNeonTheme || isCyberpunk ? `0 0 15px ${currentTheme.shadowColor}` : 'none'
-             }}>
+          style={{ 
+            backgroundColor: currentTheme.bgSecondary, 
+            borderBottom: `1px solid ${currentTheme.borderColor}`,
+            borderRadius: `${currentTheme.radius} ${currentTheme.radius} 0 0`,
+            boxShadow: isNeonTheme || isCyberpunk ? `0 0 15px ${currentTheme.shadowColor}` : 'none',
+            position: 'relative',
+            zIndex: 10  // Add this line to give the header a higher z-index
+          }}>
           <div className="flex items-center gap-2">
             <ShoppingBagIcon className="w-6 h-6" style={{ color: currentTheme.primaryColor }} />
             <h2 className={`text-xl font-semibold ${isNeonTheme ? 'sl-glow-text' : ''}`}
@@ -673,7 +675,9 @@ const Shop = () => {
               {filteredItems.map((item) => (
                 <motion.div 
                   key={item.id}
-                  layoutId={`grid-item-${item.id}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
                   className={`cursor-pointer transition-all duration-200 ${getScanLineClass(item, isNeonTheme)}`}
                   style={{
                     ...getItemCardStyle(item),
@@ -684,41 +688,6 @@ const Shop = () => {
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="p-4 flex flex-col">
-                    {/* Featured badge */}
-                    {item.featured && (
-                      <div className="absolute top-2 right-2 z-10">
-                        <span className="inline-block text-xs px-2 py-0.5 rounded"
-                              style={{ 
-                                backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.secondaryColor,
-                                color: isNeonTheme || isCyberpunk ? currentTheme.secondaryColor : '#ffffff',
-                                border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.secondaryColor}` : 'none',
-                                borderRadius: currentTheme.radius,
-                                fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                                            isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                                            currentTheme.font
-                              }}>
-                          {isNeonTheme ? '[ FEATURED ]' : isCyberpunk ? 'FEATURED' : 'Featured'}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {/* Sale badge */}
-                    {item.discounted && (
-                      <div className="absolute top-2 left-2 z-10">
-                        <span className="inline-block text-xs px-2 py-0.5 rounded"
-                              style={{ 
-                                backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : '#ef4444',
-                                color: isNeonTheme || isCyberpunk ? '#ef4444' : '#ffffff',
-                                border: isNeonTheme || isCyberpunk ? '1px solid #ef4444' : 'none',
-                                borderRadius: currentTheme.radius,
-                                fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                                            isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                                            currentTheme.font
-                              }}>
-                          {isNeonTheme ? '[ SALE ]' : isCyberpunk ? 'SALE' : 'Sale'}
-                        </span>
-                      </div>
-                    )}
                     
                     {/* Item image */}
                     <div 
