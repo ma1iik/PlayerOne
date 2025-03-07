@@ -6,6 +6,9 @@ const ThemeSettings = () => {
   const { currentTheme, setTheme, themes } = useContext(ThemeContext);
   const [activeTab, setActiveTab] = useState('themes');
 
+  const isNeonTheme = currentTheme.id.includes('neon');
+  const isCyberpunk = currentTheme.id === 'cyberpunk';
+
   const tabs = [
     { id: 'themes', label: 'Themes' },
     { id: 'preview', label: 'Preview' }
@@ -57,6 +60,16 @@ const ThemeSettings = () => {
     }
   };
 
+  // Get font styling based on theme
+  const getThemeFont = (theme) => {
+    if (theme.id.includes('neon')) {
+      return "'Orbitron', 'Rajdhani', sans-serif";
+    } else if (theme.id === 'cyberpunk') {
+      return "'Audiowide', 'Rajdhani', sans-serif";
+    }
+    return theme.font;
+  };
+
   return (
     <div className="rounded-xl p-6" style={{ 
       backgroundColor: currentTheme.bgSecondary,
@@ -65,13 +78,16 @@ const ThemeSettings = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h3 className={`text-xl font-bold flex items-center gap-2 ${
-          currentTheme.id.includes('neon') ? 'sl-glow-text' : ''
-        }`} style={{ color: currentTheme.textPrimary }}>
+          isNeonTheme ? 'sl-glow-text' : ''
+        }`} style={{ 
+          color: currentTheme.textPrimary,
+          fontFamily: getThemeFont(currentTheme)
+        }}>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83" />
           </svg>
           <span>
-            {currentTheme.id.includes('neon') ? 'APPEARANCE SETTINGS' : 'Appearance'}
+            {isNeonTheme ? 'APPEARANCE SETTINGS' : 'Appearance'}
           </span>
         </h3>
         <div className="flex gap-1">
@@ -79,18 +95,21 @@ const ThemeSettings = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 text-sm font-medium transition-colors`}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                isNeonTheme ? 'sl-glow-text' : ''
+              }`}
               style={{ 
                 backgroundColor: activeTab === tab.id ? currentTheme.primaryColor : currentTheme.bgTertiary,
                 color: activeTab === tab.id ? '#ffffff' : currentTheme.textSecondary,
-                borderRadius: currentTheme.radius
+                borderRadius: currentTheme.radius,
+                fontFamily: getThemeFont(currentTheme),
+                letterSpacing: isNeonTheme || isCyberpunk ? '0.05em' : 'normal'
               }}
             >
-              {currentTheme.id.includes('neon') ? (
-                <span className={activeTab === tab.id ? 'sl-glow-text' : ''}>{tab.label}</span>
-              ) : (
-                tab.label
-              )}
+            {isNeonTheme ? 
+              tab.label.toUpperCase() : 
+              tab.label
+            }
             </button>
           ))}
         </div>
@@ -102,6 +121,8 @@ const ThemeSettings = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.values(themes).map((theme) => {
               const themeStyle = getThemeCardStyle(theme);
+              const isThemeNeon = theme.id.includes('neon');
+              const isThemeCyberpunk = theme.id === 'cyberpunk';
               
               return (
                 <motion.div
@@ -154,8 +175,11 @@ const ThemeSettings = () => {
                     className={`p-3 flex justify-between items-center ${themeStyle.cardFooterClass}`}
                     style={{ backgroundColor: theme.cardBg }}
                   >
-                    <span className={themeStyle.nameClass} style={{ color: theme.textPrimary }}>
-                      {theme.id.includes('neon') 
+                    <span className={themeStyle.nameClass} style={{ 
+                      color: theme.textPrimary,
+                      fontFamily: getThemeFont(theme)
+                    }}>
+                      {isThemeNeon
                         ? `[ ${theme.name.toUpperCase()} ]` 
                         : theme.name}
                     </span>
@@ -187,67 +211,80 @@ const ThemeSettings = () => {
             borderRadius: currentTheme.radius,
             boxShadow: currentTheme.shadow
           }}>
-            <h4 className={`text-lg font-medium ${currentTheme.id.includes('neon') ? 'sl-glow-text selected' : ''}`}
-               style={{ color: currentTheme.textPrimary }}>
-              {currentTheme.id.includes('neon') ? '[ UI ELEMENTS ]' : 'UI Elements'}
+            <h4 className={`text-lg font-medium ${isNeonTheme ? 'sl-glow-text selected' : ''}`}
+               style={{ 
+                 color: currentTheme.textPrimary,
+                 fontFamily: getThemeFont(currentTheme)
+               }}>
+              {isNeonTheme ? '[ UI ELEMENTS ]' : 'UI Elements'}
             </h4>
             
             <div className="space-y-4">
               {/* Buttons */}
               <div>
-                <p className={`text-sm mb-2 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}
-                   style={{ color: currentTheme.id.includes('neon') ? currentTheme.textPrimary : currentTheme.textSecondary }}>
-                  Buttons
+                <p className={`text-sm mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                   style={{ 
+                     color: isNeonTheme ? currentTheme.textPrimary : currentTheme.textSecondary,
+                     fontFamily: getThemeFont(currentTheme)
+                   }}>
+                  {isNeonTheme ? '[ BUTTONS ]' : 'Buttons'}
                 </p>
                 <div className="flex flex-wrap gap-3">
                   <button 
-                    className={currentTheme.id.includes('neon') ? 'sl-glow-text px-4 py-2 border border-current' : 'px-4 py-2'}
+                    className={isNeonTheme ? 'sl-glow-text px-4 py-2 border border-current' : 'px-4 py-2'}
                     style={{ 
-                      backgroundColor: currentTheme.id.includes('neon') ? 'transparent' : currentTheme.primaryColor, 
-                      color: currentTheme.id.includes('neon') ? currentTheme.primaryColor : "#ffffff",
-                      borderRadius: currentTheme.radius
+                      backgroundColor: isNeonTheme ? 'transparent' : currentTheme.primaryColor, 
+                      color: isNeonTheme ? currentTheme.primaryColor : "#ffffff",
+                      borderRadius: currentTheme.radius,
+                      fontFamily: getThemeFont(currentTheme)
                     }}
                   >
-                    Primary
+                    {isNeonTheme ? '[ PRIMARY ]' : 'Primary'}
                   </button>
                   <button 
-                    className={currentTheme.id.includes('neon') ? 'sl-glow-text px-4 py-2 border border-current' : 'px-4 py-2'}
+                    className={isNeonTheme ? 'sl-glow-text px-4 py-2 border border-current' : 'px-4 py-2'}
                     style={{ 
-                      backgroundColor: currentTheme.id.includes('neon') ? 'transparent' : currentTheme.secondaryColor, 
-                      color: currentTheme.id.includes('neon') ? currentTheme.secondaryColor : "#ffffff",
-                      borderRadius: currentTheme.radius
+                      backgroundColor: isNeonTheme ? 'transparent' : currentTheme.secondaryColor, 
+                      color: isNeonTheme ? currentTheme.secondaryColor : "#ffffff",
+                      borderRadius: currentTheme.radius,
+                      fontFamily: getThemeFont(currentTheme)
                     }}
                   >
-                    Secondary
+                    {isNeonTheme ? '[ SECONDARY ]' : 'Secondary'}
                   </button>
                   <button 
-                    className={currentTheme.id.includes('neon') ? 'sl-glow-text px-4 py-2 border border-current' : 'px-4 py-2'}
+                    className={isNeonTheme ? 'sl-glow-text px-4 py-2 border border-current' : 'px-4 py-2'}
                     style={{ 
-                      backgroundColor: currentTheme.id.includes('neon') ? 'transparent' : currentTheme.accentColor, 
-                      color: currentTheme.id.includes('neon') ? currentTheme.accentColor : "#ffffff",
-                      borderRadius: currentTheme.radius
+                      backgroundColor: isNeonTheme ? 'transparent' : currentTheme.accentColor, 
+                      color: isNeonTheme ? currentTheme.accentColor : "#ffffff",
+                      borderRadius: currentTheme.radius,
+                      fontFamily: getThemeFont(currentTheme)
                     }}
                   >
-                    Accent
+                    {isNeonTheme ? '[ ACCENT ]' : 'Accent'}
                   </button>
                   <button 
                     className="px-4 py-2 font-medium transition-colors border"
                     style={{ 
                       borderColor: currentTheme.borderColor,
                       color: currentTheme.textPrimary,
-                      borderRadius: currentTheme.radius
+                      borderRadius: currentTheme.radius,
+                      fontFamily: getThemeFont(currentTheme)
                     }}
                   >
-                    Outline
+                    {isNeonTheme ? '[ OUTLINE ]' : 'Outline'}
                   </button>
                 </div>
               </div>
               
               {/* Cards */}
               <div>
-                <p className={`text-sm mb-2 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}
-                   style={{ color: currentTheme.id.includes('neon') ? currentTheme.textPrimary : currentTheme.textSecondary }}>
-                  Cards
+                <p className={`text-sm mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                   style={{ 
+                     color: isNeonTheme ? currentTheme.textPrimary : currentTheme.textSecondary,
+                     fontFamily: getThemeFont(currentTheme)
+                   }}>
+                  {isNeonTheme ? '[ CARDS ]' : 'Cards'}
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <div 
@@ -260,10 +297,14 @@ const ThemeSettings = () => {
                       border: `${currentTheme.borderWidth} solid ${currentTheme.borderColor}`
                     }}
                   >
-                    <h5 className={`font-medium mb-2 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}>
-                      {currentTheme.id.includes('neon') ? '[ CARD ]' : 'Card Title'}
+                    <h5 className={`font-medium mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                        style={{ fontFamily: getThemeFont(currentTheme) }}>
+                      {isNeonTheme ? '[ CARD ]' : 'Card Title'}
                     </h5>
-                    <p className="text-sm" style={{ color: currentTheme.textSecondary }}>
+                    <p className="text-sm" style={{ 
+                      color: currentTheme.textSecondary,
+                      fontFamily: getThemeFont(currentTheme)
+                    }}>
                       This is a sample card with some content.
                     </p>
                   </div>
@@ -277,13 +318,17 @@ const ThemeSettings = () => {
                       border: `${currentTheme.borderWidth} solid ${currentTheme.borderColor}`
                     }}
                   >
-                    <h5 className={`font-medium mb-2 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}>
-                      {currentTheme.id.includes('neon') ? '[ PROGRESS ]' : 'Progress'}
+                    <h5 className={`font-medium mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                        style={{ fontFamily: getThemeFont(currentTheme) }}>
+                      {isNeonTheme ? '[ PROGRESS ]' : 'Progress'}
                     </h5>
                     <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: currentTheme.bgPrimary }}>
                       <div className="h-full" style={{ width: '70%', backgroundColor: currentTheme.primaryColor }}></div>
                     </div>
-                    <p className="text-sm mt-2" style={{ color: currentTheme.textSecondary }}>
+                    <p className="text-sm mt-2" style={{ 
+                      color: currentTheme.textSecondary,
+                      fontFamily: getThemeFont(currentTheme)
+                    }}>
                       70% Complete
                     </p>
                   </div>
@@ -292,15 +337,21 @@ const ThemeSettings = () => {
               
               {/* Form Elements */}
               <div>
-                <p className={`text-sm mb-2 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}
-                   style={{ color: currentTheme.id.includes('neon') ? currentTheme.textPrimary : currentTheme.textSecondary }}>
-                  Form Elements
+                <p className={`text-sm mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                   style={{ 
+                     color: isNeonTheme ? currentTheme.textPrimary : currentTheme.textSecondary,
+                     fontFamily: getThemeFont(currentTheme)
+                   }}>
+                  {isNeonTheme ? '[ FORM ELEMENTS ]' : 'Form Elements'}
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <div className="w-64">
-                    <label className={`block text-sm mb-1 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}
-                           style={{ color: currentTheme.textPrimary }}>
-                      Input Field
+                    <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                           style={{ 
+                             color: currentTheme.textPrimary,
+                             fontFamily: getThemeFont(currentTheme)
+                           }}>
+                      {isNeonTheme ? '[ INPUT FIELD ]' : 'Input Field'}
                     </label>
                     <input
                       type="text"
@@ -312,14 +363,18 @@ const ThemeSettings = () => {
                         borderColor: currentTheme.inputBorder,
                         borderRadius: currentTheme.radius,
                         borderWidth: currentTheme.borderWidth,
-                        borderStyle: 'solid'
+                        borderStyle: 'solid',
+                        fontFamily: getThemeFont(currentTheme)
                       }}
                     />
                   </div>
                   <div className="w-64">
-                    <label className={`block text-sm mb-1 ${currentTheme.id.includes('neon') ? 'sl-glow-text' : ''}`}
-                           style={{ color: currentTheme.textPrimary }}>
-                      Select Element
+                    <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                           style={{ 
+                             color: currentTheme.textPrimary,
+                             fontFamily: getThemeFont(currentTheme)
+                           }}>
+                      {isNeonTheme ? '[ SELECT ELEMENT ]' : 'Select Element'}
                     </label>
                     <select
                       className="w-full px-4 py-2"
@@ -329,7 +384,8 @@ const ThemeSettings = () => {
                         borderColor: currentTheme.inputBorder,
                         borderRadius: currentTheme.radius,
                         borderWidth: currentTheme.borderWidth,
-                        borderStyle: 'solid'
+                        borderStyle: 'solid',
+                        fontFamily: getThemeFont(currentTheme)
                       }}
                     >
                       <option>Option 1</option>
@@ -341,13 +397,13 @@ const ThemeSettings = () => {
               </div>
 
               {/* Neon Theme Terminal Output */}
-              {currentTheme.id.includes('neon') && (
+              {isNeonTheme && (
                 <div className="mt-6 p-4" style={{ 
                   backgroundColor: 'rgba(0,0,0,0.3)', 
                   border: `1px solid ${currentTheme.borderColor}`,
                   borderRadius: currentTheme.radius
                 }}>
-                  <div className="font-mono text-sm space-y-2">
+                  <div className="font-mono text-sm space-y-2" style={{ fontFamily: getThemeFont(currentTheme) }}>
                     <p className="sl-glow-text selected" style={{ color: currentTheme.textPrimary }}>SYSTEM INITIALIZED</p>
                     <p style={{ color: currentTheme.textSecondary }}>&gt; Loading interface components...</p>
                     <p style={{ color: currentTheme.textSecondary }}>&gt; Connecting to visual subsystems...</p>
