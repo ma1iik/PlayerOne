@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { PlusIcon, MinusIcon, XIcon } from "@heroicons/react/outline";
 import ThemeContext from "../../context/ThemeContext";
-import { getRarityColor, getScanLineClass, getScanLineStyle } from "../../utils/shopUtils";
+import { getRarityColor, getScanLineClass, getScanLineStyle } from "../../utils/itemUtils.js";
 
 const CartItem = ({ item, updateQuantity, removeItem }) => {
   const { currentTheme } = useContext(ThemeContext);

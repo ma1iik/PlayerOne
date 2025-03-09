@@ -1,8 +1,15 @@
 import React from "react";
 import { motion } from "framer-motion";
 import ItemCard from "./ItemCard";
+import { PlusIcon } from "@heroicons/react/outline";
 
-const ItemGrid = ({ items, onSelectItem, viewMode }) => {
+const ItemGrid = ({ 
+  items, 
+  onSelectItem, 
+  viewMode,
+  mode = "shop", // "shop" or "inventory"
+  addToCart = null, // Only for shop mode
+}) => {
   if (viewMode !== "grid") return null;
 
   // Animation variants for container
@@ -32,22 +39,34 @@ const ItemGrid = ({ items, onSelectItem, viewMode }) => {
 
   return (
     <motion.div 
-      className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+      className={`grid grid-cols-2 ${mode === "shop" ? "sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5" : "md:grid-cols-3 lg:grid-cols-4"} gap-4`}
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
-      {items.map((item, index) => (
+      {items.map((item) => (
         <motion.div 
           key={item.id} 
           variants={itemVariants}
           layoutId={`item-${item.id}`}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.98 }}
         >
           <ItemCard 
             item={item} 
-            onSelectItem={onSelectItem} 
+            onClick={() => onSelectItem(item)}
+            mode={mode}
+            actionButton={
+              mode === "shop" ? (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToCart(item, 1);
+                  }}
+                  className="text-xs p-1 rounded"
+                >
+                  <PlusIcon className="w-4 h-4" />
+                </button>
+              ) : null
+            }
           />
         </motion.div>
       ))}

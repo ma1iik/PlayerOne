@@ -7,11 +7,16 @@ import {
   ViewListIcon,
 } from "@heroicons/react/outline";
 import ThemeContext from "../context/ThemeContext";
-import ItemGrid from "../components/inventory/ItemGrid";
-import ItemList from "../components/inventory/ItemList";
+import ItemGrid from "../components/shared/ItemGrid";
+import ItemList from "../components/shared/ItemList";
 import ItemDetail from "../components/inventory/ItemDetail";
-import FilterPanel from "../components/inventory/FilterPanel";
-import { sampleInventoryItems } from "../utils/inventoryUtils";
+import FilterPanel from "../components/shared/FilterPanel";
+import { sampleInventoryItems } from "../data/inventoryData";
+import { 
+  filterOptions, 
+  filterItems, 
+  sortItems 
+} from "../utils/itemUtils";
 
 const Inventory = () => {
   const { currentTheme } = useContext(ThemeContext);
@@ -19,7 +24,7 @@ const Inventory = () => {
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
   // State for view options, filters, sort and search
-  const [items, setItems] = useState(sampleInventoryItems);
+  const [items, setItems] = useState([]);
   const [viewMode, setViewMode] = useState("grid"); // "grid" or "list"
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,11 +37,10 @@ const Inventory = () => {
   const [sortOption, setSortOption] = useState({ field: "name", direction: "asc" });
   const [showFilters, setShowFilters] = useState(false);
 
-  // Filter options
-  const filterOptions = {
-    types: ["All", "Equipment", "Consumable", "Quest Item", "Special", "Material"],
-    rarities: ["All", "Common", "Uncommon", "Rare", "Epic", "Legendary"],
-  };
+  // Load sample inventory data
+  useEffect(() => {
+    setItems(sampleInventoryItems);
+  }, []);
 
   // Handle toggling item equip status
   const toggleEquip = (id) => {
@@ -45,50 +49,11 @@ const Inventory = () => {
     ));
   };
 
-  // Function to get filtered and sorted items
-  const getFilteredItems = () => {
-    return items
-      .filter(item => {
-        // Search filter
-        if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-          return false;
-        }
-        
-        // Type filter
-        if (activeFilters.type && activeFilters.type !== "All" && item.type !== activeFilters.type) {
-          return false;
-        }
-        
-        // Rarity filter
-        if (activeFilters.rarity && activeFilters.rarity !== "All" && item.rarity !== activeFilters.rarity) {
-          return false;
-        }
-        
-        // Equipped filter
-        if (activeFilters.showEquipped && !item.equipped) {
-          return false;
-        }
-        
-        return true;
-      })
-      .sort((a, b) => {
-        const fieldA = a[sortOption.field];
-        const fieldB = b[sortOption.field];
-        
-        if (typeof fieldA === 'string') {
-          return sortOption.direction === 'asc' 
-            ? fieldA.localeCompare(fieldB) 
-            : fieldB.localeCompare(fieldA);
-        } else {
-          return sortOption.direction === 'asc' 
-            ? fieldA - fieldB 
-            : fieldB - fieldA;
-        }
-      });
-  };
-
-  // Get filtered items
-  const filteredItems = getFilteredItems();
+  // Apply filters and sorting
+  const filteredItems = sortItems(
+    filterItems(items, activeFilters, searchQuery, "inventory"),
+    sortOption
+  );
 
   // Handle sort changes
   const handleSort = (field) => {
@@ -273,6 +238,7 @@ const Inventory = () => {
           handleSort={handleSort}
           resetFilters={resetFilters}
           filterOptions={filterOptions}
+          mode="inventory"
         />
         
         {/* Main Content Area */}
@@ -297,7 +263,8 @@ const Inventory = () => {
           <ItemGrid 
             items={filteredItems} 
             onSelectItem={handleSelectItem} 
-            viewMode={viewMode} 
+            viewMode={viewMode}
+            mode="inventory"
           />
           
           {/* List View */}
@@ -305,7 +272,8 @@ const Inventory = () => {
             items={filteredItems} 
             onSelectItem={handleSelectItem} 
             toggleEquip={toggleEquip} 
-            viewMode={viewMode} 
+            viewMode={viewMode}
+            mode="inventory"
           />
           
           {/* Empty State */}

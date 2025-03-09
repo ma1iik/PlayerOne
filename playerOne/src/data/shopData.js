@@ -1,50 +1,5 @@
-
-export const getRarityColor = (rarity) => {
-	switch(rarity) {
-	  case "Common": return "#9ca3af"; // gray-400
-	  case "Uncommon": return "#22c55e"; // green-500
-	  case "Rare": return "#3b82f6"; // blue-500
-	  case "Epic": return "#a855f7"; // purple-500
-	  case "Legendary": return "#f59e0b"; // amber-500
-	  default: return "#9ca3af"; // gray-400
-	}
-  };
-  
-  // Get scan line class (for neon themes)
-  export const getScanLineClass = (item, isNeonTheme) => {
-	if (!isNeonTheme) return '';
-	return 'sl-scan-line-custom';
-  };
-  
-  // Get custom scan line style for an item
-  export const getScanLineStyle = (item, isNeonTheme) => {
-	if (!isNeonTheme) return {};
-  
-	const rarityColor = getRarityColor(item.rarity);
-	return {
-	  '--scan-line-color': rarityColor
-	};
-  };
-  
-  // Filter options
-  export const filterOptions = {
-	types: ["All", "Weapon", "Armor", "Consumable", "Quest Item", "Special", "Material"],
-	rarities: ["All", "Common", "Uncommon", "Rare", "Epic", "Legendary"],
-  };
-  
-  // Categories for the shop items
-  export const categories = [
-	{ id: "all", name: "All Items" },
-	{ id: "weapons", name: "Weapons" },
-	{ id: "armor", name: "Armor" },
-	{ id: "potions", name: "Potions" },
-	{ id: "scrolls", name: "Scrolls" },
-	{ id: "materials", name: "Materials" },
-	{ id: "special", name: "Special Items" }
-  ];
-  
-  // Sample shop items data
-  export const sampleShopItems = [
+// Sample shop items data
+export const sampleShopItems = [
 	{ 
 	  id: 1, 
 	  name: "Health Potion", 

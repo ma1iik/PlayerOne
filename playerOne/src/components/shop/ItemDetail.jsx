@@ -8,7 +8,7 @@ import {
   ShoppingCartIcon 
 } from "@heroicons/react/outline";
 import ThemeContext from "../../context/ThemeContext";
-import { getRarityColor } from "../../utils/shopUtils";
+import { getRarityColor } from "../../utils/itemUtils.js";
 
 const ItemDetail = ({ 
   item, 

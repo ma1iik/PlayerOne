@@ -5,16 +5,23 @@ import {
   SearchIcon, 
   ViewGridIcon, 
   ViewListIcon,
-  ShoppingCartIcon
+  ShoppingCartIcon,
+  PlusIcon
 } from "@heroicons/react/outline";
 import ThemeContext from "../context/ThemeContext";
-import ItemGrid from "../components/shop/ItemGrid";
-import ItemList from "../components/shop/ItemList";
-import ItemDetail from "../components/shop/ItemDetail";
-import FilterPanel from "../components/shop/FilterPanel";
+import ItemGrid from "../components/shared/ItemGrid";
+import ItemList from "../components/shared/ItemList";
+import FilterPanel from "../components/shared/FilterPanel";
 import CategoryBar from "../components/shop/CategoryBar";
 import CartModal from "../components/shop/CartModal";
-import { sampleShopItems, filterOptions, categories } from "../utils/shopUtils";
+import ItemDetail from "../components/shop/ItemDetail";
+import { sampleShopItems } from "../data/shopData";
+import { 
+  filterOptions, 
+  shopCategories, 
+  filterItems, 
+  sortItems 
+} from "../utils/itemUtils";
 
 const Shop = () => {
   const { currentTheme } = useContext(ThemeContext);
@@ -36,7 +43,8 @@ const Shop = () => {
     maxPrice: 1000,
     type: "",
     rarity: "",
-    featured: false
+    featured: false,
+    category: "all"
   });
 
   // Initialize with sample shop items
@@ -86,60 +94,19 @@ const Shop = () => {
     return cart.reduce((count, item) => count + item.quantity, 0);
   };
 
-  // Filter items based on active filters
-  const getFilteredItems = () => {
-    return items
-      .filter(item => {
-        // Search filter
-        if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-          return false;
-        }
-        
-        // Category filter
-        if (activeCategory !== "all" && item.category !== activeCategory) {
-          return false;
-        }
-        
-        // Price range filter
-        if (item.price < activeFilters.minPrice || item.price > activeFilters.maxPrice) {
-          return false;
-        }
-        
-        // Type filter
-        if (activeFilters.type && activeFilters.type !== "All" && item.type !== activeFilters.type) {
-          return false;
-        }
-        
-        // Rarity filter
-        if (activeFilters.rarity && activeFilters.rarity !== "All" && item.rarity !== activeFilters.rarity) {
-          return false;
-        }
-        
-        // Featured filter
-        if (activeFilters.featured && !item.featured) {
-          return false;
-        }
-        
-        return true;
-      })
-      .sort((a, b) => {
-        const fieldA = a[sortOption.field];
-        const fieldB = b[sortOption.field];
-        
-        if (typeof fieldA === 'string') {
-          return sortOption.direction === 'asc' 
-            ? fieldA.localeCompare(fieldB) 
-            : fieldB.localeCompare(fieldA);
-        } else {
-          return sortOption.direction === 'asc' 
-            ? fieldA - fieldB 
-            : fieldB - fieldA;
-        }
-      });
-  };
-  
-  // Get filtered items
-  const filteredItems = getFilteredItems();
+  // Update category filter when changing category
+  useEffect(() => {
+    setActiveFilters({
+      ...activeFilters,
+      category: activeCategory
+    });
+  }, [activeCategory]);
+
+  // Apply filters and sorting
+  const filteredItems = sortItems(
+    filterItems(items, activeFilters, searchQuery, "shop"),
+    sortOption
+  );
 
   // Handle sort changes
   const handleSort = (field) => {
@@ -164,6 +131,11 @@ const Shop = () => {
       ...activeFilters,
       [filterType]: value
     });
+
+    // Update category if category filter changed
+    if (filterType === 'category') {
+      setActiveCategory(value);
+    }
   };
 
   // Reset filters
@@ -173,7 +145,8 @@ const Shop = () => {
       maxPrice: 1000,
       type: "",
       rarity: "",
-      featured: false
+      featured: false,
+      category: "all"
     });
     setSearchQuery("");
     setActiveCategory("all");
@@ -337,11 +310,12 @@ const Shop = () => {
           handleSort={handleSort}
           resetFilters={resetFilters}
           filterOptions={filterOptions}
+          mode="shop"
         />
         
         {/* Categories */}
         <CategoryBar 
-          categories={categories}
+          categories={shopCategories}
           activeCategory={activeCategory}
           setActiveCategory={setActiveCategory}
         />
@@ -370,6 +344,7 @@ const Shop = () => {
             viewMode={viewMode}
             onSelectItem={setSelectedItem}
             addToCart={addToCart}
+            mode="shop"
           />
           
           {/* List View */}
@@ -378,6 +353,7 @@ const Shop = () => {
             viewMode={viewMode}
             onSelectItem={setSelectedItem}
             addToCart={addToCart}
+            mode="shop"
           />
           
           {/* Empty state */}
@@ -426,13 +402,15 @@ const Shop = () => {
       </div>
       
       {/* Item Detail Modal */}
-      <ItemDetail
-        item={selectedItem}
-        onClose={() => setSelectedItem(null)}
-        addToCart={addToCart}
-        cartItems={cart}
-        setShowCart={setShowCart}
-      />
+      {selectedItem && (
+        <ItemDetail
+          item={selectedItem}
+          onClose={() => setSelectedItem(null)}
+          addToCart={addToCart}
+          cartItems={cart}
+          setShowCart={setShowCart}
+        />
+      )}
       
       {/* Shopping Cart Modal */}
       <CartModal

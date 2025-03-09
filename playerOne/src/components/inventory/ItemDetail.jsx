@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { motion } from "framer-motion";
 import { CogIcon, TrashIcon, XIcon, ExternalLinkIcon } from "@heroicons/react/outline";
 import ThemeContext from "../../context/ThemeContext";
-import { getRarityColor } from "../../utils/inventoryUtils";
+import { getRarityColor } from "../../utils/itemUtils.js";
 
 const ItemDetail = ({ item, onClose, toggleEquip }) => {
   if (!item) return null;

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { ArrowSmDownIcon, ArrowSmUpIcon } from "@heroicons/react/outline";
 import ThemeContext from "../../context/ThemeContext";
-import { getRarityColor } from "../../utils/shopUtils";
+import { getRarityColor } from "../../utils/itemUtils";
 
 const FilterPanel = ({ 
   showFilters, 
@@ -10,7 +10,8 @@ const FilterPanel = ({
   sortOption, 
   handleSort, 
   resetFilters,
-  filterOptions
+  filterOptions,
+  mode = "shop" // "shop" or "inventory"
 }) => {
   const { currentTheme } = useContext(ThemeContext);
   const isNeonTheme = currentTheme.id.includes('neon');
@@ -81,7 +82,7 @@ const FilterPanel = ({
       <div className="flex flex-wrap items-start gap-6">
         {/* Type filter */}
         <div>
-          <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
+          <label className={`block text-sm mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
                  style={{ 
                    color: currentTheme.textSecondary,
                    fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
@@ -106,7 +107,7 @@ const FilterPanel = ({
         
         {/* Rarity filter */}
         <div>
-          <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
+          <label className={`block text-sm mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
                  style={{ 
                    color: currentTheme.textSecondary,
                    fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
@@ -132,83 +133,109 @@ const FilterPanel = ({
           </div>
         </div>
         
-        {/* Price range filter */}
-        <div>
-          <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                 style={{ 
-                   color: currentTheme.textSecondary,
-                   fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                               isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                               currentTheme.font
-                 }}>
-            {isNeonTheme ? '[ PRICE RANGE ]' : isCyberpunk ? 'PRICE RANGE' : 'Price Range'}
-          </label>
-          <div className="flex items-center gap-2 mb-2">
-            <input
-              type="number"
-              min="0"
-              max="1000"
-              value={activeFilters.minPrice}
-              onChange={(e) => handleFilterChange('minPrice', parseInt(e.target.value))}
-              className={`w-20 px-2 py-1 text-sm ${isNeonTheme ? 'sl-glow-text' : ''}`}
-              style={{ 
-                backgroundColor: currentTheme.inputBg,
-                color: currentTheme.textPrimary,
-                borderColor: currentTheme.inputBorder,
-                borderRadius: currentTheme.radius,
-                border: `1px solid ${currentTheme.borderColor}`,
-                fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                            isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                            currentTheme.font
-              }}
-            />
-            <span style={{ color: currentTheme.textSecondary }}>to</span>
-            <input
-              type="number"
-              min="0"
-              max="1000"
-              value={activeFilters.maxPrice}
-              onChange={(e) => handleFilterChange('maxPrice', parseInt(e.target.value))}
-              className={`w-20 px-2 py-1 text-sm ${isNeonTheme ? 'sl-glow-text' : ''}`}
-              style={{ 
-                backgroundColor: currentTheme.inputBg,
-                color: currentTheme.textPrimary,
-                borderColor: currentTheme.inputBorder,
-                borderRadius: currentTheme.radius,
-                border: `1px solid ${currentTheme.borderColor}`,
-                fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                            isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                            currentTheme.font
-              }}
-            />
-          </div>
-        </div>
-        
-        {/* Featured filter */}
-        <div>
-          <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                 style={{ 
-                   color: currentTheme.textSecondary,
-                   fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                               isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                               currentTheme.font
-                 }}>
-            {isNeonTheme ? '[ OPTIONS ]' : isCyberpunk ? 'OPTIONS' : 'Options'}
-          </label>
+        {/* Mode-specific filters */}
+        {mode === "shop" ? (
+          <>
+            {/* Price range filter */}
+            <div>
+              <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                    style={{ 
+                      color: currentTheme.textSecondary,
+                      fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
+                                  isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
+                                  currentTheme.font
+                    }}>
+                {isNeonTheme ? '[ PRICE RANGE ]' : isCyberpunk ? 'PRICE RANGE' : 'Price Range'}
+              </label>
+              <div className="flex items-center gap-2 mb-2">
+                <input
+                  type="number"
+                  min="0"
+                  max="1000"
+                  value={activeFilters.minPrice}
+                  onChange={(e) => handleFilterChange('minPrice', parseInt(e.target.value) || 0)}
+                  className={`w-20 px-2 py-1 text-sm ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                  style={{ 
+                    backgroundColor: currentTheme.inputBg,
+                    color: currentTheme.textPrimary,
+                    borderColor: currentTheme.inputBorder,
+                    borderRadius: currentTheme.radius,
+                    border: `1px solid ${currentTheme.borderColor}`,
+                    fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
+                                isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
+                                currentTheme.font
+                  }}
+                />
+                <span style={{ color: currentTheme.textSecondary }}>to</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="1000"
+                  value={activeFilters.maxPrice}
+                  onChange={(e) => handleFilterChange('maxPrice', parseInt(e.target.value) || 0)}
+                  className={`w-20 px-2 py-1 text-sm ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                  style={{ 
+                    backgroundColor: currentTheme.inputBg,
+                    color: currentTheme.textPrimary,
+                    borderColor: currentTheme.inputBorder,
+                    borderRadius: currentTheme.radius,
+                    border: `1px solid ${currentTheme.borderColor}`,
+                    fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
+                                isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
+                                currentTheme.font
+                  }}
+                />
+              </div>
+            </div>
+            
+            {/* Featured filter */}
+            <div>
+              <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                    style={{ 
+                      color: currentTheme.textSecondary,
+                      fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
+                                  isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
+                                  currentTheme.font
+                    }}>
+                {isNeonTheme ? '[ OPTIONS ]' : isCyberpunk ? 'OPTIONS' : 'Options'}
+              </label>
+              <div>
+                <button
+                  onClick={() => handleFilterChange('featured', !activeFilters.featured)}
+                  className="px-3 py-1.5 text-sm transition-colors"
+                  style={getFilterButtonStyle(activeFilters.featured)}
+                >
+                  {isNeonTheme ? '[ FEATURED ONLY ]' : isCyberpunk ? 'FEATURED ONLY' : 'Featured Only'}
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
           <div>
-            <button
-              onClick={() => handleFilterChange('featured', !activeFilters.featured)}
-              className="px-3 py-1.5 text-sm transition-colors"
-              style={getFilterButtonStyle(activeFilters.featured)}
-            >
-              {isNeonTheme ? '[ FEATURED ONLY ]' : isCyberpunk ? 'FEATURED ONLY' : 'Featured Only'}
-            </button>
+            <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                   style={{ 
+                     color: currentTheme.textSecondary,
+                     fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
+                                 isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
+                                 currentTheme.font
+                   }}>
+              {isNeonTheme ? '[ STATUS ]' : isCyberpunk ? 'STATUS' : 'Status'}
+            </label>
+            <div>
+              <button
+                onClick={() => handleFilterChange('showEquipped', !activeFilters.showEquipped)}
+                className="px-3 py-1.5 text-sm transition-colors"
+                style={getFilterButtonStyle(activeFilters.showEquipped)}
+              >
+                {isNeonTheme ? '[ EQUIPPED ONLY ]' : isCyberpunk ? 'EQUIPPED ONLY' : 'Equipped Only'}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
         
         {/* Sort options */}
         <div>
-          <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
+          <label className={`block text-sm mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
                  style={{ 
                    color: currentTheme.textSecondary,
                    fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
@@ -220,8 +247,10 @@ const FilterPanel = ({
           <div className="flex flex-wrap gap-2">
             {[
               { field: 'name', label: 'Name' },
-              { field: 'price', label: 'Price' },
-              { field: 'rarity', label: 'Rarity' }
+              ...(mode === 'shop' 
+                ? [{ field: 'price', label: 'Price' }]
+                : [{ field: 'quantity', label: 'Quantity' }]),
+              { field: 'rarity', label: 'Rarity' },
             ].map(sort => (
               <button
                 key={sort.field}
