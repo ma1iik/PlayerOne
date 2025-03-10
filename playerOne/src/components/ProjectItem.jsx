@@ -1,99 +1,57 @@
 import React, { useContext } from "react";
+import { PencilIcon } from "@heroicons/react/outline";
 import ThemeContext from "../context/ThemeContext";
 
-const ProjectItem = ({ project }) => {
+const ProjectItem = ({ project, onEdit }) => {
   const { currentTheme } = useContext(ThemeContext);
-  const isNeonTheme = currentTheme.id.includes('neon');
-  const isCyberpunk = currentTheme.id === 'cyberpunk';
 
-  // Get difficulty level styling based on theme
+  // Get difficulty level styling with new design
   const getDifficultyStyle = () => {
-    if (isNeonTheme || isCyberpunk) {
-      return {
-        backgroundColor: 'transparent',
-        color: project.difficulty <= 2 
-          ? '#22c55e' // green for easy
-          : project.difficulty === 3 
-          ? '#eab308' // yellow for medium
-          : '#ef4444', // red for hard
-        border: `1px solid ${project.difficulty <= 2 
-          ? '#22c55e' // green for easy
-          : project.difficulty === 3 
-          ? '#eab308' // yellow for medium
-          : '#ef4444'}`, // red for hard
-        borderRadius: currentTheme.radius
-      };
-    }
+    // Map difficulty to emoji or text
+    const difficultyLabel = ["Easy", "Medium", "Hard", "Very Hard", "Epic"][project.difficulty - 1] || "Medium";
     
     return {
-      backgroundColor: project.difficulty <= 2 
-        ? 'rgba(34, 197, 94, 0.1)' // green bg for easy
-        : project.difficulty === 3 
-        ? 'rgba(234, 179, 8, 0.1)' // yellow bg for medium
-        : 'rgba(239, 68, 68, 0.1)', // red bg for hard
-      color: project.difficulty <= 2 
-        ? '#15803d' // green for easy
-        : project.difficulty === 3 
-        ? '#854d0e' // yellow for medium
-        : '#b91c1c', // red for hard
-      borderRadius: currentTheme.radius
-    };
+      1: { bg: "bg-green-50", text: "text-green-600" },
+      2: { bg: "bg-blue-50", text: "text-blue-600" },
+      3: { bg: "bg-yellow-50", text: "text-yellow-600" },
+      4: { bg: "bg-orange-50", text: "text-orange-600" },
+      5: { bg: "bg-red-50", text: "text-red-600" }
+    }[project.difficulty] || { bg: "bg-gray-50", text: "text-gray-600" };
   };
 
+  const difficultyStyle = getDifficultyStyle();
+
   return (
-    <div className={`p-3 rounded-lg transition-colors ${isNeonTheme ? 'sl-scan-line' : ''}`} 
-         style={{ 
-           borderRadius: currentTheme.radius,
-           backgroundColor: 'transparent',
-           border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.borderColor}` : 'none'
-         }}
-         onMouseEnter={(e) => {
-           e.currentTarget.style.backgroundColor = currentTheme.bgTertiary;
-         }}
-         onMouseLeave={(e) => {
-           e.currentTarget.style.backgroundColor = 'transparent';
-         }}>
-      <div className="flex justify-between items-center mb-2">
-        <span className={isNeonTheme ? 'sl-glow-text' : ''} 
-              style={{ 
-                color: currentTheme.textPrimary,
-                fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                           isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                           currentTheme.font
-              }}>
-          {isNeonTheme ? project.title.toUpperCase() : project.title}
-        </span>
-        <span className="text-sm px-2 py-1 rounded" style={getDifficultyStyle()}>
-          {isNeonTheme ? `[ LEVEL ${project.difficulty} ]` : `Level ${project.difficulty}`}
-        </span>
-      </div>
-      <div className="flex items-center gap-3">
-        <div className="flex-1 h-2 rounded-full" 
-             style={{ 
-               backgroundColor: isNeonTheme || isCyberpunk 
-                 ? 'rgba(255, 255, 255, 0.1)' // more subtle bg for neon/cyberpunk
-                 : currentTheme.bgTertiary,
-               borderRadius: currentTheme.radius,
-               overflow: 'hidden'
-             }}>
-          <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{ 
-              width: `${project.progress}%`,
-              backgroundColor: currentTheme.primaryColor,
-              boxShadow: isNeonTheme ? `0 0 10px ${currentTheme.primaryColor}` : 'none'
-            }}
-          />
+    <div className="group relative bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-start">
+        <div className="ml-1 flex-1">
+          <div className="flex items-center">
+            <h3 className="text-sm font-medium text-gray-900">{project.title}</h3>
+            <div className={`ml-2 px-2 py-0.5 rounded-md text-xs font-medium ${difficultyStyle.bg} ${difficultyStyle.text}`}>
+              Level {project.difficulty}
+            </div>
+          </div>
+          <div className="mt-2 flex items-center">
+            <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500 bg-purple-500"
+                style={{ width: `${project.progress}%` }}
+              />
+            </div>
+            <span className="ml-2 text-xs text-gray-500">{project.progress}%</span>
+          </div>
         </div>
-        <span className="text-sm" 
-              style={{ 
-                color: currentTheme.textSecondary,
-                fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                           isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                           currentTheme.font
-              }}>
-          {isNeonTheme ? `${project.progress}%` : `${project.progress}%`}
-        </span>
+        <div className="absolute right-3 top-3 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <button 
+            className="text-gray-400 hover:text-gray-500 p-1"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
+          >
+            <PencilIcon className="h-4 w-4" />
+          </button>
+        </div>
       </div>
     </div>
   );

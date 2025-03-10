@@ -1,106 +1,104 @@
 import React, { useContext } from "react";
+import { CalendarIcon, TagIcon, PencilIcon } from "@heroicons/react/outline";
 import ThemeContext from "../context/ThemeContext";
 
-const TaskItem = ({ task, onComplete }) => {
+const TaskItem = ({ task, onComplete, onEdit }) => {
   const { currentTheme } = useContext(ThemeContext);
-  const isNeonTheme = currentTheme.id.includes('neon');
-  const isCyberpunk = currentTheme.id === 'cyberpunk';
 
-  // Get difficulty color based on theme
-  const getDifficultyStyle = () => {
-    if (isNeonTheme || isCyberpunk) {
-      return {
-        backgroundColor: 'transparent',
-        color: task.difficulty === 1 
-          ? '#22c55e' // green for easy
-          : task.difficulty === 2 
-          ? '#eab308' // yellow for medium
-          : '#ef4444', // red for hard
-        border: `1px solid ${task.difficulty === 1 
-          ? '#22c55e' // green for easy
-          : task.difficulty === 2 
-          ? '#eab308' // yellow for medium
-          : '#ef4444'}`, // red for hard
-        borderRadius: currentTheme.radius
-      };
-    }
+  // Check if task is due soon
+  const isDueSoon = () => {
+    if (!task.due) return false;
+    const dueDate = new Date(task.due);
+    const today = new Date();
+    const diffTime = dueDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 2 && diffDays >= 0;
+  };
+
+  // Get border color based on priority/status
+  const getBorderColor = () => {
+    if (task.status === "Completed") return "border-green-400";
+    if (isDueSoon()) return "border-yellow-400";
+    if (task.difficulty === 3) return "border-red-400";
+    if (task.difficulty === 2) return "border-blue-400";
+    return "border-gray-200";
+  };
+
+  // Format the due date
+  const formatDueDate = () => {
+    if (!task.due) return "No due date";
     
-    return {
-      backgroundColor: task.difficulty === 1 
-        ? 'rgba(34, 197, 94, 0.1)' // green bg for easy
-        : task.difficulty === 2 
-        ? 'rgba(234, 179, 8, 0.1)' // yellow bg for medium
-        : 'rgba(239, 68, 68, 0.1)', // red bg for hard
-      color: task.difficulty === 1 
-        ? '#15803d' // green for easy
-        : task.difficulty === 2 
-        ? '#854d0e' // yellow for medium
-        : '#b91c1c', // red for hard
-      borderRadius: currentTheme.radius
-    };
+    const dueDate = new Date(task.due);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    if (dueDate.toDateString() === today.toDateString()) return "Today";
+    if (dueDate.toDateString() === tomorrow.toDateString()) return "Tomorrow";
+    
+    return dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
   return (
-    <div className={`p-3 rounded-lg transition-colors ${isNeonTheme ? 'sl-scan-line' : ''}`} 
-         style={{ 
-           borderRadius: currentTheme.radius,
-           backgroundColor: 'transparent',
-           border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.borderColor}` : 'none'
-         }}
-         onMouseEnter={(e) => {
-           e.currentTarget.style.backgroundColor = currentTheme.bgTertiary;
-         }}
-         onMouseLeave={(e) => {
-           e.currentTarget.style.backgroundColor = 'transparent';
-         }}>
-      <div className="flex justify-between items-center">
-        <span className={isNeonTheme ? 'sl-glow-text' : ''} 
-              style={{ 
-                color: currentTheme.textPrimary,
-                fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                           isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                           currentTheme.font
-              }}>
-          {isNeonTheme ? task.title.toUpperCase() : task.title}
-        </span>
-        <span className="text-sm px-2 py-1 rounded" 
-              style={getDifficultyStyle()}>
-          {isNeonTheme 
-            ? `[ ${["EASY", "MEDIUM", "HARD"][task.difficulty - 1]} ]` 
-            : ["Easy", "Medium", "Hard"][task.difficulty - 1]}
-        </span>
+    <div className={`group relative bg-white ${task.difficulty === 3 || isDueSoon() ? 'border-l-4' : 'border'} ${getBorderColor()} border-gray-200 rounded-lg px-4 py-3 shadow-sm hover:shadow-md transition-shadow`}>
+      <div className="flex items-start">
+        <div className="flex items-center h-5 mt-0.5">
+          <div 
+            className={`flex-shrink-0 w-5 h-5 rounded-md border-2 ${task.status === "Completed" ? "bg-green-500 border-green-500" : "border-gray-300 hover:border-purple-500"} cursor-pointer transition-colors`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onComplete(task.id);
+            }}
+          >
+            {task.status === "Completed" && (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+        </div>
+        <div className="ml-3 flex-1">
+          <div className="flex items-center">
+            <h3 className={`text-sm font-medium ${task.status === "Completed" ? "text-gray-500 line-through" : "text-gray-900"}`}>
+              {task.title}
+            </h3>
+            {isDueSoon() && (
+              <div className="ml-2 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded-md font-medium">
+                Due soon
+              </div>
+            )}
+          </div>
+          {task.description && (
+            <p className={`text-xs ${task.status === "Completed" ? "text-gray-400" : "text-gray-500"} mt-1`}>
+              {task.description}
+            </p>
+          )}
+          <div className="flex items-center mt-1.5">
+            <div className="flex items-center text-xs">
+              <span className="bg-purple-50 text-purple-500 rounded-md px-1.5 py-0.5 font-medium">
+                {task.recurrence}
+              </span>
+            </div>
+            {task.due && (
+              <div className="flex items-center ml-3">
+                <CalendarIcon className="h-3 w-3 text-gray-400" />
+                <span className="text-xs text-gray-500 ml-1">{formatDueDate()}</span>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="absolute right-3 top-3 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <button 
+            className="text-gray-400 hover:text-gray-500 p-1"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
+          >
+            <PencilIcon className="h-4 w-4" />
+          </button>
+        </div>
       </div>
-      <div className="mt-2 flex justify-between items-center text-sm">
-        <span style={{ 
-          color: currentTheme.textSecondary,
-          fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                     isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                     currentTheme.font
-        }}>
-          {isNeonTheme ? task.recurrence.toUpperCase() : task.recurrence}
-        </span>
-        <span style={{ 
-          color: currentTheme.textSecondary,
-          fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                     isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                     currentTheme.font
-        }}>
-          {isNeonTheme ? `DUE ${task.due}` : `Due ${task.due}`}
-        </span>
-      </div>
-      <button
-        onClick={() => onComplete(task.id)}
-        className={`mt-2 hover:text-opacity-80 transition-colors ${isNeonTheme ? 'sl-glow-text' : ''}`}
-        style={{ 
-          color: currentTheme.primaryColor,
-          fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                     isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                     currentTheme.font,
-          textShadow: isNeonTheme ? `0 0 5px ${currentTheme.primaryColor}` : 'none'
-        }}
-      >
-        {isNeonTheme ? "[ COMPLETE ]" : "Complete"}
-      </button>
     </div>
   );
 };
