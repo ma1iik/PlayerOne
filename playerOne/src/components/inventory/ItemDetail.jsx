@@ -39,6 +39,12 @@ const ItemDetail = ({ item, onClose, toggleEquip }) => {
     }
   };
 
+  // New function to handle equipping and closing
+  const handleEquipAndClose = (id) => {
+    toggleEquip(id);
+    onClose();
+  };
+
   return (
     <motion.div 
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75 backdrop-blur-sm"
@@ -238,7 +244,7 @@ const ItemDetail = ({ item, onClose, toggleEquip }) => {
           {/* Action buttons */}
           <div className="space-y-3 mt-6">
             <button
-              onClick={() => toggleEquip(item.id)}
+              onClick={() => handleEquipAndClose(item.id)}
               className={`w-full py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors ${isNeonTheme ? 'sl-glow-text' : ''}`}
               style={{ 
                 backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.primaryColor,

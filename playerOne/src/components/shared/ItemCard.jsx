@@ -67,7 +67,7 @@ const ItemCard = ({
       );
     } else {
       return (
-        <div className="mt-2 flex justify-between items-center">
+        <div className="mt-2 flex justify-between items-center h-6">
           {item.equipped && (
             <span className="text-xs py-1 px-2 rounded" 
                   style={{ 
@@ -112,7 +112,7 @@ const ItemCard = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
-      className={`cursor-pointer transition-all duration-200 ${getScanLineClass(item, isNeonTheme)}`}
+      className={`h-full cursor-pointer transition-all duration-200 ${getScanLineClass(item, isNeonTheme)}`}
       style={{
         ...getItemCardStyle(),
         ...getScanLineStyle(item, isNeonTheme)
@@ -121,7 +121,7 @@ const ItemCard = ({
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
-      <div className="p-4 flex flex-col">
+      <div className="p-4 flex flex-col h-full">
         {/* Item image */}
         <div 
           className="w-full aspect-square flex items-center justify-center mb-3 relative" 
