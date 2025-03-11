@@ -2,6 +2,31 @@ import React, { useContext } from "react";
 import { PencilIcon } from "@heroicons/react/outline";
 import ThemeContext from "../context/ThemeContext";
 
+// Dynamic Segmented Progress Bar Component
+const SegmentedProgressBar = ({ project }) => {
+  // If project has subtasks property, use that length, otherwise default to 5
+  const totalSegments = project.subtasks?.length || 5;
+  
+  // Calculate how many segments should be filled based on progress percentage
+  // and the total number of segments
+  const completedSubtasks = Math.round((project.progress / 100) * totalSegments);
+  
+  return (
+    <div className="flex gap-0.5 w-full h-2 mt-2">
+      {Array.from({ length: totalSegments }).map((_, index) => (
+        <div 
+          key={index}
+          className={`flex-1 transition-colors ${
+            index < completedSubtasks 
+              ? 'bg-purple-500' 
+              : 'bg-gray-200'
+          }`}
+        ></div>
+      ))}
+    </div>
+  );
+};
+
 const ProjectItem = ({ project, onEdit }) => {
   const { currentTheme } = useContext(ThemeContext);
 
@@ -21,6 +46,10 @@ const ProjectItem = ({ project, onEdit }) => {
 
   const difficultyStyle = getDifficultyStyle();
 
+  // Get number of completed subtasks and total subtasks
+  const totalSubtasks = project.subtasks?.length || 5;
+  const completedSubtasks = Math.round((project.progress / 100) * totalSubtasks);
+
   return (
     <div className="group relative bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-start">
@@ -31,14 +60,15 @@ const ProjectItem = ({ project, onEdit }) => {
               Level {project.difficulty}
             </div>
           </div>
-          <div className="mt-2 flex items-center">
-            <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-500 bg-purple-500"
-                style={{ width: `${project.progress}%` }}
-              />
+          <div className="mt-2">
+            {/* Dynamic segmented progress bar */}
+            <SegmentedProgressBar project={project} />
+            <div className="flex justify-between mt-1">
+              <span className="text-xs text-gray-500">
+                {completedSubtasks}/{totalSubtasks} subtasks
+              </span>
+              <span className="text-xs font-medium text-purple-600">{project.progress}%</span>
             </div>
-            <span className="ml-2 text-xs text-gray-500">{project.progress}%</span>
           </div>
         </div>
         <div className="absolute right-3 top-3 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">

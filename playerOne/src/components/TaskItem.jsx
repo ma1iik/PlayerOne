@@ -40,11 +40,11 @@ const TaskItem = ({ task, onComplete, onEdit }) => {
   };
 
   return (
-    <div className={`group relative bg-white ${task.difficulty === 3 || isDueSoon() ? 'border-l-4' : 'border'} ${getBorderColor()} border-gray-200 rounded-lg px-4 py-3 shadow-sm hover:shadow-md transition-shadow`}>
+    <div className={`group relative bg-white ${task.difficulty === 3 || isDueSoon() ? 'border-l-4' : 'border'} ${getBorderColor()} border-gray-200 rounded-sm px-4 py-3 shadow-sm hover:shadow-md transition-shadow`}>
       <div className="flex items-start">
         <div className="flex items-center h-5 mt-0.5">
           <div 
-            className={`flex-shrink-0 w-5 h-5 rounded-md border-2 ${task.status === "Completed" ? "bg-green-500 border-green-500" : "border-gray-300 hover:border-purple-500"} cursor-pointer transition-colors`}
+            className={`flex-shrink-0 w-5 h-5 rounded-sm border-2 ${task.status === "Completed" ? "bg-green-500 border-green-500" : "border-gray-300 hover:border-purple-500"} cursor-pointer transition-colors`}
             onClick={(e) => {
               e.stopPropagation();
               onComplete(task.id);
@@ -63,7 +63,7 @@ const TaskItem = ({ task, onComplete, onEdit }) => {
               {task.title}
             </h3>
             {isDueSoon() && (
-              <div className="ml-2 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded-md font-medium">
+              <div className="ml-2 px-1.5 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded-sm font-medium">
                 Due soon
               </div>
             )}
@@ -75,7 +75,7 @@ const TaskItem = ({ task, onComplete, onEdit }) => {
           )}
           <div className="flex items-center mt-1.5">
             <div className="flex items-center text-xs">
-              <span className="bg-purple-50 text-purple-500 rounded-md px-1.5 py-0.5 font-medium">
+              <span className="bg-purple-50 text-purple-500 rounded-sm px-1.5 py-0.5 font-medium">
                 {task.recurrence}
               </span>
             </div>
