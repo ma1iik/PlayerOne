@@ -1,46 +1,67 @@
 import React, { createContext, useState, useEffect } from "react";
 
 export const THEMES = {
-  DARK: {
-    id: "dark",
-    name: "Dark Mode",
-    primaryColor: "#6d28d9",
-    secondaryColor: "#8b5cf6",
-    accentColor: "#38bdf8", 
-    bgPrimary: "#0f172a", 
-    bgSecondary: "#1e293b", 
-    bgTertiary: "#334155", 
-    textPrimary: "#f8fafc", 
-    textSecondary: "#cbd5e1", 
-    borderColor: "#334155", 
-    cardBg: "#1e293b", 
-    inputBg: "#0f172a", 
-    inputBorder: "#334155", 
-    shadowColor: "rgba(15, 23, 42, 0.7)", 
-    radius: "0.5rem", 
-    borderWidth: "1px",
-    shadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    font: "'Inter', sans-serif"
-  },
   LIGHT: {
     id: "light",
     name: "Light Mode",
-    primaryColor: "#3b82f6", // blue-500
-    secondaryColor: "#60a5fa", // blue-400
-    accentColor: "#2563eb", // blue-600
+    primaryColor: "#6d28d9", // purple-600
+    secondaryColor: "#8b5cf6", // purple-500
+    accentColor: "#38bdf8", // blue-400
     bgPrimary: "#f9fafb", // gray-50 (main background)
-    bgSecondary: "#ffffff", // white (card backgrounds)
-    bgTertiary: "#f3f4f6", // gray-100 (hover states)
+    bgSecondary: "#ffffff", // white (card/panel backgrounds)
+    bgTertiary: "#f3f4f6", // gray-100 (hover states, secondary elements)
     textPrimary: "#1f2937", // gray-800
     textSecondary: "#6b7280", // gray-500
-    borderColor: "#e5e7eb", // gray-200 - matching the task borders
+    borderColor: "#e5e7eb", // gray-200
     cardBg: "#ffffff", // white
     inputBg: "#f9fafb", // gray-50
     inputBorder: "#e5e7eb", // gray-200
     shadowColor: "rgba(0, 0, 0, 0.05)",
-    radius: "0.5rem",
+    radius: "0.375rem", // Slightly more rounded corners
     borderWidth: "1px",
-    shadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+    shadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
+    font: "'Inter', sans-serif"
+  },
+  DARK: {
+    id: "dark",
+    name: "Dark Mode",
+    primaryColor: "#8b5cf6", // purple-500
+    secondaryColor: "#a78bfa", // purple-400
+    accentColor: "#38bdf8", // blue-400
+    bgPrimary: "#1f2937", // gray-800 (main background)
+    bgSecondary: "#111827", // gray-900 (card/panel backgrounds)
+    bgTertiary: "#374151", // gray-700 (hover states, secondary elements)
+    textPrimary: "#f9fafb", // gray-50
+    textSecondary: "#d1d5db", // gray-300
+    borderColor: "#374151", // gray-700
+    cardBg: "#111827", // gray-900
+    inputBg: "#1f2937", // gray-800
+    inputBorder: "#374151", // gray-700
+    shadowColor: "rgba(0, 0, 0, 0.3)",
+    radius: "0.375rem", // Slightly more rounded corners
+    borderWidth: "1px",
+    shadow: "0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.1)",
+    font: "'Inter', sans-serif"
+  },
+  DARK_DEEP: {
+    id: "dark-deep",
+    name: "Deep Dark",
+    primaryColor: "#7c3aed", // violet-600
+    secondaryColor: "#6d28d9", // violet-700
+    accentColor: "#60a5fa", // blue-400
+    bgPrimary: "#0f172a", // slate-900 (main background)
+    bgSecondary: "#1e293b", // slate-800 (card/panel backgrounds)
+    bgTertiary: "#334155", // slate-700 (hover states, secondary elements)
+    textPrimary: "#f8fafc", // slate-50
+    textSecondary: "#cbd5e1", // slate-300
+    borderColor: "#334155", // slate-700
+    cardBg: "#1e293b", // slate-800
+    inputBg: "#0f172a", // slate-900
+    inputBorder: "#334155", // slate-700
+    shadowColor: "rgba(15, 23, 42, 0.7)", // slate-900 with alpha
+    radius: "0.375rem", // Slightly more rounded corners
+    borderWidth: "1px",
+    shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
     font: "'Inter', sans-serif"
   },
   NEON_VIOLET: {
@@ -111,7 +132,7 @@ export const THEMES = {
 export const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [currentTheme, setCurrentTheme] = useState(THEMES.DARK);
+  const [currentTheme, setCurrentTheme] = useState(THEMES.LIGHT);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {

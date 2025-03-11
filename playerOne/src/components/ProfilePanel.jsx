@@ -30,15 +30,15 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
       >
         <div className="p-6 h-full flex flex-col">
           <div className="flex flex-col items-center">
-            {/* Avatar */}
+            {/* Avatar with pixel-style border */}
             <div className="mb-4 relative">
               <img
                 src={profile.avatar || "https://via.placeholder.com/150?text=Avatar"}
                 alt="Profile"
-                className="w-24 h-24 object-cover rounded-full border-2 border-purple-100 shadow-sm"
+                className="w-24 h-24 object-cover rounded-sm border-2 border-purple-100 shadow-sm"
               />
-              {/* Level badge */}
-              <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">
+              {/* Pixel-styled level badge */}
+              <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold px-2 py-1 rounded-sm shadow-sm">
                 LVL {profile.level}
               </div>
             </div>
@@ -51,10 +51,10 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
               {profile.role}
             </p>
 
-            {/* Daily Check-in Button */}
+            {/* Daily Check-in Button with pixel-style */}
             <div className="w-full mb-6">
               <button 
-                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg ${
+                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-sm ${
                   hasCheckedIn 
                     ? 'bg-green-50 text-green-600 border border-green-200' 
                     : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white'
@@ -72,16 +72,16 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
               </button>
             </div>
 
-            {/* Stats section */}
+            {/* Stats section with pixel-style cards */}
             <div className="w-full space-y-5">
               {/* Today's Progress */}
-              <div className="bg-purple-50 rounded-lg p-4">
+              <div className="bg-purple-50 rounded-sm p-4">
                 <h3 className="text-sm font-semibold text-purple-700 mb-2 flex items-center">
                   <span role="img" aria-label="Today" className="mr-2">📅</span>
                   Today's Progress
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white p-2 rounded-md shadow-sm flex items-center justify-between">
+                  <div className="bg-white p-2 rounded-sm shadow-sm flex items-center justify-between">
                     <div className="flex items-center">
                       <span role="img" aria-label="Tasks" className="mr-2">✅</span>
                       <span className="text-xs text-gray-500">Tasks</span>
@@ -90,7 +90,7 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                       {dailyStats.tasksCompleted}/{dailyStats.totalTasks}
                     </span>
                   </div>
-                  <div className="bg-white p-2 rounded-md shadow-sm flex items-center justify-between">
+                  <div className="bg-white p-2 rounded-sm shadow-sm flex items-center justify-between">
                     <div className="flex items-center">
                       <span role="img" aria-label="Coins" className="mr-2">🪙</span>
                       <span className="text-xs text-gray-500">Earned</span>
@@ -102,7 +102,7 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                 </div>
               </div>
 
-              {/* Level and XP */}
+              {/* Level and XP with pixel-style progress bar */}
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-600 font-medium flex items-center">
@@ -113,7 +113,7 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                     {profile.xp}/{profile.maxXP} XP
                   </span>
                 </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-3 bg-gray-100 rounded-sm overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-purple-600 to-indigo-600 transition-all duration-500"
                     style={{ width: `${(profile.xp / profile.maxXP) * 100}%` }}
@@ -124,35 +124,35 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                 </div>
               </div>
 
-              {/* Stats Grid - IMPROVED STYLING HERE */}
+              {/* Stats Grid with pixel-style cards */}
               <div className="grid grid-cols-3 gap-3">
-                <div className="p-3 bg-amber-50 rounded-lg col-span-1 flex flex-col items-center">
+                <div className="p-3 bg-amber-50 rounded-sm col-span-1 flex flex-col items-center">
                   <div className="text-2xl mb-1">⚡</div>
                   <p className="text-xs font-medium text-amber-700 mb-1">Energy</p>
                   <p className="text-xl font-semibold text-amber-700">{profile.energy}%</p>
                 </div>
-                <div className="p-3 bg-red-50 rounded-lg col-span-1 flex flex-col items-center">
+                <div className="p-3 bg-red-50 rounded-sm col-span-1 flex flex-col items-center">
                   <div className="text-2xl mb-1">🔥</div>
                   <p className="text-xs font-medium text-red-700 mb-1">Streak</p>
                   <p className="text-xl font-semibold text-red-700">{profile.streak}</p>
                 </div>
-                <div className="p-3 bg-blue-50 rounded-lg col-span-1 flex flex-col items-center">
+                <div className="p-3 bg-blue-50 rounded-sm col-span-1 flex flex-col items-center">
                   <div className="text-2xl mb-1">📋</div>
                   <p className="text-xs font-medium text-blue-700 mb-1">Tasks</p>
                   <p className="text-xl font-semibold text-blue-700">{profile.completedTasks}</p>
                 </div>
               </div>
               
-              {/* Currency display */}
+              {/* Currency display with pixel-style */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-gray-50 rounded-lg flex items-center justify-between">
+                <div className="p-3 bg-gray-50 rounded-sm flex items-center justify-between">
                   <div className="flex items-center">
                     <span role="img" aria-label="Coin" className="mr-2">🪙</span>
                     <p className="text-xs text-gray-500">Coins</p>
                   </div>
                   <p className="text-md font-semibold text-gray-700">1,250</p>
                 </div>
-                <div className="p-3 bg-gray-50 rounded-lg flex items-center justify-between">
+                <div className="p-3 bg-gray-50 rounded-sm flex items-center justify-between">
                   <div className="flex items-center">
                     <span role="img" aria-label="Gem" className="mr-2">💎</span>
                     <p className="text-xs text-gray-500">Gems</p>
@@ -161,8 +161,8 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                 </div>
               </div>
               
-              {/* Current Character Class */}
-              <div className="p-3 bg-indigo-50 rounded-lg flex items-center justify-between">
+              {/* Current Character Class with pixel-style */}
+              <div className="p-3 bg-indigo-50 rounded-sm flex items-center justify-between">
                 <div className="flex items-center">
                   <span role="img" aria-label="Character" className="text-2xl mr-3">🧙‍♀️</span>
                   <div>
@@ -170,7 +170,7 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                     <p className="text-sm font-semibold text-indigo-700">Master Developer</p>
                   </div>
                 </div>
-                <span className="text-xs py-1 px-2 bg-indigo-200 text-indigo-800 rounded-full">
+                <span className="text-xs py-1 px-2 bg-indigo-200 text-indigo-800 rounded-sm">
                   +15% XP
                 </span>
               </div>
@@ -178,11 +178,11 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
           </div>
         </div>
 
-        {/* Toggle Button in the top-right corner - only visible when expanded */}
+        {/* Pixel-styled toggle button */}
         {!isCollapsed && (
           <button
             onClick={toggleCollapse}
-            className="absolute top-2 right-2 p-2 rounded-full border border-gray-200 shadow-sm bg-white hover:bg-gray-50 transition-colors"
+            className="absolute top-2 right-2 p-2 rounded-sm border border-gray-200 shadow-sm bg-white hover:bg-gray-50 transition-colors"
           >
             <ChevronLeftIcon className="w-5 h-5 text-gray-500" />
           </button>

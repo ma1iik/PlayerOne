@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
-import { ThemeContext } from '../context/ThemeContext';
+import ThemeContext from '../context/ThemeContext';
 
 const ThemeSettings = () => {
   const { currentTheme, setTheme, themes } = useContext(ThemeContext);
@@ -14,52 +14,6 @@ const ThemeSettings = () => {
     { id: 'preview', label: 'Preview' }
   ];
 
-  // Map each theme to its specific styling for the theme card
-  const getThemeCardStyle = (theme) => {
-    switch(theme.id) {
-      case 'neon-violet':
-        return {
-          cardWrapperClass: 'sl-scan-line',
-          cardHeaderClass: 'border-b border-purple-600',
-          cardFooterClass: 'border-t border-purple-600 bg-opacity-30 bg-purple-900',
-          nameClass: 'sl-glow-text font-orbitron tracking-wide',
-          previewClass: 'border border-purple-600',
-          activeIndicatorClass: 'bg-purple-700',
-          cardShadow: '0 0 15px rgba(126, 34, 206, 0.5)'
-        };
-      case 'neon-orange':
-        return {
-          cardWrapperClass: 'sl-scan-line',
-          cardHeaderClass: 'border-b border-orange-500',
-          cardFooterClass: 'border-t border-orange-500 bg-opacity-30 bg-orange-900',
-          nameClass: 'sl-glow-text font-orbitron tracking-wide',
-          previewClass: 'border border-orange-500',
-          activeIndicatorClass: 'bg-orange-600',
-          cardShadow: '0 0 15px rgba(245, 158, 11, 0.5)'
-        };
-      case 'cyberpunk':
-        return {
-          cardWrapperClass: '',
-          cardHeaderClass: 'border-b border-red-500',
-          cardFooterClass: 'border-t border-red-500 bg-opacity-30 bg-gray-900',
-          nameClass: 'font-audiowide tracking-wide',
-          previewClass: 'border border-red-500',
-          activeIndicatorClass: 'bg-red-500',
-          cardShadow: '0 0 15px rgba(244, 63, 94, 0.5)'
-        };
-      default:
-        return {
-          cardWrapperClass: '',
-          cardHeaderClass: '',
-          cardFooterClass: '',
-          nameClass: 'font-medium',
-          previewClass: '',
-          activeIndicatorClass: 'bg-primary',
-          cardShadow: ''
-        };
-    }
-  };
-
   // Get font styling based on theme
   const getThemeFont = (theme) => {
     if (theme.id.includes('neon')) {
@@ -70,352 +24,435 @@ const ThemeSettings = () => {
     return theme.font;
   };
 
+  // Generate the color pill component for theme cards
+  const ColorPill = ({ color, label }) => (
+    <div className="flex items-center gap-1.5">
+      <div 
+        className="w-3 h-3 rounded-full" 
+        style={{ backgroundColor: color }}
+      />
+      <span className="text-xs" style={{ color: currentTheme.textSecondary }}>{label}</span>
+    </div>
+  );
+
   return (
-    <div className="rounded-xl p-6" style={{ 
+    <div className="rounded-lg overflow-hidden" style={{ 
       backgroundColor: currentTheme.bgSecondary,
-      borderRadius: currentTheme.radius 
+      borderRadius: currentTheme.radius,
+      boxShadow: currentTheme.shadow,
+      border: `${currentTheme.borderWidth} solid ${currentTheme.borderColor}`
     }}>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h3 className={`text-xl font-bold flex items-center gap-2 ${
-          isNeonTheme ? 'sl-glow-text' : ''
-        }`} style={{ 
-          color: currentTheme.textPrimary,
-          fontFamily: getThemeFont(currentTheme)
-        }}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83" />
+      {/* Header with tabs */}
+      <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: currentTheme.borderColor }}>
+        <h3 className="text-lg font-semibold flex items-center gap-2" style={{ color: currentTheme.textPrimary }}>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
           </svg>
-          <span>
-            {isNeonTheme ? 'APPEARANCE SETTINGS' : 'Appearance'}
-          </span>
+          {isNeonTheme ? 'APPEARANCE' : 'Appearance'}
         </h3>
-        <div className="flex gap-1">
+        
+        <div className="flex p-1 bg-gray-100 rounded-lg" style={{ 
+          backgroundColor: currentTheme.bgTertiary,
+          borderRadius: currentTheme.radius
+        }}>
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 text-sm font-medium transition-colors ${
-                isNeonTheme ? 'sl-glow-text' : ''
-              }`}
+              className="px-3 py-1.5 text-sm font-medium transition-colors"
               style={{ 
-                backgroundColor: activeTab === tab.id ? currentTheme.primaryColor : currentTheme.bgTertiary,
-                color: activeTab === tab.id ? '#ffffff' : currentTheme.textSecondary,
-                borderRadius: currentTheme.radius,
-                fontFamily: getThemeFont(currentTheme),
-                letterSpacing: isNeonTheme || isCyberpunk ? '0.05em' : 'normal'
+                backgroundColor: activeTab === tab.id ? currentTheme.bgSecondary : 'transparent',
+                color: activeTab === tab.id ? currentTheme.textPrimary : currentTheme.textSecondary,
+                borderRadius: `calc(${currentTheme.radius} - 2px)`,
+                boxShadow: activeTab === tab.id ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
               }}
             >
-            {isNeonTheme ? 
-              tab.label.toUpperCase() : 
-              tab.label
-            }
+              {isNeonTheme ? tab.label.toUpperCase() : tab.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Themes Tab */}
-      {activeTab === 'themes' && (
-        <div className="space-y-6">
+      {/* Content area */}
+      <div className="p-4">
+        {activeTab === 'themes' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.values(themes).map((theme) => {
-              const themeStyle = getThemeCardStyle(theme);
+              const isActive = currentTheme.id === theme.id;
               const isThemeNeon = theme.id.includes('neon');
               const isThemeCyberpunk = theme.id === 'cyberpunk';
               
               return (
                 <motion.div
                   key={theme.id}
-                  className={`relative overflow-hidden cursor-pointer group transition-all duration-200 ${
-                    currentTheme.id === theme.id ? 'ring-2' : ''
-                  } ${themeStyle.cardWrapperClass}`}
+                  className="relative overflow-hidden cursor-pointer transition-all duration-200"
                   style={{ 
                     borderRadius: theme.radius,
-                    boxShadow: currentTheme.id === theme.id ? themeStyle.cardShadow : 'none',
-                    ringColor: theme.primaryColor
+                    border: `1px solid ${isActive ? theme.primaryColor : currentTheme.borderColor}`,
+                    backgroundColor: isActive ? `${theme.primaryColor}10` : currentTheme.bgSecondary,
+                    boxShadow: isActive ? `0 0 0 1px ${theme.primaryColor}40` : currentTheme.shadow
                   }}
                   onClick={() => setTheme(theme.id)}
-                  whileHover={{ scale: 1.01 }}
+                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   {/* Theme Preview */}
-                  <div 
-                    className={`h-28 ${themeStyle.previewClass}`} 
-                    style={{ backgroundColor: theme.bgPrimary }}
-                  >
-                    <div className="flex h-full w-full">
-                      <div className="w-2/3 flex flex-col">
-                        <div className="flex-1 flex">
-                          <div className="w-1/2 p-2">
-                            <div className="h-full w-full rounded-sm" style={{ 
-                              backgroundColor: theme.bgSecondary,
-                              borderRadius: theme.radius
-                            }}></div>
-                          </div>
-                          <div className="w-1/2 p-2">
-                            <div className="h-full w-full rounded-sm" style={{ 
-                              backgroundColor: theme.bgTertiary,
-                              borderRadius: theme.radius
-                            }}></div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="w-1/3 p-2 flex flex-col justify-around">
-                        <div className="h-4 w-full rounded-sm" style={{ 
-                          backgroundColor: theme.accentColor,
-                          borderRadius: theme.radius
-                        }}></div>
-                      </div>
+                  <div className="p-3" style={{ backgroundColor: theme.bgPrimary }}>
+                    <div className="flex gap-2 mb-2">
+                      <div className="flex-1 h-6 rounded" style={{ 
+                        backgroundColor: theme.bgSecondary,
+                        borderRadius: theme.radius 
+                      }}></div>
+                      <div className="w-8 h-6 rounded" style={{ 
+                        backgroundColor: theme.primaryColor,
+                        borderRadius: theme.radius 
+                      }}></div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2 mb-3">
+                      <div className="h-10 rounded" style={{ 
+                        backgroundColor: theme.bgSecondary,
+                        borderRadius: theme.radius 
+                      }}></div>
+                      <div className="h-10 rounded" style={{ 
+                        backgroundColor: theme.bgTertiary,
+                        borderRadius: theme.radius 
+                      }}></div>
+                    </div>
+                    
+                    <div className="h-2 w-full rounded-full overflow-hidden" style={{ backgroundColor: `${theme.primaryColor}30` }}>
+                      <div className="h-full w-3/4" style={{ backgroundColor: theme.primaryColor }}></div>
                     </div>
                   </div>
                   
                   {/* Theme Info */}
-                  <div 
-                    className={`p-3 flex justify-between items-center ${themeStyle.cardFooterClass}`}
-                    style={{ backgroundColor: theme.cardBg }}
-                  >
-                    <span className={themeStyle.nameClass} style={{ 
-                      color: theme.textPrimary,
-                      fontFamily: getThemeFont(theme)
-                    }}>
-                      {isThemeNeon
-                        ? `[ ${theme.name.toUpperCase()} ]` 
-                        : theme.name}
-                    </span>
+                  <div className="p-3 flex items-center justify-between" style={{ backgroundColor: theme.bgSecondary }}>
+                    <div>
+                      <h3 className="font-medium mb-1" style={{ 
+                        color: theme.textPrimary,
+                        fontFamily: getThemeFont(theme)
+                      }}>
+                        {isThemeNeon || isThemeCyberpunk ? theme.name.toUpperCase() : theme.name}
+                      </h3>
+                      
+                      <div className="flex gap-2">
+                        <ColorPill color={theme.primaryColor} label="Primary" />
+                        <ColorPill color={theme.secondaryColor} label="Secondary" />
+                      </div>
+                    </div>
                     
                     {/* Active theme indicator */}
-                    <div 
-                      className="w-5 h-5 flex items-center justify-center transition-all duration-300 relative overflow-hidden"
-                      style={{
-                        borderRadius: theme.radius === '0' ? '0' : '50%',
-                        border: `2px solid ${theme.borderColor}`,
-                        backgroundColor: currentTheme.id === theme.id ? theme.primaryColor : 'transparent'
-                      }}
-                    >
-                    </div>
+                    {isActive && (
+                      <div 
+                        className="w-6 h-6 rounded-full flex items-center justify-center" 
+                        style={{ backgroundColor: theme.primaryColor }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               );
             })}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Preview Tab */}
-      {activeTab === 'preview' && (
-        <div className="space-y-6">
-          {/* UI Elements */}
-          <div className="space-y-6 p-6 rounded-lg" style={{
-            backgroundColor: currentTheme.cardBg,
-            borderRadius: currentTheme.radius,
-            boxShadow: currentTheme.shadow
-          }}>
-            <h4 className={`text-lg font-medium ${isNeonTheme ? 'sl-glow-text selected' : ''}`}
-               style={{ 
-                 color: currentTheme.textPrimary,
-                 fontFamily: getThemeFont(currentTheme)
-               }}>
-              {isNeonTheme ? '[ UI ELEMENTS ]' : 'UI Elements'}
-            </h4>
-            
-            <div className="space-y-4">
-              {/* Buttons */}
-              <div>
-                <p className={`text-sm mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                   style={{ 
-                     color: isNeonTheme ? currentTheme.textPrimary : currentTheme.textSecondary,
-                     fontFamily: getThemeFont(currentTheme)
-                   }}>
-                  {isNeonTheme ? '[ BUTTONS ]' : 'Buttons'}
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <button 
-                    className={isNeonTheme ? 'sl-glow-text px-4 py-2 border border-current' : 'px-4 py-2'}
-                    style={{ 
-                      backgroundColor: isNeonTheme ? 'transparent' : currentTheme.primaryColor, 
-                      color: isNeonTheme ? currentTheme.primaryColor : "#ffffff",
-                      borderRadius: currentTheme.radius,
-                      fontFamily: getThemeFont(currentTheme)
-                    }}
-                  >
-                    {isNeonTheme ? '[ PRIMARY ]' : 'Primary'}
-                  </button>
-                  <button 
-                    className={isNeonTheme ? 'sl-glow-text px-4 py-2 border border-current' : 'px-4 py-2'}
-                    style={{ 
-                      backgroundColor: isNeonTheme ? 'transparent' : currentTheme.secondaryColor, 
-                      color: isNeonTheme ? currentTheme.secondaryColor : "#ffffff",
-                      borderRadius: currentTheme.radius,
-                      fontFamily: getThemeFont(currentTheme)
-                    }}
-                  >
-                    {isNeonTheme ? '[ SECONDARY ]' : 'Secondary'}
-                  </button>
-                  <button 
-                    className={isNeonTheme ? 'sl-glow-text px-4 py-2 border border-current' : 'px-4 py-2'}
-                    style={{ 
-                      backgroundColor: isNeonTheme ? 'transparent' : currentTheme.accentColor, 
-                      color: isNeonTheme ? currentTheme.accentColor : "#ffffff",
-                      borderRadius: currentTheme.radius,
-                      fontFamily: getThemeFont(currentTheme)
-                    }}
-                  >
-                    {isNeonTheme ? '[ ACCENT ]' : 'Accent'}
-                  </button>
-                  <button 
-                    className="px-4 py-2 font-medium transition-colors border"
-                    style={{ 
+        {activeTab === 'preview' && (
+          <div className="space-y-6">
+            {/* UI Elements */}
+            <div className="p-5 rounded-lg" style={{
+              backgroundColor: currentTheme.bgTertiary,
+              borderRadius: currentTheme.radius
+            }}>
+              <h4 className="text-base font-medium mb-4" style={{ color: currentTheme.textPrimary }}>
+                {isNeonTheme ? 'UI ELEMENTS' : 'UI Elements'}
+              </h4>
+              
+              <div className="space-y-5">
+                {/* Buttons */}
+                <div>
+                  <h5 className="text-sm mb-3" style={{ color: currentTheme.textSecondary }}>
+                    {isNeonTheme ? 'BUTTONS' : 'Buttons'}
+                  </h5>
+                  <div className="flex flex-wrap gap-3">
+                    <button className="px-4 py-2 font-medium rounded" style={{ 
+                      backgroundColor: currentTheme.primaryColor,
+                      color: '#ffffff',
+                      borderRadius: currentTheme.radius
+                    }}>
+                      Primary
+                    </button>
+                    <button className="px-4 py-2 font-medium rounded" style={{ 
+                      backgroundColor: currentTheme.secondaryColor,
+                      color: '#ffffff',
+                      borderRadius: currentTheme.radius
+                    }}>
+                      Secondary
+                    </button>
+                    <button className="px-4 py-2 font-medium rounded border" style={{ 
                       borderColor: currentTheme.borderColor,
                       color: currentTheme.textPrimary,
-                      borderRadius: currentTheme.radius,
-                      fontFamily: getThemeFont(currentTheme)
-                    }}
-                  >
-                    {isNeonTheme ? '[ OUTLINE ]' : 'Outline'}
-                  </button>
+                      borderRadius: currentTheme.radius
+                    }}>
+                      Outline
+                    </button>
+                  </div>
                 </div>
-              </div>
-              
-              {/* Cards */}
-              <div>
-                <p className={`text-sm mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                   style={{ 
-                     color: isNeonTheme ? currentTheme.textPrimary : currentTheme.textSecondary,
-                     fontFamily: getThemeFont(currentTheme)
-                   }}>
-                  {isNeonTheme ? '[ CARDS ]' : 'Cards'}
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  <div 
-                    className="p-4 w-48"
-                    style={{ 
+                
+                {/* Cards */}
+                <div>
+                  <h5 className="text-sm mb-3" style={{ color: currentTheme.textSecondary }}>
+                    {isNeonTheme ? 'CARDS' : 'Cards'}
+                  </h5>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-3 rounded-lg" style={{ 
                       backgroundColor: currentTheme.bgSecondary,
-                      color: currentTheme.textPrimary,
                       borderRadius: currentTheme.radius,
                       boxShadow: currentTheme.shadow,
                       border: `${currentTheme.borderWidth} solid ${currentTheme.borderColor}`
-                    }}
-                  >
-                    <h5 className={`font-medium mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                        style={{ fontFamily: getThemeFont(currentTheme) }}>
-                      {isNeonTheme ? '[ CARD ]' : 'Card Title'}
-                    </h5>
-                    <p className="text-sm" style={{ 
-                      color: currentTheme.textSecondary,
-                      fontFamily: getThemeFont(currentTheme)
                     }}>
-                      This is a sample card with some content.
-                    </p>
-                  </div>
-                  <div 
-                    className="p-4 w-48"
-                    style={{ 
-                      backgroundColor: currentTheme.bgTertiary,
-                      color: currentTheme.textPrimary,
-                      borderRadius: currentTheme.radius,
-                      boxShadow: currentTheme.shadow,
-                      border: `${currentTheme.borderWidth} solid ${currentTheme.borderColor}`
-                    }}
-                  >
-                    <h5 className={`font-medium mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                        style={{ fontFamily: getThemeFont(currentTheme) }}>
-                      {isNeonTheme ? '[ PROGRESS ]' : 'Progress'}
-                    </h5>
-                    <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: currentTheme.bgPrimary }}>
-                      <div className="h-full" style={{ width: '70%', backgroundColor: currentTheme.primaryColor }}></div>
+                      <h6 className="font-medium mb-2" style={{ color: currentTheme.textPrimary }}>
+                        Card Title
+                      </h6>
+                      <p className="text-sm" style={{ color: currentTheme.textSecondary }}>
+                        This is a sample card.
+                      </p>
                     </div>
-                    <p className="text-sm mt-2" style={{ 
-                      color: currentTheme.textSecondary,
-                      fontFamily: getThemeFont(currentTheme)
+                    <div className="p-3 rounded-lg" style={{ 
+                      backgroundColor: currentTheme.bgSecondary,
+                      borderRadius: currentTheme.radius,
+                      boxShadow: currentTheme.shadow,
+                      border: `${currentTheme.borderWidth} solid ${currentTheme.borderColor}`
                     }}>
-                      70% Complete
-                    </p>
+                      <h6 className="font-medium mb-2" style={{ color: currentTheme.textPrimary }}>
+                        Progress
+                      </h6>
+                      <div className="w-full h-2 rounded-full overflow-hidden mb-2" style={{ backgroundColor: `${currentTheme.primaryColor}20` }}>
+                        <div className="h-full" style={{ width: '70%', backgroundColor: currentTheme.primaryColor }}></div>
+                      </div>
+                      <p className="text-xs" style={{ color: currentTheme.textSecondary }}>
+                        70% Complete
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Form Elements */}
+                <div>
+                  <h5 className="text-sm mb-3" style={{ color: currentTheme.textSecondary }}>
+                    {isNeonTheme ? 'FORM ELEMENTS' : 'Form Elements'}
+                  </h5>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm mb-1" style={{ color: currentTheme.textPrimary }}>
+                        Input Field
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full px-3 py-2 rounded"
+                        placeholder="Type here..."
+                        style={{
+                          backgroundColor: currentTheme.inputBg,
+                          color: currentTheme.textPrimary,
+                          borderColor: currentTheme.inputBorder,
+                          borderRadius: currentTheme.radius,
+                          borderWidth: currentTheme.borderWidth,
+                          borderStyle: 'solid'
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm mb-1" style={{ color: currentTheme.textPrimary }}>
+                        Select
+                      </label>
+                      <select
+                        className="w-full px-3 py-2 rounded appearance-none"
+                        style={{
+                          backgroundColor: currentTheme.inputBg,
+                          color: currentTheme.textPrimary,
+                          borderColor: currentTheme.inputBorder,
+                          borderRadius: currentTheme.radius,
+                          borderWidth: currentTheme.borderWidth,
+                          borderStyle: 'solid'
+                        }}
+                      >
+                        <option>Option 1</option>
+                        <option>Option 2</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Theme color palette */}
+            <div className="p-5 rounded-lg" style={{
+              backgroundColor: currentTheme.bgTertiary,
+              borderRadius: currentTheme.radius
+            }}>
+              <h4 className="text-base font-medium mb-4" style={{ color: currentTheme.textPrimary }}>
+                {isNeonTheme ? 'COLOR PALETTE' : 'Color Palette'}
+              </h4>
+              
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <div className="h-12 rounded-t-lg" style={{ 
+                    backgroundColor: currentTheme.primaryColor,
+                    borderTopLeftRadius: currentTheme.radius,
+                    borderTopRightRadius: currentTheme.radius
+                  }}></div>
+                  <div className="py-2 px-3 text-center bg-white rounded-b-lg shadow-sm" style={{
+                    backgroundColor: currentTheme.bgSecondary,
+                    borderBottomLeftRadius: currentTheme.radius,
+                    borderBottomRightRadius: currentTheme.radius
+                  }}>
+                    <p className="text-xs font-medium" style={{ color: currentTheme.textPrimary }}>Primary</p>
+                    <p className="text-xs mt-1" style={{ color: currentTheme.textSecondary }}>{currentTheme.primaryColor}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="h-12 rounded-t-lg" style={{ 
+                    backgroundColor: currentTheme.secondaryColor,
+                    borderTopLeftRadius: currentTheme.radius,
+                    borderTopRightRadius: currentTheme.radius
+                  }}></div>
+                  <div className="py-2 px-3 text-center bg-white rounded-b-lg shadow-sm" style={{
+                    backgroundColor: currentTheme.bgSecondary,
+                    borderBottomLeftRadius: currentTheme.radius,
+                    borderBottomRightRadius: currentTheme.radius
+                  }}>
+                    <p className="text-xs font-medium" style={{ color: currentTheme.textPrimary }}>Secondary</p>
+                    <p className="text-xs mt-1" style={{ color: currentTheme.textSecondary }}>{currentTheme.secondaryColor}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="h-12 rounded-t-lg" style={{ 
+                    backgroundColor: currentTheme.accentColor,
+                    borderTopLeftRadius: currentTheme.radius,
+                    borderTopRightRadius: currentTheme.radius
+                  }}></div>
+                  <div className="py-2 px-3 text-center bg-white rounded-b-lg shadow-sm" style={{
+                    backgroundColor: currentTheme.bgSecondary,
+                    borderBottomLeftRadius: currentTheme.radius,
+                    borderBottomRightRadius: currentTheme.radius
+                  }}>
+                    <p className="text-xs font-medium" style={{ color: currentTheme.textPrimary }}>Accent</p>
+                    <p className="text-xs mt-1" style={{ color: currentTheme.textSecondary }}>{currentTheme.accentColor}</p>
                   </div>
                 </div>
               </div>
               
-              {/* Form Elements */}
-              <div>
-                <p className={`text-sm mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                   style={{ 
-                     color: isNeonTheme ? currentTheme.textPrimary : currentTheme.textSecondary,
-                     fontFamily: getThemeFont(currentTheme)
-                   }}>
-                  {isNeonTheme ? '[ FORM ELEMENTS ]' : 'Form Elements'}
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  <div className="w-64">
-                    <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                           style={{ 
-                             color: currentTheme.textPrimary,
-                             fontFamily: getThemeFont(currentTheme)
-                           }}>
-                      {isNeonTheme ? '[ INPUT FIELD ]' : 'Input Field'}
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full px-4 py-2"
-                      placeholder="Type something..."
-                      style={{
-                        backgroundColor: currentTheme.inputBg,
-                        color: currentTheme.textPrimary,
-                        borderColor: currentTheme.inputBorder,
-                        borderRadius: currentTheme.radius,
-                        borderWidth: currentTheme.borderWidth,
-                        borderStyle: 'solid',
-                        fontFamily: getThemeFont(currentTheme)
-                      }}
-                    />
+              <div className="grid grid-cols-3 gap-3 mt-3">
+                <div>
+                  <div className="h-12 rounded-t-lg" style={{ 
+                    backgroundColor: currentTheme.bgPrimary,
+                    borderTopLeftRadius: currentTheme.radius,
+                    borderTopRightRadius: currentTheme.radius,
+                    border: `1px solid ${currentTheme.borderColor}`
+                  }}></div>
+                  <div className="py-2 px-3 text-center bg-white rounded-b-lg shadow-sm" style={{
+                    backgroundColor: currentTheme.bgSecondary,
+                    borderBottomLeftRadius: currentTheme.radius,
+                    borderBottomRightRadius: currentTheme.radius
+                  }}>
+                    <p className="text-xs font-medium" style={{ color: currentTheme.textPrimary }}>Background</p>
+                    <p className="text-xs mt-1" style={{ color: currentTheme.textSecondary }}>Primary</p>
                   </div>
-                  <div className="w-64">
-                    <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                           style={{ 
-                             color: currentTheme.textPrimary,
-                             fontFamily: getThemeFont(currentTheme)
-                           }}>
-                      {isNeonTheme ? '[ SELECT ELEMENT ]' : 'Select Element'}
-                    </label>
-                    <select
-                      className="w-full px-4 py-2"
-                      style={{
-                        backgroundColor: currentTheme.inputBg,
-                        color: currentTheme.textPrimary,
-                        borderColor: currentTheme.inputBorder,
-                        borderRadius: currentTheme.radius,
-                        borderWidth: currentTheme.borderWidth,
-                        borderStyle: 'solid',
-                        fontFamily: getThemeFont(currentTheme)
-                      }}
-                    >
-                      <option>Option 1</option>
-                      <option>Option 2</option>
-                      <option>Option 3</option>
-                    </select>
+                </div>
+                
+                <div>
+                  <div className="h-12 rounded-t-lg" style={{ 
+                    backgroundColor: currentTheme.bgSecondary,
+                    borderTopLeftRadius: currentTheme.radius,
+                    borderTopRightRadius: currentTheme.radius,
+                    border: `1px solid ${currentTheme.borderColor}`
+                  }}></div>
+                  <div className="py-2 px-3 text-center bg-white rounded-b-lg shadow-sm" style={{
+                    backgroundColor: currentTheme.bgSecondary,
+                    borderBottomLeftRadius: currentTheme.radius,
+                    borderBottomRightRadius: currentTheme.radius
+                  }}>
+                    <p className="text-xs font-medium" style={{ color: currentTheme.textPrimary }}>Background</p>
+                    <p className="text-xs mt-1" style={{ color: currentTheme.textSecondary }}>Secondary</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="h-12 rounded-t-lg" style={{ 
+                    backgroundColor: currentTheme.bgTertiary,
+                    borderTopLeftRadius: currentTheme.radius,
+                    borderTopRightRadius: currentTheme.radius,
+                    border: `1px solid ${currentTheme.borderColor}`
+                  }}></div>
+                  <div className="py-2 px-3 text-center bg-white rounded-b-lg shadow-sm" style={{
+                    backgroundColor: currentTheme.bgSecondary,
+                    borderBottomLeftRadius: currentTheme.radius,
+                    borderBottomRightRadius: currentTheme.radius
+                  }}>
+                    <p className="text-xs font-medium" style={{ color: currentTheme.textPrimary }}>Background</p>
+                    <p className="text-xs mt-1" style={{ color: currentTheme.textSecondary }}>Tertiary</p>
                   </div>
                 </div>
               </div>
-
-              {/* Neon Theme Terminal Output */}
-              {isNeonTheme && (
-                <div className="mt-6 p-4" style={{ 
-                  backgroundColor: 'rgba(0,0,0,0.3)', 
-                  border: `1px solid ${currentTheme.borderColor}`,
-                  borderRadius: currentTheme.radius
-                }}>
-                  <div className="font-mono text-sm space-y-2" style={{ fontFamily: getThemeFont(currentTheme) }}>
-                    <p className="sl-glow-text selected" style={{ color: currentTheme.textPrimary }}>SYSTEM INITIALIZED</p>
-                    <p style={{ color: currentTheme.textSecondary }}>&gt; Loading interface components...</p>
-                    <p style={{ color: currentTheme.textSecondary }}>&gt; Connecting to visual subsystems...</p>
-                    <p className="sl-glow-text" style={{ color: currentTheme.textPrimary }}>ACCESS GRANTED</p>
-                    <p style={{ color: currentTheme.primaryColor }}>&gt; {currentTheme.name} theme activated</p>
-                  </div>
-                </div>
-              )}
             </div>
+            
+            {/* Current theme details */}
+            <div className="p-5 rounded-lg border" style={{
+              backgroundColor: currentTheme.bgSecondary,
+              borderRadius: currentTheme.radius,
+              borderColor: currentTheme.borderColor
+            }}>
+              <h4 className="text-base font-medium mb-3" style={{ color: currentTheme.textPrimary }}>
+                {isNeonTheme ? 'CURRENT THEME' : 'Current Theme'}
+              </h4>
+              
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                <div>
+                  <p className="text-xs mb-1" style={{ color: currentTheme.textSecondary }}>Theme Name</p>
+                  <p className="text-sm font-medium" style={{ color: currentTheme.textPrimary }}>{currentTheme.name}</p>
+                </div>
+                <div>
+                  <p className="text-xs mb-1" style={{ color: currentTheme.textSecondary }}>ID</p>
+                  <p className="text-sm font-medium" style={{ color: currentTheme.textPrimary }}>{currentTheme.id}</p>
+                </div>
+                <div>
+                  <p className="text-xs mb-1" style={{ color: currentTheme.textSecondary }}>Border Radius</p>
+                  <p className="text-sm font-medium" style={{ color: currentTheme.textPrimary }}>{currentTheme.radius}</p>
+                </div>
+                <div>
+                  <p className="text-xs mb-1" style={{ color: currentTheme.textSecondary }}>Font</p>
+                  <p className="text-sm font-medium" style={{ color: currentTheme.textPrimary }}>{
+                    currentTheme.font.includes("'")
+                      ? currentTheme.font.split("'")[1]
+                      : currentTheme.font
+                  }</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Neon theme terminal output - only shown for neon themes */}
+            {isNeonTheme && (
+              <div className="p-4 rounded-lg" style={{ 
+                backgroundColor: 'rgba(0,0,0,0.3)', 
+                border: `1px solid ${currentTheme.borderColor}`,
+                borderRadius: currentTheme.radius
+              }}>
+                <div className="font-mono text-sm space-y-2" style={{ fontFamily: getThemeFont(currentTheme) }}>
+                  <p className="sl-glow-text selected" style={{ color: currentTheme.textPrimary }}>SYSTEM INITIALIZED</p>
+                  <p style={{ color: currentTheme.textSecondary }}>&gt; Loading interface components...</p>
+                  <p style={{ color: currentTheme.textSecondary }}>&gt; Connecting to visual subsystems...</p>
+                  <p className="sl-glow-text" style={{ color: currentTheme.textPrimary }}>ACCESS GRANTED</p>
+                  <p style={{ color: currentTheme.primaryColor }}>&gt; {currentTheme.name} theme activated</p>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
