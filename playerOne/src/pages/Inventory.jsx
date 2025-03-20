@@ -1,3 +1,4 @@
+// src/pages/Inventory.jsx
 import React, { useState, useContext, useEffect } from "react";
 import { 
   BriefcaseIcon, 
@@ -102,7 +103,7 @@ const Inventory = () => {
   };
 
   return (
-    <div className="flex flex-col flex-1 font-sans p-6"
+    <div className="flex flex-col flex-1 p-6 overflow-y-auto"
          style={{ 
            backgroundColor: currentTheme.bgPrimary,
            backgroundImage: isNeonTheme ? 
@@ -116,13 +117,13 @@ const Inventory = () => {
              'none'
          }}>
       <div className="w-full max-w-7xl mx-auto">
-        {/* Header */}
+        {/* Header - Updated styling */}
         <div className="p-4 flex items-center justify-between" 
              style={{ 
                backgroundColor: currentTheme.bgSecondary, 
-               borderBottom: `1px solid ${currentTheme.borderColor}`,
                borderRadius: `${currentTheme.radius} ${currentTheme.radius} 0 0`,
-               boxShadow: isNeonTheme || isCyberpunk ? `0 0 15px ${currentTheme.shadowColor}` : 'none'
+               boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+               borderBottom: `1px solid ${currentTheme.borderColor}`
              }}>
           <div className="flex items-center gap-2">
             <BriefcaseIcon className="w-6 h-6" style={{ color: currentTheme.primaryColor }} />
@@ -137,7 +138,7 @@ const Inventory = () => {
             </h2>
           </div>
           <div className="flex items-center gap-3">
-            {/* Currency display */}
+            {/* Currency display - Updated styling */}
             <div className="flex items-center gap-1 px-3 py-1 rounded"
                  style={{ 
                    backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary,
@@ -157,7 +158,7 @@ const Inventory = () => {
               <span style={{ color: currentTheme.textPrimary }}>75</span>
             </div>
 
-            {/* Search bar */}
+            {/* Search bar - Updated styling */}
             <div className="relative">
               <input
                 type="text"
@@ -166,7 +167,7 @@ const Inventory = () => {
                 style={{ 
                   backgroundColor: currentTheme.inputBg,
                   color: currentTheme.textPrimary,
-                  borderColor: currentTheme.inputBorder,
+                  borderColor: currentTheme.borderColor,
                   borderRadius: currentTheme.radius,
                   fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
                               isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
@@ -178,7 +179,7 @@ const Inventory = () => {
               <SearchIcon className="w-4 h-4 absolute left-3 top-3" style={{ color: currentTheme.textSecondary }} />
             </div>
             
-            {/* View mode toggle */}
+            {/* View mode toggle - Updated styling */}
             <div className="flex border rounded"
                  style={{ 
                    backgroundColor: currentTheme.bgTertiary,
@@ -211,7 +212,7 @@ const Inventory = () => {
               </button>
             </div>
             
-            {/* Filter toggle button */}
+            {/* Filter toggle button - Updated styling */}
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isNeonTheme ? 'sl-glow-text' : ''}`}
@@ -228,7 +229,7 @@ const Inventory = () => {
             </button>
           </div>
         </div>
-        
+
         {/* Filters Panel */}
         <FilterPanel 
           showFilters={showFilters}
@@ -242,7 +243,15 @@ const Inventory = () => {
         />
         
         {/* Main Content Area */}
-        <div className="p-4" style={{ backgroundColor: 'transparent' }}>
+        <div className="p-4" style={{ 
+          backgroundColor: currentTheme.bgSecondary,
+          borderBottomLeftRadius: currentTheme.radius,
+          borderBottomRightRadius: currentTheme.radius,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+          borderLeft: `1px solid ${currentTheme.borderColor}`,
+          borderRight: `1px solid ${currentTheme.borderColor}`,
+          borderBottom: `1px solid ${currentTheme.borderColor}`
+        }}>
           {/* Item count and results info */}
           <div className="mb-4" style={{ color: currentTheme.textSecondary }}>
             <span className={isNeonTheme ? 'sl-glow-text' : ''}
@@ -282,7 +291,7 @@ const Inventory = () => {
                  style={{ 
                    backgroundColor: isNeonTheme || isCyberpunk 
                      ? 'rgba(255, 255, 255, 0.05)' 
-                     : currentTheme.bgSecondary,
+                     : currentTheme.bgTertiary,
                    borderRadius: currentTheme.radius,
                    border: `1px solid ${currentTheme.borderColor}`
                  }}>
