@@ -26,11 +26,21 @@ const Home = () => {
     completedTasks: 327,
   });
 
-  // Sample data for habits, tasks, and projects
-  const [habits, setHabits] = useState([
-    { id: 1, title: "Morning jog", recurrence: "daily", streak: 18 },
-    { id: 2, title: "Review goals", recurrence: "daily", streak: 45 },
-  ]);
+// Sample data for habits, tasks, and projects
+const [habits, setHabits] = useState([
+  { id: 1, title: "Morning jog", recurrence: "daily", streak: 18 },
+  { id: 2, title: "Review goals", recurrence: "daily", streak: 45 },
+  { 
+    id: 3, 
+    title: "Drink water", 
+    recurrence: "daily", 
+    streak: 3, 
+    difficulty: 1,
+    countable: true,
+    currentCount: 5,
+    targetCount: 8
+  }
+]);
 
   const [tasks, setTasks] = useState([
     {

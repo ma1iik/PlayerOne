@@ -1,4 +1,4 @@
-// playerOne/src/services/apiService.js
+// frontend/src/services/apiService.js
 
 import authService from './authService';
 

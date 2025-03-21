@@ -11,6 +11,6 @@ frontend.js
 test-db.js
 node_modules/
 dist/
-playerOne/dist/
+frontend/dist/
 npm-debug.log
 yarn-error.log

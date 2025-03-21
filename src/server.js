@@ -38,7 +38,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/tasks', taskRoutes);
 
-const frontendPath = path.join(__dirname, '../playerOne/dist');
+const frontendPath = path.join(__dirname, '../frontend/dist');
 app.use(express.static(frontendPath));
 
 app.get('*', (req, res, next) => {
