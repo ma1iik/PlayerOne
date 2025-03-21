@@ -1,11 +1,27 @@
-import React, { useContext, useState } from "react";
+// Handle toggling a habit completion
+  const handleToggleHabit = (id) => {
+    setHabits(
+      habits.map((h) =>
+        h.id === id ? { ...h, completed: !h.completed } : h
+      )
+    );
+  };
+
+  // Handle updating a countable habit
+  const handleUpdateHabitCount = (id, newCount) => {
+    setHabits(
+      habits.map((h) =>
+        h.id === id ? { ...h, currentCount: newCount } : h
+      )
+    );
+  };import React, { useContext, useState } from "react";
 import { PlusIcon, SearchIcon, ChevronRightIcon } from "@heroicons/react/outline";
 import HabitItem from "./HabitItem";
 import TaskItem from "./TaskItem";
 import ProjectItem from "./ProjectItem";
 import ThemeContext from "../context/ThemeContext";
 
-// Section component for DRY code
+// Section component for DRY code - with optional tabs
 const Section = ({ 
   title, 
   icon, 
@@ -19,7 +35,8 @@ const Section = ({
   footerText,
   addButtonText,
   onAdd,
-  renderItem
+  renderItem,
+  showTabs = true
 }) => {
   const { currentTheme } = useContext(ThemeContext);
   const isNeonTheme = currentTheme.id.includes('neon');
@@ -39,35 +56,38 @@ const Section = ({
           <h2 className="text-base font-semibold" style={{ color: currentTheme.textPrimary }}>
             {isNeonTheme ? title.toUpperCase() : title}
           </h2>
-          <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{
+          <span className="text-xs font-medium px-2 py-0.5" style={{
             backgroundColor: `${currentTheme.primaryColor}15`,
-            color: currentTheme.primaryColor
+            color: currentTheme.primaryColor,
+            borderRadius: `calc(${currentTheme.radius} / 2)` // Make it less round, more square
           }}>
             {count}
           </span>
         </div>
         
-        {/* Tabs */}
-        <div className="flex bg-gray-100 rounded-lg p-1" style={{
-          backgroundColor: currentTheme.bgTertiary,
-          borderRadius: currentTheme.radius
-        }}>
-          {tabs.map(tab => (
-            <button
-              key={tab.value}
-              onClick={() => setActiveTab(tab.value)}
-              className="px-2.5 py-1 text-xs font-medium transition-colors"
-              style={{
-                backgroundColor: activeTab === tab.value ? currentTheme.bgSecondary : 'transparent',
-                color: activeTab === tab.value ? currentTheme.primaryColor : currentTheme.textSecondary,
-                borderRadius: `calc(${currentTheme.radius} - 2px)`,
-                boxShadow: activeTab === tab.value ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
-              }}
-            >
-              {isNeonTheme ? tab.label.toUpperCase() : tab.label}
-            </button>
-          ))}
-        </div>
+        {/* Tabs - only shown if showTabs is true */}
+        {showTabs && tabs && (
+          <div className="flex bg-gray-100 rounded-lg p-1" style={{
+            backgroundColor: currentTheme.bgTertiary,
+            borderRadius: currentTheme.radius
+          }}>
+            {tabs.map(tab => (
+              <button
+                key={tab.value}
+                onClick={() => setActiveTab(tab.value)}
+                className="px-2.5 py-1 text-xs font-medium transition-colors"
+                style={{
+                  backgroundColor: activeTab === tab.value ? currentTheme.bgSecondary : 'transparent',
+                  color: activeTab === tab.value ? currentTheme.primaryColor : currentTheme.textSecondary,
+                  borderRadius: `calc(${currentTheme.radius} - 2px)`,
+                  boxShadow: activeTab === tab.value ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
+                }}
+              >
+                {isNeonTheme ? tab.label.toUpperCase() : tab.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       
       {/* Content container */}
@@ -84,12 +104,51 @@ const Section = ({
         <div className="p-4 pb-2">
           <button
             onClick={onAdd}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-all duration-200"
             style={{
               border: `1px dashed ${currentTheme.borderColor}`,
               backgroundColor: currentTheme.bgTertiary,
               color: currentTheme.textSecondary,
               borderRadius: currentTheme.radius
+            }}
+            onMouseOver={(e) => {
+              // Slightly darken background and border on hover, keeping same color family
+              if (currentTheme.id.includes('neon') || currentTheme.id === 'cyberpunk') {
+                // For neon/cyberpunk themes - just slightly increase opacity
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                e.currentTarget.style.borderColor = `${currentTheme.borderColor}`;
+                // Just slightly increase text brightness
+                e.currentTarget.style.color = currentTheme.textSecondary;
+                e.currentTarget.style.opacity = "0.9";
+              } else {
+                // For regular themes - make background just slightly darker
+                const bgColor = currentTheme.bgTertiary;
+                if (bgColor.startsWith('#')) {
+                  // Subtle darkening - just reduce brightness by about 5-10%
+                  e.currentTarget.style.backgroundColor = bgColor === '#f3f4f6' ? '#ebedf0' : 
+                                                         bgColor === '#374151' ? '#333a48' :
+                                                         bgColor === '#1e1e35' ? '#1c1c31' : 
+                                                         '#e9eaec'; // fallback
+                } else {
+                  // For non-hex colors, use opacity trick
+                  e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.03)';
+                }
+                
+                // Slightly darken border
+                e.currentTarget.style.borderColor = currentTheme.borderColor === '#e5e7eb' ? '#dfe3ea' :
+                                                   currentTheme.borderColor === '#374151' ? '#3d4759' :
+                                                   currentTheme.borderColor; 
+              }
+              // Make text just slightly darker, not dramatically different
+              e.currentTarget.style.color = currentTheme.textSecondary;
+              e.currentTarget.style.opacity = "0.85";
+            }}
+            onMouseOut={(e) => {
+              // Reset on mouse out
+              e.currentTarget.style.backgroundColor = currentTheme.bgTertiary;
+              e.currentTarget.style.color = currentTheme.textSecondary;
+              e.currentTarget.style.borderColor = currentTheme.borderColor;
+              e.currentTarget.style.opacity = "1";
             }}
           >
             <PlusIcon className="h-4 w-4" />
@@ -152,7 +211,7 @@ const MainContent = ({
   const { currentTheme } = useContext(ThemeContext);
   const isNeonTheme = currentTheme.id.includes('neon');
   
-  // Tab states for each section
+  // Tab states for each section - Keep habits tab functionality but don't show it
   const [habitTab, setHabitTab] = useState('all');
   const [taskTab, setTaskTab] = useState('active');
   const [projectTab, setProjectTab] = useState('all');
@@ -181,7 +240,15 @@ const MainContent = ({
   // Filter items based on search query and active tab
   const filteredHabits = habits.filter(habit => 
     searchQuery ? habit.title.toLowerCase().includes(searchQuery.toLowerCase()) : true
-  );
+  ).sort((a, b) => {
+    // Sort by completion status - completed habits go to the bottom
+    const aCompleted = a.completed || (a.countable && a.targetCount > 0 && (a.currentCount || 0) >= a.targetCount);
+    const bCompleted = b.completed || (b.countable && b.targetCount > 0 && (b.currentCount || 0) >= b.targetCount);
+    
+    if (aCompleted && !bCompleted) return 1;
+    if (!aCompleted && bCompleted) return -1;
+    return 0;
+  });
   
   const filteredTasks = tasks.filter(task => {
     if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -294,7 +361,7 @@ const MainContent = ({
       {/* Content with grid layout */}
       <div className="flex-1 pt-4 pb-6 overflow-hidden px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full">
-          {/* Habits section */}
+          {/* Habits section - No tabs */}
           <Section
             title="Habits"
             icon={habitIcon}
@@ -317,8 +384,11 @@ const MainContent = ({
                 key={habit.id}
                 habit={habit}
                 onEdit={() => handleEditItem(habit, "habit")}
+                onToggle={handleToggleHabit}
+                onUpdateCount={handleUpdateHabitCount}
               />
             )}
+            showTabs={false} // This is the key change - hide tabs for habits
           />
 
           {/* Tasks section */}
