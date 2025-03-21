@@ -82,7 +82,7 @@ const HabitItem = ({ habit, onEdit, onToggle, onUpdateCount }) => {
 
   return (
     <div 
-      className={`group relative transition-all duration-300 hover:translate-y-[-2px] ${displayAsCompleted ? 'translate-y-[10px] opacity-75' : ''}`}
+      className={`group relative transition-all duration-300 hover:translate-y-[-2px] ${displayAsCompleted ? 'opacity-75' : ''}`}
       style={{
         backgroundColor: displayAsCompleted ? currentTheme.bgTertiary : currentTheme.bgSecondary,
         borderRadius: currentTheme.radius,
@@ -92,7 +92,7 @@ const HabitItem = ({ habit, onEdit, onToggle, onUpdateCount }) => {
     >
       <div className="flex items-center">
         {/* Main content */}
-        <div className="flex-1 pl-5 pr-3 py-3">
+        <div className="flex-1 pl-7 pr-3 py-3">
           <div className="flex items-center">
             <h3 
               className="text-sm font-medium transition-all duration-300" 
