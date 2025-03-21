@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { PlusIcon, MinusIcon } from "@heroicons/react/outline";
 import ThemeContext from "../context/ThemeContext";
 
@@ -6,6 +6,7 @@ const HabitItem = ({ habit, onEdit, onToggle, onUpdateCount }) => {
   const { currentTheme } = useContext(ThemeContext);
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
+  const containerRef = useRef(null);
   
   // Local state to track completion status for animation purposes
   const [isCompleted, setIsCompleted] = useState(habit.completed || false);
@@ -17,6 +18,20 @@ const HabitItem = ({ habit, onEdit, onToggle, onUpdateCount }) => {
   
   // Use either the local state or countable completion status
   const displayAsCompleted = isCompleted || isCountableCompleted;
+  
+  // This effect updates the border directly on completion change
+  // by manipulating the DOM element directly, bypassing React's transitions
+  useEffect(() => {
+    if (containerRef.current) {
+      const baseBorder = `1px solid ${currentTheme.borderColor}`;
+      
+      if (displayAsCompleted && !isNeonTheme && !isCyberpunk) {
+        containerRef.current.style.borderLeft = '4px solid #10b981';
+      } else {
+        containerRef.current.style.borderLeft = baseBorder;
+      }
+    }
+  }, [displayAsCompleted, currentTheme, isNeonTheme, isCyberpunk]);
   
   // Get difficulty indicator with stars based on level (1-4)
   const getDifficultyIndicator = (level = 1) => {
@@ -80,15 +95,26 @@ const HabitItem = ({ habit, onEdit, onToggle, onUpdateCount }) => {
     }
   };
 
+  // Get styles without border (we'll handle the border separately)
+  const getStyles = () => {
+    const baseBorder = `1px solid ${currentTheme.borderColor}`;
+    
+    return {
+      backgroundColor: displayAsCompleted ? currentTheme.bgTertiary : currentTheme.bgSecondary,
+      borderRadius: currentTheme.radius,
+      boxShadow: currentTheme.shadow,
+      borderTop: baseBorder,
+      borderRight: baseBorder,
+      borderBottom: baseBorder,
+      // borderLeft is handled by the useEffect
+    };
+  };
+
   return (
     <div 
+      ref={containerRef}
       className={`group relative transition-all duration-300 hover:translate-y-[-2px] ${displayAsCompleted ? 'opacity-75' : ''}`}
-      style={{
-        backgroundColor: displayAsCompleted ? currentTheme.bgTertiary : currentTheme.bgSecondary,
-        borderRadius: currentTheme.radius,
-        border: `1px solid ${currentTheme.borderColor}`,
-        boxShadow: currentTheme.shadow,
-      }}
+      style={getStyles()}
     >
       <div className="flex items-center">
         {/* Main content */}
@@ -236,9 +262,9 @@ const HabitItem = ({ habit, onEdit, onToggle, onUpdateCount }) => {
             >
               <div 
                 className="flex-shrink-0 w-5 h-5 rounded-sm cursor-pointer transition-all flex items-center justify-center" 
-                style={{
-                  border: `2px solid ${displayAsCompleted ? currentTheme.primaryColor : currentTheme.borderColor}`,
-                  backgroundColor: displayAsCompleted ? currentTheme.primaryColor : 'transparent',
+                style={{ 
+                  backgroundColor: displayAsCompleted ? '#10b981' : 'transparent', // green-500 when completed
+                  border: `2px solid ${displayAsCompleted ? '#10b981' : currentTheme.borderColor}`, // green-500 when completed
                   borderRadius: `calc(${currentTheme.radius} / 2)`,
                 }}
               >
