@@ -33,26 +33,64 @@ const ProjectItem = ({ project, onEdit }) => {
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
-  // Get difficulty level styling with new design
-  const getDifficultyStyle = () => {
-    // Map difficulty to emoji or text
-    const difficultyLabel = ["Easy", "Medium", "Hard", "Very Hard", "Epic"][project.difficulty - 1] || "Medium";
-    
-    // Color mapping based on difficulty
-    const colors = {
-      1: { bg: 'rgba(16, 185, 129, 0.1)', text: '#10b981' },  // green
-      2: { bg: 'rgba(59, 130, 246, 0.1)', text: '#3b82f6' },  // blue
-      3: { bg: 'rgba(245, 158, 11, 0.1)', text: '#f59e0b' },  // amber
-      4: { bg: 'rgba(249, 115, 22, 0.1)', text: '#f97316' },  // orange
-      5: { bg: 'rgba(239, 68, 68, 0.1)', text: '#ef4444' }    // red
-    }[project.difficulty] || { bg: 'rgba(156, 163, 175, 0.1)', text: '#6b7280' }; // gray default
-    
-    return {
-      backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : colors.bg,
-      color: colors.text,
-      borderRadius: currentTheme.radius,
-      border: isNeonTheme || isCyberpunk ? `1px solid ${colors.text}` : 'none'
+  // Get difficulty indicator with stars based on level (1-4)
+  const getDifficultyIndicator = (level = 1) => {
+    const stars = [];
+    // Different colors based on difficulty level
+    const getStarColor = (level) => {
+      switch(level) {
+        case 1: return "text-green-400"; // Easy - green
+        case 2: return "text-blue-400";  // Medium - blue
+        case 3: return "text-orange-400"; // Hard - yellow
+        case 4: return "text-red-400";   // Very hard - red
+        default: return "text-green-400";
+      }
     };
+    
+    for (let i = 0; i < 4; i++) {
+      stars.push(
+        <span 
+          key={i} 
+          className={i < level ? getStarColor(level) : "text-gray-300 opacity-50"}
+        >
+          ★
+        </span>
+      );
+    }
+    return <div className="flex gap-0.5">{stars}</div>;
+  };
+
+  // Format the due date
+  const formatDueDate = () => {
+    if (!project.due) return "";
+    
+    const dueDate = new Date(project.due);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    if (dueDate.toDateString() === today.toDateString()) return "Today";
+    if (dueDate.toDateString() === tomorrow.toDateString()) return "Tomorrow";
+    
+    return dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  // Check if project is due soon (within 48 hours)
+  const isDueSoon = () => {
+    if (!project.due) return false;
+    const dueDate = new Date(project.due);
+    const today = new Date();
+    const diffTime = dueDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 2 && diffDays >= 0;
+  };
+
+  // Check if project is overdue
+  const isOverdue = () => {
+    if (!project.due) return false;
+    const dueDate = new Date(project.due);
+    const today = new Date();
+    return dueDate < today;
   };
 
   // Get number of completed subtasks and total subtasks
@@ -71,17 +109,25 @@ const ProjectItem = ({ project, onEdit }) => {
     >
       <div className="flex items-start">
         <div className="ml-1 flex-1">
-          <div className="flex items-center">
+          <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium" style={{ color: currentTheme.textPrimary }}>
               {isNeonTheme ? project.title.toUpperCase() : project.title}
             </h3>
-            <div 
-              className="ml-2 px-2 py-0.5 rounded-md text-xs font-medium"
-              style={getDifficultyStyle()}
-            >
-              {isNeonTheme ? `LEVEL ${project.difficulty}` : `Level ${project.difficulty}`}
+            <div className="text-xs">
+              {getDifficultyIndicator(project.difficulty || 1)}
             </div>
           </div>
+          
+          {/* Description - Added */}
+          {project.description && (
+            <p 
+              className="text-xs mt-1 mb-1.5" 
+              style={{ color: currentTheme.textSecondary }}
+            >
+              {project.description}
+            </p>
+          )}
+          
           <div className="mt-2">
             {/* Dynamic segmented progress bar */}
             <SegmentedProgressBar project={project} currentTheme={currentTheme} />
@@ -96,6 +142,51 @@ const ProjectItem = ({ project, onEdit }) => {
                 {project.progress}%
               </span>
             </div>
+          </div>
+          
+          {/* Due date and metadata section - Added */}
+          <div className="flex items-center mt-2">
+            {/* Due date with color coding - Added */}
+            {project.due && (
+              <span 
+                className="text-xs"
+                style={{ 
+                  color: isOverdue() ? '#ef4444' : isDueSoon() ? '#f59e0b' : '#3b82f6'
+                }}
+              >
+                {formatDueDate()}
+              </span>
+            )}
+            
+            {/* Due soon badge - Added */}
+            {isDueSoon() && !isOverdue() && (
+              <span 
+                className="ml-2 text-xs px-1.5 py-0.5 font-medium"
+                style={{
+                  backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : 'rgba(251, 191, 36, 0.1)',
+                  color: '#f59e0b', // amber-500
+                  borderRadius: currentTheme.radius,
+                  border: isNeonTheme || isCyberpunk ? '1px solid #f59e0b' : 'none'
+                }}
+              >
+                {isNeonTheme ? '[ DUE SOON ]' : isCyberpunk ? 'DUE SOON' : 'Due Soon'}
+              </span>
+            )}
+            
+            {/* Overdue badge - Added */}
+            {isOverdue() && (
+              <span 
+                className="ml-2 text-xs px-1.5 py-0.5 font-medium"
+                style={{
+                  backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : 'rgba(239, 68, 68, 0.1)',
+                  color: '#ef4444', // red-500
+                  borderRadius: currentTheme.radius,
+                  border: isNeonTheme || isCyberpunk ? '1px solid #ef4444' : 'none'
+                }}
+              >
+                {isNeonTheme ? '[ OVERDUE ]' : isCyberpunk ? 'OVERDUE' : 'Overdue'}
+              </span>
+            )}
           </div>
         </div>
         <div 

@@ -48,7 +48,7 @@ const [habits, setHabits] = useState([
       title: "Complete API integration",
       recurrence: "weekly",
       difficulty: 3,
-      due: "2024-03-20",
+      due: "2025-04-05",
       status: "In Progress",
       description: "Finish integrating the payment gateway API"
     },
@@ -57,15 +57,37 @@ const [habits, setHabits] = useState([
       title: "Update documentation",
       recurrence: "monthly",
       difficulty: 2,
-      due: "2024-03-18",
+      due: "2025-04-01",
       status: "Pending",
       description: "Update the user guide with new features"
     },
   ]);
 
   const [projects, setProjects] = useState([
-    { id: 1, title: "Mobile App Launch", progress: 75, difficulty: 4 },
-    { id: 2, title: "Server Migration", progress: 35, difficulty: 3 },
+    { 
+      id: 1, 
+      title: "Mobile App Launch", 
+      progress: 75, 
+      difficulty: 4,
+      description: "Complete the final testing and launch the mobile app to the app stores",
+      due: "2025-04-20"
+    },
+    { 
+      id: 2, 
+      title: "Server Migration", 
+      progress: 35, 
+      difficulty: 3,
+      description: "Migrate all services from on-premise to cloud infrastructure",
+      due: "2025-03-31" // Overdue date for demonstration
+    },
+    { 
+      id: 3, 
+      title: "User Analytics Dashboard", 
+      progress: 50, 
+      difficulty: 2,
+      description: "Develop a dashboard that visualizes user engagement metrics",
+      due: "2025-04-02" // Due soon date for demonstration
+    },
   ]);
 
   // Handler for adding or updating an item

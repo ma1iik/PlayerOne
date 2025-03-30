@@ -2,6 +2,162 @@ import React, { useState, useContext, useEffect } from "react";
 import { XIcon, PlusIcon, SaveIcon, MinusIcon } from "@heroicons/react/outline";
 import ThemeContext from "../context/ThemeContext";
 
+// Default form data structure
+const DEFAULT_FORM_DATA = {
+  title: "",
+  recurrence: "one-time",
+  difficulty: 1,
+  description: "",
+  due: "",
+  progress: 0,
+  status: "Pending",
+  streak: 0,
+  countable: false,
+  targetCount: 1,
+  currentCount: 0,
+  weekday: "monday",
+  monthday: 1,
+};
+
+// Input validation functions
+const validateInput = (name, value) => {
+  switch (name) {
+    case 'title':
+      // Title should not be empty and should be reasonably sized
+      return value.trim().length > 0 && value.length <= 100;
+    case 'description':
+      // Description can be empty but should have a reasonable size limit
+      return value.length <= 500;
+    case 'difficulty':
+      // Difficulty should be between 1 and 4
+      return value >= 1 && value <= 4 && Number.isInteger(parseFloat(value));
+    case 'progress':
+      // Progress should be between 0 and 100
+      return value >= 0 && value <= 100 && !isNaN(parseFloat(value));
+    case 'targetCount':
+      // Target count should be a positive integer
+      return value > 0 && Number.isInteger(parseFloat(value));
+    case 'currentCount':
+      // Current count should be a non-negative integer
+      return value >= 0 && Number.isInteger(parseFloat(value));
+    case 'streak':
+      // Streak should be a non-negative integer
+      return value >= 0 && Number.isInteger(parseFloat(value));
+    case 'monthday':
+      // Month day should be between 1 and 31
+      return value >= 1 && value <= 31 && Number.isInteger(parseFloat(value));
+    default:
+      return true;
+  }
+};
+
+// Sanitize input to prevent XSS
+const sanitizeInput = (value) => {
+  if (typeof value !== 'string') return value;
+  
+  // Basic sanitization: replace HTML tags
+  return value
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
+// Utility function for rendering themed buttons
+const ThemedButton = ({ 
+  onClick, 
+  isActive = false, 
+  children, 
+  color = null,
+  fullWidth = false,
+  className = "",
+  disabled = false
+}) => {
+  const { currentTheme } = useContext(ThemeContext);
+  const isNeonTheme = currentTheme.id.includes('neon');
+  const isCyberpunk = currentTheme.id === 'cyberpunk';
+  
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`py-2 text-sm font-medium ${fullWidth ? 'w-full' : ''} ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+      style={{
+        backgroundColor: isActive 
+          ? (isNeonTheme || isCyberpunk ? 'rgba(255, 255, 255, 0.1)' : color ? `${color}` : currentTheme.primaryColor)
+          : (isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary),
+        color: isActive 
+          ? (isNeonTheme || isCyberpunk ? color || currentTheme.primaryColor : 'white')
+          : currentTheme.textSecondary,
+        border: isNeonTheme || isCyberpunk 
+          ? `1px solid ${isActive ? (color || currentTheme.primaryColor) : currentTheme.borderColor}` 
+          : 'none',
+        borderRadius: currentTheme.radius
+      }}
+    >
+      {children}
+    </button>
+  );
+};
+
+// Utility function for form labels
+const FormLabel = ({ htmlFor, children }) => {
+  const { currentTheme } = useContext(ThemeContext);
+  
+  return (
+    <label 
+      htmlFor={htmlFor} 
+      className="block text-sm font-medium mb-1" 
+      style={{ color: currentTheme.textPrimary }}
+    >
+      {children}
+    </label>
+  );
+};
+
+// Utility function for form inputs with validation
+const FormInput = ({ 
+  id, 
+  name, 
+  type = "text", 
+  value, 
+  onChange, 
+  placeholder = "", 
+  required = false,
+  error = false,
+  maxLength = null
+}) => {
+  const { currentTheme } = useContext(ThemeContext);
+  
+  return (
+    <div>
+      <input
+        id={id || name}
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        className={`w-full px-4 py-2 border rounded-lg text-sm placeholder-gray-500 focus:outline-none ${error ? 'border-red-500' : 'focus:border-purple-500'}`}
+        style={{ 
+          backgroundColor: currentTheme.inputBg,
+          color: currentTheme.textPrimary,
+          borderColor: error ? '#ef4444' : currentTheme.borderColor,
+          borderRadius: currentTheme.radius
+        }}
+        value={value}
+        onChange={onChange}
+        required={required}
+        maxLength={maxLength}
+      />
+      {error && (
+        <p className="mt-1 text-xs text-red-500">
+          {`Invalid ${name === 'title' ? 'title. Title is required.' : name + ' value.'}`}
+        </p>
+      )}
+    </div>
+  );
+};
+
 const AddItemModal = ({ 
   showAddModal, 
   setShowAddModal, 
@@ -11,21 +167,9 @@ const AddItemModal = ({
 }) => {
   const { currentTheme } = useContext(ThemeContext);
   const [selectedType, setSelectedType] = useState("task");
-  const [formData, setFormData] = useState({
-    title: "",
-    recurrence: "one-time",
-    difficulty: 1,
-    description: "",
-    due: "",
-    progress: 0,
-    status: "Pending",
-    streak: 0,
-    countable: false,
-    targetCount: 1,
-    currentCount: 0,
-    weekday: "monday", // for weekly recurrence
-    monthday: 1, // for monthly recurrence
-  });
+  const [formData, setFormData] = useState({ ...DEFAULT_FORM_DATA });
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
@@ -37,74 +181,127 @@ const AddItemModal = ({
       if (editingItem?.item) {
         // Edit mode - populate form with item data
         setSelectedType(editingItem.type);
+        
+        // Sanitize all string inputs before setting state
+        const sanitizedItem = { ...editingItem.item };
+        for (const key in sanitizedItem) {
+          if (typeof sanitizedItem[key] === 'string') {
+            sanitizedItem[key] = sanitizeInput(sanitizedItem[key]);
+          }
+        }
+        
         setFormData({
-          ...formData, // Keep default values
-          ...editingItem.item, // Override with item data
+          ...DEFAULT_FORM_DATA,
+          ...sanitizedItem,
         });
       } else if (editingItem?.type) {
         // New item with pre-selected type
         setSelectedType(editingItem.type);
-        // Reset to defaults but keep the type
         setFormData({
-          title: "",
-          recurrence: selectedType === "habit" ? "daily" : "one-time",
-          difficulty: 1,
-          description: "",
-          due: "",
-          progress: 0,
-          status: "Pending",
-          streak: 0,
-          countable: false,
-          targetCount: 1,
-          currentCount: 0,
-          weekday: "monday",
-          monthday: 1,
+          ...DEFAULT_FORM_DATA,
+          recurrence: editingItem.type === "habit" ? "daily" : "one-time",
         });
       } else {
         // Default new item
         setSelectedType("task");
-        setFormData({
-          title: "",
-          recurrence: "one-time",
-          difficulty: 1,
-          description: "",
-          due: "",
-          progress: 0,
-          status: "Pending",
-          streak: 0,
-          countable: false,
-          targetCount: 1,
-          currentCount: 0,
-          weekday: "monday",
-          monthday: 1,
-        });
+        setFormData({ ...DEFAULT_FORM_DATA });
       }
+      
+      // Reset errors whenever the modal opens
+      setErrors({});
+      setIsSubmitting(false);
     }
   }, [showAddModal, editingItem]);
 
+  // Validate all form fields
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Check title (required for all types)
+    if (!validateInput('title', formData.title)) {
+      newErrors.title = true;
+    }
+    
+    // Check description (optional but validate if present)
+    if (formData.description && !validateInput('description', formData.description)) {
+      newErrors.description = true;
+    }
+    
+    // Check difficulty
+    if (!validateInput('difficulty', formData.difficulty)) {
+      newErrors.difficulty = true;
+    }
+    
+    // Check progress for projects
+    if (selectedType === 'project' && !validateInput('progress', formData.progress)) {
+      newErrors.progress = true;
+    }
+    
+    // Check counts for countable habits
+    if (selectedType === 'habit' && formData.countable) {
+      if (!validateInput('targetCount', formData.targetCount)) {
+        newErrors.targetCount = true;
+      }
+      if (isEditMode && !validateInput('currentCount', formData.currentCount)) {
+        newErrors.currentCount = true;
+      }
+    }
+    
+    // Check streak for habits in edit mode
+    if (selectedType === 'habit' && isEditMode && !validateInput('streak', formData.streak)) {
+      newErrors.streak = true;
+    }
+    
+    // Check month day for monthly recurrence
+    if (formData.recurrence === 'monthly' && !validateInput('monthday', formData.monthday)) {
+      newErrors.monthday = true;
+    }
+    
+    // Check due date for projects
+    if (selectedType === 'project' && formData.recurrence === 'one-time' && !formData.due) {
+      newErrors.due = true;
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = () => {
-    if (!formData.title.trim()) {
-      return; // Prevent adding empty items
+    setIsSubmitting(true);
+    
+    // Validate all fields before submission
+    if (!validateForm()) {
+      setIsSubmitting(false);
+      return;
+    }
+    
+    // Sanitize string inputs before submission
+    const sanitizedData = { ...formData };
+    for (const key in sanitizedData) {
+      if (typeof sanitizedData[key] === 'string') {
+        sanitizedData[key] = sanitizeInput(sanitizedData[key]);
+      }
     }
     
     if (isEditMode) {
       // Update existing item
       const updatedItem = {
         ...editingItem.item,
-        ...formData
+        ...sanitizedData
       };
       onAddItem(selectedType, updatedItem, true);
     } else {
       // Create new item
       const newItem = {
         id: Date.now(),
-        ...formData
+        ...sanitizedData
       };
       onAddItem(selectedType, newItem, false);
     }
     
     setShowAddModal(false);
     if (setEditingItem) setEditingItem(null);
+    setIsSubmitting(false);
   };
 
   const handleTypeChange = (type) => {
@@ -115,62 +312,85 @@ const AddItemModal = ({
         ...formData,
         recurrence: "daily",
       });
-    } else if (type === "task") {
+    } else if (type === "task" || type === "project") {
       setFormData({
         ...formData,
         recurrence: "one-time",
       });
     }
+    
+    // Reset errors when type changes
+    setErrors({});
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    let processedValue = value;
+    
+    // Remove any error for this field
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: false });
+    }
     
     // Handle special conversions
     if (["difficulty", "targetCount", "currentCount", "monthday"].includes(name)) {
-      setFormData({ ...formData, [name]: parseInt(value) || 0 });
+      processedValue = parseInt(value) || 0;
+      // Validate the numeric input
+      if (!validateInput(name, processedValue)) {
+        setErrors({ ...errors, [name]: true });
+      }
     } else if (name === "progress") {
-      setFormData({ ...formData, [name]: Math.min(100, Math.max(0, parseInt(value) || 0)) });
+      processedValue = Math.min(100, Math.max(0, parseInt(value) || 0));
+      // Validate the progress value
+      if (!validateInput(name, processedValue)) {
+        setErrors({ ...errors, [name]: true });
+      }
     } else if (name === "streak") {
-      setFormData({ ...formData, [name]: Math.max(0, parseInt(value) || 0) });
+      processedValue = Math.max(0, parseInt(value) || 0);
+      // Validate the streak value
+      if (!validateInput(name, processedValue)) {
+        setErrors({ ...errors, [name]: true });
+      }
     } else if (name === "countable") {
-      setFormData({ ...formData, [name]: value === "true" });
-    } else {
-      setFormData({ ...formData, [name]: value });
+      processedValue = value === "true";
+    } else if (typeof value === 'string') {
+      // For string inputs, validate if they match their criteria
+      if (!validateInput(name, value)) {
+        setErrors({ ...errors, [name]: true });
+      }
     }
+    
+    setFormData({ ...formData, [name]: processedValue });
   };
 
-  const handleCountChange = (type) => {
-    if (type === "increment") {
-      setFormData({
-        ...formData,
-        currentCount: formData.currentCount + 1
-      });
-    } else if (type === "decrement") {
-      setFormData({
-        ...formData,
-        currentCount: Math.max(0, formData.currentCount - 1)
-      });
+  const handleNumberChange = (name, value) => {
+    // Remove any error for this field
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: false });
     }
-  };
-
-  const handleTargetCountChange = (type) => {
-    if (type === "increment") {
-      setFormData({
-        ...formData,
-        targetCount: formData.targetCount + 1
-      });
-    } else if (type === "decrement") {
-      setFormData({
-        ...formData,
-        targetCount: Math.max(1, formData.targetCount - 1)
-      });
+    
+    let processedValue = value;
+    
+    if (name === "currentCount") {
+      processedValue = Math.max(0, value);
+    } else if (name === "targetCount") {
+      processedValue = Math.max(1, value);
+    } else if (name === "streak") {
+      processedValue = Math.max(0, value);
     }
+    
+    // Validate the numeric input
+    if (!validateInput(name, processedValue)) {
+      setErrors({ ...errors, [name]: true });
+    }
+    
+    setFormData({ ...formData, [name]: processedValue });
   };
 
   const handleCancel = () => {
     setShowAddModal(false);
     if (setEditingItem) setEditingItem(null);
+    setErrors({});
   };
 
   // Get difficulty indicator based on level (1-4)
@@ -189,12 +409,78 @@ const AddItemModal = ({
     return <div className="flex justify-center gap-1">{stars}</div>;
   };
 
-  // Generate weekday options
+  // Generate options for selects
   const weekdays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
-  
-  // Generate monthday options (1-31)
   const monthdays = Array.from({ length: 31 }, (_, i) => i + 1);
 
+  // Utility function for status colors
+  const getStatusColor = (status, opacity = 1) => {
+    const colors = {
+      "Pending": `rgba(245, 158, 11, ${opacity})`, // amber
+      "In Progress": `rgba(59, 130, 246, ${opacity})`, // blue
+      "Completed": `rgba(16, 185, 129, ${opacity})` // green
+    };
+    return colors[status] || `rgba(107, 114, 128, ${opacity})`; // gray as fallback
+  };
+
+  // Render counter input (used for target, current count, streak)
+  const renderCounter = (name, value, label = "") => {
+    return (
+      <div className="flex items-center">
+        <button
+          type="button"
+          onClick={() => handleNumberChange(name, value - 1)}
+          className="p-1.5 rounded-l-md"
+          style={{ 
+            backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary,
+            color: currentTheme.textSecondary,
+            border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.borderColor}` : 'none',
+            borderRadius: `${currentTheme.radius} 0 0 ${currentTheme.radius}`
+          }}
+        >
+          <MinusIcon className="h-4 w-4" />
+        </button>
+        <input
+          id={name}
+          name={name}
+          type="number"
+          min={name === "targetCount" ? "1" : "0"}
+          className={`w-16 py-1.5 px-2 border text-center border-l-0 border-r-0 ${errors[name] ? 'border-red-500' : ''}`}
+          style={{ 
+            backgroundColor: currentTheme.inputBg,
+            color: currentTheme.textPrimary,
+            borderColor: errors[name] ? '#ef4444' : currentTheme.borderColor
+          }}
+          value={value}
+          onChange={handleInputChange}
+        />
+        <button
+          type="button"
+          onClick={() => handleNumberChange(name, value + 1)}
+          className="p-1.5 rounded-r-md"
+          style={{ 
+            backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary,
+            color: currentTheme.textSecondary,
+            border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.borderColor}` : 'none',
+            borderRadius: `0 ${currentTheme.radius} ${currentTheme.radius} 0`
+          }}
+        >
+          <PlusIcon className="h-4 w-4" />
+        </button>
+        {label && (
+          <span className="ml-2 text-sm" style={{ color: currentTheme.textSecondary }}>
+            {label}
+          </span>
+        )}
+        {errors[name] && (
+          <p className="ml-2 text-xs text-red-500">
+            Invalid value
+          </p>
+        )}
+      </div>
+    );
+  };
+  
   if (!showAddModal) return null;
 
   return (
@@ -243,139 +529,97 @@ const AddItemModal = ({
           {!isEditMode && (
             <div className="flex gap-2 mb-1">
               {["habit", "task", "project"].map((type) => (
-                <button
+                <ThemedButton
                   key={type}
                   onClick={() => handleTypeChange(type)}
-                  className="flex-1 capitalize py-2 rounded-md text-sm font-medium transition-colors"
-                  style={{
-                    backgroundColor: selectedType === type 
-                      ? (isNeonTheme || isCyberpunk ? 'rgba(255, 255, 255, 0.1)' : currentTheme.primaryColor)
-                      : (isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary),
-                    color: selectedType === type 
-                      ? (isNeonTheme || isCyberpunk ? currentTheme.primaryColor : 'white')
-                      : currentTheme.textSecondary,
-                    border: isNeonTheme || isCyberpunk 
-                      ? `1px solid ${selectedType === type ? currentTheme.primaryColor : currentTheme.borderColor}` 
-                      : 'none',
-                    borderRadius: currentTheme.radius
-                  }}
+                  isActive={selectedType === type}
+                  fullWidth={true}
+                  className="capitalize"
                 >
                   {type}
-                </button>
+                </ThemedButton>
               ))}
             </div>
           )}
           
           {/* Title Field */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
-              Title
-            </label>
-            <input
-              id="title"
+            <FormLabel htmlFor="title">Title</FormLabel>
+            <FormInput
               name="title"
-              type="text"
-              placeholder={`What ${selectedType === "habit" ? "habit do you want to build" : "do you want to accomplish"}?`}
-              className="w-full px-4 py-2 border rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:border-purple-500"
-              style={{ 
-                backgroundColor: currentTheme.inputBg,
-                color: currentTheme.textPrimary,
-                borderColor: currentTheme.borderColor,
-                borderRadius: currentTheme.radius
-              }}
               value={formData.title}
               onChange={handleInputChange}
+              placeholder={`What ${selectedType === "habit" ? "habit do you want to build" : "do you want to accomplish"}?`}
+              required={true}
+              error={errors.title}
+              maxLength={100}
             />
           </div>
           
           {/* Description Field */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
-              Description (optional)
-            </label>
+            <FormLabel htmlFor="description">Description (optional)</FormLabel>
             <textarea
               id="description"
               name="description"
               placeholder="Add details..."
-              className="w-full px-4 py-2 border rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:border-purple-500"
+              className={`w-full px-4 py-2 border rounded-lg text-sm placeholder-gray-500 focus:outline-none ${errors.description ? 'border-red-500 focus:border-red-500' : 'focus:border-purple-500'}`}
               rows="2"
               style={{ 
                 backgroundColor: currentTheme.inputBg,
                 color: currentTheme.textPrimary,
-                borderColor: currentTheme.borderColor,
+                borderColor: errors.description ? '#ef4444' : currentTheme.borderColor,
                 borderRadius: currentTheme.radius
               }}
               value={formData.description || ""}
               onChange={handleInputChange}
+              maxLength={500}
             />
+            {errors.description && (
+              <p className="mt-1 text-xs text-red-500">
+                Description is too long (maximum 500 characters).
+              </p>
+            )}
           </div>
           
           {/* Recurrence Selector */}
           <div>
-            <label htmlFor="recurrence" className="block text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
-              Recurrence
-            </label>
+            <FormLabel htmlFor="recurrence">Recurrence</FormLabel>
             
-            {/* Different options for habit vs task */}
+            {/* Different options for habit vs task/project */}
             {selectedType === "habit" ? (
               <div className="grid grid-cols-3 gap-2">
                 {["daily", "weekly", "monthly"].map((recur) => (
-                  <button
+                  <ThemedButton
                     key={recur}
-                    type="button"
-                    className="py-2 capitalize text-sm font-medium"
-                    style={{
-                      backgroundColor: formData.recurrence === recur 
-                        ? (isNeonTheme || isCyberpunk ? 'rgba(255, 255, 255, 0.1)' : currentTheme.primaryColor)
-                        : (isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary),
-                      color: formData.recurrence === recur 
-                        ? (isNeonTheme || isCyberpunk ? currentTheme.primaryColor : 'white')
-                        : currentTheme.textSecondary,
-                      border: isNeonTheme || isCyberpunk 
-                        ? `1px solid ${formData.recurrence === recur ? currentTheme.primaryColor : currentTheme.borderColor}` 
-                        : 'none',
-                      borderRadius: currentTheme.radius
-                    }}
                     onClick={() => setFormData({ ...formData, recurrence: recur })}
+                    isActive={formData.recurrence === recur}
+                    className="capitalize"
                   >
                     {recur}
-                  </button>
+                  </ThemedButton>
                 ))}
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-2">
                 {["one-time", "recurring"].map((recur) => (
-                  <button
+                  <ThemedButton
                     key={recur}
-                    type="button"
-                    className="py-2 capitalize text-sm font-medium"
-                    style={{
-                      backgroundColor: formData.recurrence === recur 
-                        ? (isNeonTheme || isCyberpunk ? 'rgba(255, 255, 255, 0.1)' : currentTheme.primaryColor)
-                        : (isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary),
-                      color: formData.recurrence === recur 
-                        ? (isNeonTheme || isCyberpunk ? currentTheme.primaryColor : 'white')
-                        : currentTheme.textSecondary,
-                      border: isNeonTheme || isCyberpunk 
-                        ? `1px solid ${formData.recurrence === recur ? currentTheme.primaryColor : currentTheme.borderColor}` 
-                        : 'none',
-                      borderRadius: currentTheme.radius
-                    }}
                     onClick={() => setFormData({ ...formData, recurrence: recur })}
+                    isActive={formData.recurrence === recur}
+                    className="capitalize"
                   >
                     {recur.replace('-', ' ')}
-                  </button>
+                  </ThemedButton>
                 ))}
               </div>
             )}
           </div>
           
           {/* Weekly day selector */}
-          {(formData.recurrence === "weekly" || (selectedType === "task" && formData.recurrence === "recurring")) && (
+          {(formData.recurrence === "weekly" || ((selectedType === "task" || selectedType === "project") && formData.recurrence === "recurring")) && (
             <div>
-              <label htmlFor="weekday" className="block text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
-                Day of Week
-              </label>
+              <FormLabel htmlFor="weekday">Day of Week</FormLabel>
               <select
                 id="weekday"
                 name="weekday"
@@ -401,17 +645,15 @@ const AddItemModal = ({
           {/* Monthly day selector */}
           {formData.recurrence === "monthly" && (
             <div>
-              <label htmlFor="monthday" className="block text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
-                Day of Month
-              </label>
+              <FormLabel htmlFor="monthday">Day of Month</FormLabel>
               <select
                 id="monthday"
                 name="monthday"
-                className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:border-purple-500"
+                className={`w-full px-4 py-2 border rounded-lg text-sm focus:outline-none ${errors.monthday ? 'border-red-500 focus:border-red-500' : 'focus:border-purple-500'}`}
                 style={{ 
                   backgroundColor: currentTheme.inputBg,
                   color: currentTheme.textPrimary,
-                  borderColor: currentTheme.borderColor,
+                  borderColor: errors.monthday ? '#ef4444' : currentTheme.borderColor,
                   borderRadius: currentTheme.radius
                 }}
                 value={formData.monthday}
@@ -423,63 +665,50 @@ const AddItemModal = ({
                   </option>
                 ))}
               </select>
+              {errors.monthday && (
+                <p className="mt-1 text-xs text-red-500">
+                  Please select a valid day of the month.
+                </p>
+              )}
             </div>
           )}
           
-          {/* Due Date for Tasks Only */}
-          {selectedType === "task" && formData.recurrence === "one-time" && (
+          {/* Due Date for Tasks and Projects */}
+          {(selectedType === "task" || selectedType === "project") && formData.recurrence === "one-time" && (
             <div>
-              <label htmlFor="due" className="block text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
-                Due Date (optional)
-              </label>
-              <input
-                id="due"
+              <FormLabel htmlFor="due">Due Date {selectedType === "project" ? "" : "(optional)"}</FormLabel>
+              <FormInput
                 name="due"
                 type="date"
-                className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:border-purple-500"
-                style={{ 
-                  backgroundColor: currentTheme.inputBg,
-                  color: currentTheme.textPrimary,
-                  borderColor: currentTheme.borderColor,
-                  borderRadius: currentTheme.radius
-                }}
                 value={formData.due || ""}
                 onChange={handleInputChange}
+                required={selectedType === "project"}
+                error={errors.due}
               />
+              {errors.due && selectedType === "project" && (
+                <p className="mt-1 text-xs text-red-500">
+                  Due date is required for projects.
+                </p>
+              )}
             </div>
           )}
           
           {/* Countable Toggle for Habits */}
           {selectedType === "habit" && (
             <div>
-              <label htmlFor="countable" className="block text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
-                Type of Habit
-              </label>
+              <FormLabel htmlFor="countable">Type of Habit</FormLabel>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { value: "false", label: "Check-off" },
                   { value: "true", label: "Countable" }
                 ].map((option) => (
-                  <button
+                  <ThemedButton
                     key={option.value}
-                    type="button"
-                    className="py-2 text-sm font-medium"
-                    style={{
-                      backgroundColor: String(formData.countable) === option.value 
-                        ? (isNeonTheme || isCyberpunk ? 'rgba(255, 255, 255, 0.1)' : currentTheme.primaryColor)
-                        : (isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary),
-                      color: String(formData.countable) === option.value 
-                        ? (isNeonTheme || isCyberpunk ? currentTheme.primaryColor : 'white')
-                        : currentTheme.textSecondary,
-                      border: isNeonTheme || isCyberpunk 
-                        ? `1px solid ${String(formData.countable) === option.value ? currentTheme.primaryColor : currentTheme.borderColor}` 
-                        : 'none',
-                      borderRadius: currentTheme.radius
-                    }}
                     onClick={() => setFormData({ ...formData, countable: option.value === "true" })}
+                    isActive={String(formData.countable) === option.value}
                   >
                     {option.label}
-                  </button>
+                  </ThemedButton>
                 ))}
               </div>
               <p className="mt-1 text-xs text-gray-500">
@@ -493,152 +722,55 @@ const AddItemModal = ({
           {/* Target count for countable habits */}
           {selectedType === "habit" && formData.countable && (
             <div>
-              <label htmlFor="targetCount" className="block text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
-                Daily Target
-              </label>
-              <div className="flex items-center">
-                <button
-                  type="button"
-                  onClick={() => handleTargetCountChange("decrement")}
-                  className="p-1.5 rounded-l-md"
-                  style={{ 
-                    backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary,
-                    color: currentTheme.textSecondary,
-                    border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.borderColor}` : 'none',
-                    borderRadius: `${currentTheme.radius} 0 0 ${currentTheme.radius}`
-                  }}
-                >
-                  <MinusIcon className="h-4 w-4" />
-                </button>
-                <input
-                  id="targetCount"
-                  name="targetCount"
-                  type="number"
-                  min="1"
-                  className="w-16 py-1.5 px-2 border text-center border-l-0 border-r-0"
-                  style={{ 
-                    backgroundColor: currentTheme.inputBg,
-                    color: currentTheme.textPrimary,
-                    borderColor: currentTheme.borderColor
-                  }}
-                  value={formData.targetCount}
-                  onChange={handleInputChange}
-                />
-                <button
-                  type="button"
-                  onClick={() => handleTargetCountChange("increment")}
-                  className="p-1.5 rounded-r-md"
-                  style={{ 
-                    backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary,
-                    color: currentTheme.textSecondary,
-                    border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.borderColor}` : 'none',
-                    borderRadius: `0 ${currentTheme.radius} ${currentTheme.radius} 0`
-                  }}
-                >
-                  <PlusIcon className="h-4 w-4" />
-                </button>
-                <span className="ml-2 text-sm" style={{ color: currentTheme.textPrimary }}>
-                  per day
-                </span>
-              </div>
+              <FormLabel htmlFor="targetCount">Daily Target</FormLabel>
+              {renderCounter("targetCount", formData.targetCount, "per day")}
             </div>
           )}
           
           {/* Current count for countable habits (edit mode only) */}
           {selectedType === "habit" && formData.countable && isEditMode && (
             <div>
-              <label htmlFor="currentCount" className="block text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
-                Current Count
-              </label>
-              <div className="flex items-center">
-                <button
-                  type="button"
-                  onClick={() => handleCountChange("decrement")}
-                  className="p-1.5 rounded-l-md"
-                  style={{ 
-                    backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary,
-                    color: currentTheme.textSecondary,
-                    border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.borderColor}` : 'none',
-                    borderRadius: `${currentTheme.radius} 0 0 ${currentTheme.radius}`
-                  }}
-                >
-                  <MinusIcon className="h-4 w-4" />
-                </button>
-                <input
-                  id="currentCount"
-                  name="currentCount"
-                  type="number"
-                  min="0"
-                  className="w-16 py-1.5 px-2 border text-center border-l-0 border-r-0"
-                  style={{ 
-                    backgroundColor: currentTheme.inputBg,
-                    color: currentTheme.textPrimary,
-                    borderColor: currentTheme.borderColor
-                  }}
-                  value={formData.currentCount}
-                  onChange={handleInputChange}
-                />
-                <button
-                  type="button"
-                  onClick={() => handleCountChange("increment")}
-                  className="p-1.5 rounded-r-md"
-                  style={{ 
-                    backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary,
-                    color: currentTheme.textSecondary,
-                    border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.borderColor}` : 'none',
-                    borderRadius: `0 ${currentTheme.radius} ${currentTheme.radius} 0`
-                  }}
-                >
-                  <PlusIcon className="h-4 w-4" />
-                </button>
-                <span className="ml-2 text-sm" style={{ color: currentTheme.textSecondary }}>
-                  of {formData.targetCount} target
-                </span>
-              </div>
+              <FormLabel htmlFor="currentCount">Current Count</FormLabel>
+              {renderCounter("currentCount", formData.currentCount, `of ${formData.targetCount} target`)}
             </div>
           )}
           
-          {/* Difficulty Selector for Both Habits and Tasks */}
+          {/* Difficulty Selector */}
           <div>
-            <label htmlFor="difficulty" className="block text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
-              Difficulty
-            </label>
+            <FormLabel htmlFor="difficulty">Difficulty</FormLabel>
             <div className="grid grid-cols-4 gap-2">
-              {[1, 2, 3, 4].map((level) => (
-                <button
-                  key={level}
-                  type="button"
-                  className="py-2 rounded-md text-sm font-medium"
-                  style={{
-                    backgroundColor: formData.difficulty === level 
-                      ? (isNeonTheme || isCyberpunk ? 'rgba(255, 255, 255, 0.1)' : `rgba(${level === 1 ? '16, 185, 129' : level === 2 ? '59, 130, 246' : level === 3 ? '249, 115, 22' : '239, 68, 68'}, 0.4)`)
-                      : (isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary),
-                    color: formData.difficulty === level 
-                      ? (isNeonTheme || isCyberpunk ? [null, "#10b981", "#3b82f6", "#f97316", "#ef4444"][level] : currentTheme.textPrimary)
-                      : currentTheme.textSecondary,
-                    border: isNeonTheme || isCyberpunk 
-                      ? `1px solid ${formData.difficulty === level ? [null, "#10b981", "#3b82f6", "#f97316", "#ef4444"][level] : currentTheme.borderColor}` 
-                      : 'none',
-                    borderRadius: currentTheme.radius
-                  }}
-                  onClick={() => setFormData({ ...formData, difficulty: level })}
-                >
-                  {getDifficultyIndicator(level)}
-                  <div className="mt-1">
-                    {["", "Easy", "Medium", "Hard", "Epic"][level]}
-                  </div>
-                </button>
-              ))}
+              {[1, 2, 3, 4].map((level) => {
+                // Colors for the difficulty levels
+                const difficultyColors = [null, "#10b981", "#3b82f6", "#f97316", "#ef4444"];
+                const bgColors = [null, "rgba(16, 185, 129, 0.4)", "rgba(59, 130, 246, 0.4)", "rgba(249, 115, 22, 0.4)", "rgba(239, 68, 68, 0.4)"];
+                
+                return (
+                  <ThemedButton
+                    key={level}
+                    onClick={() => setFormData({ ...formData, difficulty: level })}
+                    isActive={formData.difficulty === level}
+                    color={isNeonTheme || isCyberpunk ? difficultyColors[level] : bgColors[level]}
+                  >
+                    {getDifficultyIndicator(level)}
+                    <div className="mt-1">
+                      {["", "Easy", "Medium", "Hard", "Epic"][level]}
+                    </div>
+                  </ThemedButton>
+                );
+              })}
             </div>
+            {errors.difficulty && (
+              <p className="mt-1 text-xs text-red-500">
+                Please select a valid difficulty level.
+              </p>
+            )}
           </div>
           
           {/* Progress for Projects Only */}
           {selectedType === "project" && (
             <div>
               <div className="flex justify-between items-center mb-1">
-                <label htmlFor="progress" className="block text-sm font-medium" style={{ color: currentTheme.textPrimary }}>
-                  Progress
-                </label>
+                <FormLabel htmlFor="progress">Progress</FormLabel>
                 <span className="text-sm font-medium" style={{ color: currentTheme.primaryColor }}>
                   {formData.progress || 0}%
                 </span>
@@ -650,7 +782,7 @@ const AddItemModal = ({
                 min="0"
                 max="100"
                 step="5"
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                className={`w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer ${errors.progress ? 'border border-red-500' : ''}`}
                 style={{
                   backgroundColor: `${currentTheme.primaryColor}20`,
                   accentColor: currentTheme.primaryColor
@@ -671,56 +803,20 @@ const AddItemModal = ({
                   ></div>
                 ))}
               </div>
+              {errors.progress && (
+                <p className="mt-1 text-xs text-red-500">
+                  Progress must be between 0 and 100.
+                </p>
+              )}
             </div>
           )}
           
           {/* Streak for Habits Only - only visible when editing */}
           {selectedType === "habit" && isEditMode && (
             <div>
-              <label htmlFor="streak" className="block text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
-                Current Streak
-              </label>
+              <FormLabel htmlFor="streak">Current Streak</FormLabel>
               <div className="flex items-center">
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, streak: Math.max(0, (formData.streak || 0) - 1) })}
-                  className="p-1.5 rounded-l-md"
-                  style={{ 
-                    backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary,
-                    color: currentTheme.textSecondary,
-                    border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.borderColor}` : 'none',
-                    borderRadius: `${currentTheme.radius} 0 0 ${currentTheme.radius}`
-                  }}
-                >
-                  <MinusIcon className="h-4 w-4" />
-                </button>
-                <input
-                  id="streak"
-                  name="streak"
-                  type="number"
-                  min="0"
-                  className="w-16 py-1.5 px-2 border text-center border-l-0 border-r-0"
-                  style={{ 
-                    backgroundColor: currentTheme.inputBg,
-                    color: currentTheme.textPrimary,
-                    borderColor: currentTheme.borderColor
-                  }}
-                  value={formData.streak || 0}
-                  onChange={handleInputChange}
-                />
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, streak: (formData.streak || 0) + 1 })}
-                  className="p-1.5 rounded-r-md"
-                  style={{ 
-                    backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary,
-                    color: currentTheme.textSecondary,
-                    border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.borderColor}` : 'none',
-                    borderRadius: `0 ${currentTheme.radius} ${currentTheme.radius} 0`
-                  }}
-                >
-                  <PlusIcon className="h-4 w-4" />
-                </button>
+                {renderCounter("streak", formData.streak || 0)}
                 <div 
                   className="ml-2 flex items-center gap-1 px-2 py-1 rounded"
                   style={{
@@ -743,33 +839,36 @@ const AddItemModal = ({
           {/* Status for Tasks Only - only visible when editing */}
           {selectedType === "task" && isEditMode && (
             <div>
-              <label htmlFor="status" className="block text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
-                Status
-              </label>
+              <FormLabel htmlFor="status">Status</FormLabel>
               <div className="grid grid-cols-3 gap-2">
                 {["Pending", "In Progress", "Completed"].map((status) => (
-                  <button
+                  <ThemedButton
                     key={status}
-                    type="button"
-                    className="py-2 text-sm font-medium"
-                    style={{
-                      backgroundColor: formData.status === status 
-                        ? (isNeonTheme || isCyberpunk ? 'rgba(255, 255, 255, 0.1)' : getStatusColor(status, 0.4))
-                        : (isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary),
-                      color: formData.status === status 
-                        ? (isNeonTheme || isCyberpunk ? getStatusColor(status, 1) : currentTheme.textPrimary)
-                        : currentTheme.textSecondary,
-                      border: isNeonTheme || isCyberpunk 
-                        ? `1px solid ${formData.status === status ? getStatusColor(status, 1) : currentTheme.borderColor}` 
-                        : 'none',
-                      borderRadius: currentTheme.radius
-                    }}
                     onClick={() => setFormData({ ...formData, status: status })}
+                    isActive={formData.status === status}
+                    color={isNeonTheme || isCyberpunk ? getStatusColor(status, 1) : getStatusColor(status, 0.4)}
                   >
                     {status}
-                  </button>
+                  </ThemedButton>
                 ))}
               </div>
+            </div>
+          )}
+          
+          {/* Show validation errors summary if there are any */}
+          {Object.keys(errors).length > 0 && isSubmitting && (
+            <div className="bg-red-50 border border-red-400 text-red-800 px-4 py-3 rounded relative" role="alert">
+              <strong className="font-bold">Please correct the errors before submitting:</strong>
+              <ul className="mt-1 list-disc list-inside text-sm">
+                {errors.title && <li>Title is required</li>}
+                {errors.description && <li>Description is too long</li>}
+                {errors.due && selectedType === "project" && <li>Due date is required for projects</li>}
+                {errors.difficulty && <li>Invalid difficulty level</li>}
+                {errors.progress && <li>Progress must be between 0-100</li>}
+                {errors.targetCount && <li>Target count must be a positive number</li>}
+                {errors.currentCount && <li>Current count cannot be negative</li>}
+                {errors.streak && <li>Streak cannot be negative</li>}
+              </ul>
             </div>
           )}
         </div>
@@ -791,12 +890,13 @@ const AddItemModal = ({
               borderColor: currentTheme.borderColor,
               borderRadius: currentTheme.radius
             }}
+            disabled={isSubmitting}
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 rounded-md text-sm font-medium shadow-sm transition-all flex items-center"
+            className={`px-4 py-2 rounded-md text-sm font-medium shadow-sm transition-all flex items-center ${isSubmitting ? 'opacity-70 cursor-wait' : ''}`}
             style={{ 
               background: isNeonTheme || isCyberpunk 
                 ? 'transparent' 
@@ -805,8 +905,17 @@ const AddItemModal = ({
               border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.primaryColor}` : 'none',
               borderRadius: currentTheme.radius
             }}
+            disabled={isSubmitting}
           >
-            {isEditMode ? (
+            {isSubmitting ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+              </>
+            ) : isEditMode ? (
               <>
                 <SaveIcon className="w-4 h-4 mr-1.5" />
                 Save Changes
@@ -822,16 +931,6 @@ const AddItemModal = ({
       </div>
     </div>
   );
-};
-
-// Utility function to get color for status
-const getStatusColor = (status, opacity = 1) => {
-  const colors = {
-    "Pending": `rgba(245, 158, 11, ${opacity})`, // amber
-    "In Progress": `rgba(59, 130, 246, ${opacity})`, // blue
-    "Completed": `rgba(16, 185, 129, ${opacity})` // green
-  };
-  return colors[status] || `rgba(107, 114, 128, ${opacity})`; // gray as fallback
 };
 
 export default AddItemModal;
