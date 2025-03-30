@@ -17,7 +17,7 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
 
   return (
     <div className={`relative h-full transition-all duration-300 ease-in-out ${
-      isCollapsed ? "w-0" : "w-96" // Increased width from 72 to 96
+      isCollapsed ? "w-0" : "w-104" // Increased width from 72 to 96
     }`}>
       {/* Inner "sliding door" for the panel content */}
       <div

@@ -13,8 +13,9 @@ export const DEFAULT_FORM_DATA = {
 	currentCount: 0,
 	weekday: "monday",
 	monthday: 1,
+	subtasks: [], // Added subtasks array
   };
-  
+	
   // Input validation functions
   export const validateInput = (name, value) => {
 	switch (name) {
@@ -46,7 +47,7 @@ export const DEFAULT_FORM_DATA = {
 		return true;
 	}
   };
-  
+	
   // Sanitize input to prevent XSS
   export const sanitizeInput = (value) => {
 	if (typeof value !== 'string') return value;
@@ -58,9 +59,10 @@ export const DEFAULT_FORM_DATA = {
 	  .replace(/"/g, '&quot;')
 	  .replace(/'/g, '&#39;');
   };
-  
+	
   // Validate all form fields
-  export const validateForm = (formData, selectedType, isEditMode, setErrors) => {
+  // Validate all form fields
+export const validateForm = (formData, selectedType, isEditMode, setErrors) => {
 	const newErrors = {};
 	
 	// Check title (required for all types)
@@ -101,11 +103,6 @@ export const DEFAULT_FORM_DATA = {
 	// Check month day for monthly recurrence
 	if (formData.recurrence === 'monthly' && !validateInput('monthday', formData.monthday)) {
 	  newErrors.monthday = true;
-	}
-	
-	// Check due date for projects
-	if (selectedType === 'project' && formData.recurrence === 'one-time' && !formData.due) {
-	  newErrors.due = true;
 	}
 	
 	setErrors(newErrors);

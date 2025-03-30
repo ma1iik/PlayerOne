@@ -28,7 +28,7 @@ const SegmentedProgressBar = ({ project, currentTheme }) => {
   );
 };
 
-const ProjectItem = ({ project, onEdit }) => {
+const ProjectItem = ({ project, onEdit, onClick }) => {
   const { currentTheme } = useContext(ThemeContext);
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
@@ -106,6 +106,7 @@ const ProjectItem = ({ project, onEdit }) => {
         border: `1px solid ${currentTheme.borderColor}`,
         boxShadow: currentTheme.shadow
       }}
+      onClick={() => onClick && onClick(project)}
     >
       <div className="flex items-start">
         <div className="ml-1 flex-1">

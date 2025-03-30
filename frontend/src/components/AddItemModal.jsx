@@ -7,7 +7,7 @@ import RecurrenceSection from "./AddItemModal/RecurrenceSection";
 import DifficultySection from "./AddItemModal/DifficultySection";
 import CountableSection from "./AddItemModal/CountableSection";
 import StatusSection from "./AddItemModal/StatusSection";
-import ProgressSection from "./AddItemModal/ProgressSection";
+import SubtaskSection from "./AddItemModal/SubtaskSection";
 import { validateInput, validateForm, sanitizeInput, DEFAULT_FORM_DATA } from "./AddItemModal/ValidationUtils";
 
 const AddItemModal = ({ 
@@ -79,6 +79,17 @@ const AddItemModal = ({
     for (const key in sanitizedData) {
       if (typeof sanitizedData[key] === 'string') {
         sanitizedData[key] = sanitizeInput(sanitizedData[key]);
+      }
+    }
+    
+    // Calculate progress for projects based on completed subtasks
+    if (selectedType === "project") {
+      if (sanitizedData.subtasks && sanitizedData.subtasks.length > 0) {
+        const completedSubtasks = sanitizedData.subtasks.filter(st => st.completed).length;
+        sanitizedData.progress = Math.round((completedSubtasks / sanitizedData.subtasks.length) * 100);
+      } else {
+        // For projects without subtasks, set progress to 0 or use the current value if editing
+        sanitizedData.progress = isEditMode ? formData.progress : 0;
       }
     }
     
@@ -340,13 +351,50 @@ const AddItemModal = ({
             errors={errors}
           />
           
-          {/* Progress for Projects Only */}
+          {/* Subtasks for Projects Only */}
           {selectedType === "project" && (
-            <ProgressSection
+            <SubtaskSection
               formData={formData}
-              handleInputChange={handleInputChange}
-              errors={errors}
+              setFormData={setFormData}
             />
+          )}
+          
+          {/* Progress Display for Projects */}
+          {selectedType === "project" && formData.subtasks && formData.subtasks.length > 0 && (
+            <div>
+              <FormLabel>Progress (Calculated)</FormLabel>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm" style={{ color: currentTheme.textSecondary }}>
+                  {formData.subtasks.filter(st => st.completed).length} of {formData.subtasks.length} subtasks completed
+                </span>
+                <span className="text-sm font-medium" style={{ color: currentTheme.primaryColor }}>
+                  {Math.round((formData.subtasks.filter(st => st.completed).length / formData.subtasks.length) * 100)}%
+                </span>
+              </div>
+              <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: `${currentTheme.primaryColor}20` }}>
+                <div 
+                  className="h-full" 
+                  style={{ 
+                    width: `${Math.round((formData.subtasks.filter(st => st.completed).length / formData.subtasks.length) * 100)}%`, 
+                    backgroundColor: currentTheme.primaryColor 
+                  }}
+                ></div>
+              </div>
+            </div>
+          )}
+
+          {/* For projects without subtasks, show a message */}
+          {selectedType === "project" && (!formData.subtasks || formData.subtasks.length === 0) && (
+            <div>
+              <FormLabel>Progress</FormLabel>
+              <div className="text-center p-3 rounded" style={{ 
+                backgroundColor: currentTheme.bgTertiary, 
+                color: currentTheme.textSecondary,
+                borderRadius: currentTheme.radius
+              }}>
+                Add subtasks to track progress automatically
+              </div>
+            </div>
           )}
           
           {/* Streak for Habits Only - only visible when editing */}

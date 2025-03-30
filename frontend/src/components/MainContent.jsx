@@ -22,292 +22,295 @@ import ProjectItem from "./ProjectItem";
 import ThemeContext from "../context/ThemeContext";
 
 // Section component for DRY code - with optional tabs
-const Section = ({ 
-title, 
-icon, 
-count, 
-tabs,
-activeTab, 
-setActiveTab, 
-items, 
-emptyMessage, 
-emptyDescription,
-footerText,
-addButtonText,
-onAdd,
-renderItem,
-showTabs = true
-}) => {
-const { currentTheme } = useContext(ThemeContext);
-const isNeonTheme = currentTheme.id.includes('neon');
+// In MainContent.jsx, find the Section component and modify the div structure to support scrolling
 
-return (
-  <div className="flex flex-col h-full overflow-hidden">
-    {/* Header */}
-    <div className="flex items-center justify-between p-4 border-b" style={{
-      backgroundColor: currentTheme.bgSecondary,
-      borderColor: currentTheme.borderColor,
-      borderTopLeftRadius: currentTheme.radius,
-      borderTopRightRadius: currentTheme.radius,
-      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
-    }}>
-      <div className="flex items-center gap-2">
-        {icon}
-        <h2 className="text-base font-semibold" style={{ color: currentTheme.textPrimary }}>
-          {isNeonTheme ? title.toUpperCase() : title}
-        </h2>
-        <span className="text-xs font-medium px-2 py-0.5" style={{
-          backgroundColor: `${currentTheme.primaryColor}15`,
-          color: currentTheme.primaryColor,
-          borderRadius: `calc(${currentTheme.radius} / 2)` // Make it less round, more square
-        }}>
-          {count}
-        </span>
-      </div>
-      
-      {/* Tabs - only shown if showTabs is true */}
-      {showTabs && tabs && (
-        <div className="flex bg-gray-100 rounded-lg p-1" style={{
-          backgroundColor: currentTheme.bgTertiary,
-          borderRadius: currentTheme.radius
-        }}>
-          {tabs.map(tab => (
-            <button
-              key={tab.value}
-              onClick={() => setActiveTab(tab.value)}
-              className="px-2.5 py-1 text-xs font-medium transition-colors"
-              style={{
-                backgroundColor: activeTab === tab.value ? currentTheme.bgSecondary : 'transparent',
-                color: activeTab === tab.value ? currentTheme.primaryColor : currentTheme.textSecondary,
-                borderRadius: `calc(${currentTheme.radius} - 2px)`,
-                boxShadow: activeTab === tab.value ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
-              }}
-            >
-              {isNeonTheme ? tab.label.toUpperCase() : tab.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-    
-    {/* Content container */}
-    <div className="flex-1 flex flex-col" style={{
-      backgroundColor: currentTheme.bgPrimary,
-      borderBottomLeftRadius: currentTheme.radius,
-      borderBottomRightRadius: currentTheme.radius,
-      boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-      borderLeft: `1px solid ${currentTheme.borderColor}`,
-      borderRight: `1px solid ${currentTheme.borderColor}`,
-      borderBottom: `1px solid ${currentTheme.borderColor}`
-    }}>
-      {/* Add button */}
-      <div className="p-4 pb-2">
-        <button
-          onClick={onAdd}
-          className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-all duration-200"
-          style={{
-            border: `1px dashed ${currentTheme.borderColor}`,
-            backgroundColor: currentTheme.bgTertiary,
-            color: currentTheme.textSecondary,
-            borderRadius: currentTheme.radius
-          }}
-          onMouseOver={(e) => {
-            // Slightly darken background and border on hover, keeping same color family
-            if (currentTheme.id.includes('neon') || currentTheme.id === 'cyberpunk') {
-              // For neon/cyberpunk themes - just slightly increase opacity
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
-              e.currentTarget.style.borderColor = `${currentTheme.borderColor}`;
-              // Just slightly increase text brightness
-              e.currentTarget.style.color = currentTheme.textSecondary;
-              e.currentTarget.style.opacity = "0.9";
-            } else {
-              // For regular themes - make background just slightly darker
-              const bgColor = currentTheme.bgTertiary;
-              if (bgColor.startsWith('#')) {
-                // Subtle darkening - just reduce brightness by about 5-10%
-                e.currentTarget.style.backgroundColor = bgColor === '#f3f4f6' ? '#ebedf0' : 
-                                                       bgColor === '#374151' ? '#333a48' :
-                                                       bgColor === '#1e1e35' ? '#1c1c31' : 
-                                                       '#e9eaec'; // fallback
-              } else {
-                // For non-hex colors, use opacity trick
-                e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.03)';
-              }
-              
-              // Slightly darken border
-              e.currentTarget.style.borderColor = currentTheme.borderColor === '#e5e7eb' ? '#dfe3ea' :
-                                                 currentTheme.borderColor === '#374151' ? '#3d4759' :
-                                                 currentTheme.borderColor; 
-            }
-            // Make text just slightly darker, not dramatically different
-            e.currentTarget.style.color = currentTheme.textSecondary;
-            e.currentTarget.style.opacity = "0.85";
-          }}
-          onMouseOut={(e) => {
-            // Reset on mouse out
-            e.currentTarget.style.backgroundColor = currentTheme.bgTertiary;
-            e.currentTarget.style.color = currentTheme.textSecondary;
-            e.currentTarget.style.borderColor = currentTheme.borderColor;
-            e.currentTarget.style.opacity = "1";
-          }}
-        >
-          <PlusIcon className="h-4 w-4" />
-          <span>{isNeonTheme ? addButtonText.toUpperCase() : addButtonText}</span>
-        </button>
-      </div>
-      
-      {/* Item list or empty state */}
-      <div className="flex-1 px-4 overflow-y-auto">
-        {items.length === 0 ? (
-          <div className="flex items-center justify-center text-center h-full" style={{
-            color: currentTheme.textSecondary,
-            padding: '2rem 1rem'
+// Section component for DRY code - with optional tabs
+const Section = ({ 
+  title, 
+  icon, 
+  count, 
+  tabs,
+  activeTab, 
+  setActiveTab, 
+  items, 
+  emptyMessage, 
+  emptyDescription,
+  footerText,
+  addButtonText,
+  onAdd,
+  renderItem,
+  showTabs = true
+  }) => {
+  const { currentTheme } = useContext(ThemeContext);
+  const isNeonTheme = currentTheme.id.includes('neon');
+  
+  return (
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b" style={{
+        backgroundColor: currentTheme.bgSecondary,
+        borderColor: currentTheme.borderColor,
+        borderTopLeftRadius: currentTheme.radius,
+        borderTopRightRadius: currentTheme.radius,
+        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+      }}>
+        <div className="flex items-center gap-2">
+          {icon}
+          <h2 className="text-base font-semibold" style={{ color: currentTheme.textPrimary }}>
+            {isNeonTheme ? title.toUpperCase() : title}
+          </h2>
+          <span className="text-xs font-medium px-2 py-0.5" style={{
+            backgroundColor: `${currentTheme.primaryColor}15`,
+            color: currentTheme.primaryColor,
+            borderRadius: `calc(${currentTheme.radius} / 2)` // Make it less round, more square
           }}>
-            <div>
-              {icon && React.cloneElement(icon, {
-                className: "h-12 w-12 mx-auto mb-3",
-                style: { color: `${currentTheme.textSecondary}50` }
-              })}
-              <p className="text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
-                {isNeonTheme ? emptyMessage.toUpperCase() : emptyMessage}
-              </p>
-              <p className="text-xs">{emptyDescription}</p>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-3 py-2">
-            {items.map(item => renderItem(item))}
+            {count}
+          </span>
+        </div>
+        
+        {/* Tabs - only shown if showTabs is true */}
+        {showTabs && tabs && (
+          <div className="flex bg-gray-100 rounded-lg p-1" style={{
+            backgroundColor: currentTheme.bgTertiary,
+            borderRadius: currentTheme.radius
+          }}>
+            {tabs.map(tab => (
+              <button
+                key={tab.value}
+                onClick={() => setActiveTab(tab.value)}
+                className="px-2.5 py-1 text-xs font-medium transition-colors"
+                style={{
+                  backgroundColor: activeTab === tab.value ? currentTheme.bgSecondary : 'transparent',
+                  color: activeTab === tab.value ? currentTheme.primaryColor : currentTheme.textSecondary,
+                  borderRadius: `calc(${currentTheme.radius} - 2px)`,
+                  boxShadow: activeTab === tab.value ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
+                }}
+              >
+                {isNeonTheme ? tab.label.toUpperCase() : tab.label}
+              </button>
+            ))}
           </div>
         )}
       </div>
       
-      {/* Footer */}
-      <div className="px-4 py-3">
-        <div className="border-t pt-3" style={{ borderColor: currentTheme.borderColor }}>
+      {/* Content container with fixed height and scrollable content */}
+      <div className="flex-1 flex flex-col overflow-hidden" style={{
+        backgroundColor: currentTheme.bgPrimary,
+        borderBottomLeftRadius: currentTheme.radius,
+        borderBottomRightRadius: currentTheme.radius,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+        borderLeft: `1px solid ${currentTheme.borderColor}`,
+        borderRight: `1px solid ${currentTheme.borderColor}`,
+        borderBottom: `1px solid ${currentTheme.borderColor}`
+      }}>
+        {/* Add button - fixed at the top */}
+        <div className="p-4 pb-2">
+          <button
+            onClick={onAdd}
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-all duration-200"
+            style={{
+              border: `1px dashed ${currentTheme.borderColor}`,
+              backgroundColor: currentTheme.bgTertiary,
+              color: currentTheme.textSecondary,
+              borderRadius: currentTheme.radius
+            }}
+            onMouseOver={(e) => {
+              // Slightly darken background and border on hover, keeping same color family
+              if (currentTheme.id.includes('neon') || currentTheme.id === 'cyberpunk') {
+                // For neon/cyberpunk themes - just slightly increase opacity
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                e.currentTarget.style.borderColor = `${currentTheme.borderColor}`;
+                // Just slightly increase text brightness
+                e.currentTarget.style.color = currentTheme.textSecondary;
+                e.currentTarget.style.opacity = "0.9";
+              } else {
+                // For regular themes - make background just slightly darker
+                const bgColor = currentTheme.bgTertiary;
+                if (bgColor.startsWith('#')) {
+                  // Subtle darkening - just reduce brightness by about 5-10%
+                  e.currentTarget.style.backgroundColor = bgColor === '#f3f4f6' ? '#ebedf0' : 
+                                                         bgColor === '#374151' ? '#333a48' :
+                                                         bgColor === '#1e1e35' ? '#1c1c31' : 
+                                                         '#e9eaec'; // fallback
+                } else {
+                  // For non-hex colors, use opacity trick
+                  e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.03)';
+                }
+                
+                // Slightly darken border
+                e.currentTarget.style.borderColor = currentTheme.borderColor === '#e5e7eb' ? '#dfe3ea' :
+                                                   currentTheme.borderColor === '#374151' ? '#3d4759' :
+                                                   currentTheme.borderColor; 
+              }
+              // Make text just slightly darker, not dramatically different
+              e.currentTarget.style.color = currentTheme.textSecondary;
+              e.currentTarget.style.opacity = "0.85";
+            }}
+            onMouseOut={(e) => {
+              // Reset on mouse out
+              e.currentTarget.style.backgroundColor = currentTheme.bgTertiary;
+              e.currentTarget.style.color = currentTheme.textSecondary;
+              e.currentTarget.style.borderColor = currentTheme.borderColor;
+              e.currentTarget.style.opacity = "1";
+            }}
+          >
+            <PlusIcon className="h-4 w-4" />
+            <span>{isNeonTheme ? addButtonText.toUpperCase() : addButtonText}</span>
+          </button>
+        </div>
+        
+        {/* Scrollable item list area with fixed height */}
+        <div className="flex-1 px-4 overflow-y-auto custom-scrollbar">
+          {items.length === 0 ? (
+            <div className="flex items-center justify-center text-center h-full" style={{
+              color: currentTheme.textSecondary,
+              padding: '2rem 1rem'
+            }}>
+              <div>
+                {icon && React.cloneElement(icon, {
+                  className: "h-12 w-12 mx-auto mb-3",
+                  style: { color: `${currentTheme.textSecondary}50` }
+                })}
+                <p className="text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
+                  {isNeonTheme ? emptyMessage.toUpperCase() : emptyMessage}
+                </p>
+                <p className="text-xs">{emptyDescription}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3 py-2 pb-16">
+              {items.map(item => renderItem(item))}
+            </div>
+          )}
+        </div>
+        
+        {/* Footer - fixed at the bottom */}
+        <div className="px-4 py-3 mt-auto border-t" style={{ borderColor: currentTheme.borderColor }}>
           <p className="text-xs text-center" style={{ color: currentTheme.textSecondary }}>
             {footerText}
           </p>
         </div>
       </div>
     </div>
-  </div>
-);
-};
+  );
+  };
 
 const MainContent = ({
-setShowAddModal,
-searchQuery,
-setSearchQuery,
-habits,
-tasks,
-projects,
-setTasks,
-setHabits,
-setProjects,
-isCollapsed,
-toggleCollapse,
-setEditingItem
+  setShowAddModal,
+  searchQuery,
+  setSearchQuery,
+  habits,
+  tasks,
+  projects,
+  setTasks,
+  setHabits,
+  setProjects,
+  isCollapsed,
+  toggleCollapse,
+  setEditingItem,
+  setSelectedProject
 }) => {
-const { currentTheme } = useContext(ThemeContext);
-const isNeonTheme = currentTheme.id.includes('neon');
+  const { currentTheme } = useContext(ThemeContext);
+  const isNeonTheme = currentTheme.id.includes('neon');
 
-// Tab states for each section - Keep habits tab functionality but don't show it
-const [habitTab, setHabitTab] = useState('all');
-const [taskTab, setTaskTab] = useState('active');
-const [projectTab, setProjectTab] = useState('all');
+  // Tab states for each section - Keep habits tab functionality but don't show it
+  const [habitTab, setHabitTab] = useState('all');
+  const [taskTab, setTaskTab] = useState('active');
+  const [projectTab, setProjectTab] = useState('all');
 
-// Handle completing a task
-const handleCompleteTask = (id) => {
-  setTasks(
-    tasks.map((t) =>
-      t.id === id ? { ...t, status: t.status === "Completed" ? "Pending" : "Completed" } : t
-    )
+  // Handle completing a task
+  const handleCompleteTask = (id) => {
+    setTasks(
+      tasks.map((t) =>
+        t.id === id ? { ...t, status: t.status === "Completed" ? "Pending" : "Completed" } : t
+      )
+    );
+  };
+
+  // Handle toggling a habit completion
+  const handleToggleHabit = (id) => {
+    setHabits(
+      habits.map((h) =>
+        h.id === id ? { ...h, completed: !h.completed } : h
+      )
+    );
+  };
+
+  // Handle updating a countable habit
+  const handleUpdateHabitCount = (id, newCount) => {
+    setHabits(
+      habits.map((h) =>
+        h.id === id ? { ...h, currentCount: newCount } : h
+      )
+    );
+  };
+
+  // Handle editing an item
+  const handleEditItem = (item, type) => {
+    setEditingItem({ item, type });
+    setShowAddModal(true);
+  };
+
+  // Handle adding a new item based on type
+  const handleAddItem = (type) => {
+    setEditingItem({ type, item: null });
+    setShowAddModal(true);
+  };
+
+  // Filter items based on search query and active tab
+  const filteredHabits = habits.filter(habit => 
+    searchQuery ? habit.title.toLowerCase().includes(searchQuery.toLowerCase()) : true
+  ).sort((a, b) => {
+    // Sort by completion status - completed habits go to the bottom
+    const aCompleted = a.completed || (a.countable && a.targetCount > 0 && (a.currentCount || 0) >= a.targetCount);
+    const bCompleted = b.completed || (b.countable && b.targetCount > 0 && (b.currentCount || 0) >= b.targetCount);
+    
+    if (aCompleted && !bCompleted) return 1;
+    if (!aCompleted && bCompleted) return -1;
+    return 0;
+  });
+
+  const filteredTasks = tasks.filter(task => {
+    if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+    
+    if (taskTab === 'active') return task.status !== 'Completed';
+    if (taskTab === 'completed') return task.status === 'Completed';
+    if (taskTab === 'scheduled') return task.due && task.status !== 'Completed';
+    return true;
+  });
+
+  const filteredProjects = projects.filter(project => {
+    if (searchQuery && !project.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+    
+    if (projectTab === 'active') return project.progress < 100;
+    if (projectTab === 'completed') return project.progress === 100;
+    return true;
+  });
+
+  // Icons for sections
+  const habitIcon = (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" style={{ color: currentTheme.textSecondary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
   );
-};
 
-// Handle toggling a habit completion
-const handleToggleHabit = (id) => {
-  setHabits(
-    habits.map((h) =>
-      h.id === id ? { ...h, completed: !h.completed } : h
-    )
+  const taskIcon = (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" style={{ color: currentTheme.textSecondary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+    </svg>
   );
-};
 
-// Handle updating a countable habit
-const handleUpdateHabitCount = (id, newCount) => {
-  setHabits(
-    habits.map((h) =>
-      h.id === id ? { ...h, currentCount: newCount } : h
-    )
+  const projectIcon = (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" style={{ color: currentTheme.textSecondary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+    </svg>
   );
-};
 
-// Handle editing an item
-const handleEditItem = (item, type) => {
-  setEditingItem({ item, type });
-  setShowAddModal(true);
-};
-
-// Handle adding a new item based on type
-const handleAddItem = (type) => {
-  setEditingItem({ type, item: null });
-  setShowAddModal(true);
-};
-
-// Filter items based on search query and active tab
-const filteredHabits = habits.filter(habit => 
-  searchQuery ? habit.title.toLowerCase().includes(searchQuery.toLowerCase()) : true
-).sort((a, b) => {
-  // Sort by completion status - completed habits go to the bottom
-  const aCompleted = a.completed || (a.countable && a.targetCount > 0 && (a.currentCount || 0) >= a.targetCount);
-  const bCompleted = b.completed || (b.countable && b.targetCount > 0 && (b.currentCount || 0) >= b.targetCount);
-  
-  if (aCompleted && !bCompleted) return 1;
-  if (!aCompleted && bCompleted) return -1;
-  return 0;
-});
-
-const filteredTasks = tasks.filter(task => {
-  if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-    return false;
-  }
-  
-  if (taskTab === 'active') return task.status !== 'Completed';
-  if (taskTab === 'completed') return task.status === 'Completed';
-  if (taskTab === 'scheduled') return task.due && task.status !== 'Completed';
-  return true;
-});
-
-const filteredProjects = projects.filter(project => {
-  if (searchQuery && !project.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-    return false;
-  }
-  
-  if (projectTab === 'active') return project.progress < 100;
-  if (projectTab === 'completed') return project.progress === 100;
-  return true;
-});
-
-// Icons for sections
-const habitIcon = (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" style={{ color: currentTheme.textSecondary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
-
-const taskIcon = (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" style={{ color: currentTheme.textSecondary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-  </svg>
-);
-
-const projectIcon = (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" style={{ color: currentTheme.textSecondary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-  </svg>
-);
-
+  // In MainContent.jsx, find the main return function and update the outer container
 return (
   <div className="flex-1 flex flex-col overflow-hidden" style={{ backgroundColor: currentTheme.bgPrimary }}>
     {/* Header */}
@@ -376,8 +379,8 @@ return (
       </div>
     </div>
 
-    {/* Content with grid layout */}
-    <div className="flex-1 pt-4 pb-6 overflow-hidden px-4 sm:px-6 lg:px-8">
+    {/* Content with grid layout - this container is scrollable */}
+    <div className="flex-1 overflow-hidden pt-4 pb-6 px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full">
         {/* Habits section - No tabs */}
         <Section
@@ -460,6 +463,7 @@ return (
               key={project.id}
               project={project}
               onEdit={() => handleEditItem(project, "project")}
+              onClick={setSelectedProject}
             />
           )}
         />
@@ -467,6 +471,6 @@ return (
     </div>
   </div>
 );
-};
+}
 
 export default MainContent;
