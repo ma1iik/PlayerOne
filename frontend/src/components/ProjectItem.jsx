@@ -109,11 +109,42 @@ const ProjectItem = ({ project, onEdit }) => {
     >
       <div className="flex items-start">
         <div className="ml-1 flex-1">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <h3 className="text-sm font-medium" style={{ color: currentTheme.textPrimary }}>
               {isNeonTheme ? project.title.toUpperCase() : project.title}
             </h3>
-            <div className="text-xs">
+            
+            {/* Edit button (pencil icon) - styled to match TaskItem */}
+            <div 
+              className="ml-2 opacity-0 group-hover:opacity-40 transition-opacity"
+            >
+              <button 
+                className="p-1 rounded-sm transition-opacity"
+                style={{ 
+                  color: currentTheme.textSecondary
+                }}
+                onMouseOver={(e) => {
+                  // Darken the icon itself on hover (not the background)
+                  e.currentTarget.style.opacity = "1";
+                }}
+                onMouseOut={(e) => {
+                  // Reset on mouse out
+                  e.currentTarget.style.opacity = "";
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+              >
+                <PencilIcon className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            
+            {/* Add flex-1 to push the stars to the right */}
+            <div className="flex-1"></div>
+            
+            {/* Difficulty stars - positioned at the right */}
+            <div className="text-xs mr-2">
               {getDifficultyIndicator(project.difficulty || 1)}
             </div>
           </div>
@@ -188,25 +219,6 @@ const ProjectItem = ({ project, onEdit }) => {
               </span>
             )}
           </div>
-        </div>
-        <div 
-          className="absolute right-3 top-3 flex items-center opacity-0 group-hover:opacity-100 transition-opacity"
-        >
-          <button 
-            className="p-1 transition-colors"
-            style={{ 
-              color: currentTheme.textSecondary,
-              backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary,
-              borderRadius: currentTheme.radius,
-              border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.borderColor}` : 'none'
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit();
-            }}
-          >
-            <PencilIcon className="h-4 w-4" />
-          </button>
         </div>
       </div>
     </div>
