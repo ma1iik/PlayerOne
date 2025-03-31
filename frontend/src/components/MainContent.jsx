@@ -21,6 +21,7 @@ import TaskItem from "./TaskItem";
 import ProjectItem from "./ProjectItem";
 import ThemeContext from "../context/ThemeContext";
 
+
 // Section component for DRY code - with optional tabs
 // In MainContent.jsx, find the Section component and modify the div structure to support scrolling
 
@@ -215,7 +216,7 @@ const MainContent = ({
 
   // Tab states for each section - Keep habits tab functionality but don't show it
   const [habitTab, setHabitTab] = useState('all');
-  const [taskTab, setTaskTab] = useState('active');
+  const [taskTab, setTaskTab] = useState('all');
   const [projectTab, setProjectTab] = useState('all');
 
   // Handle completing a task
@@ -275,10 +276,34 @@ const MainContent = ({
       return false;
     }
     
-    if (taskTab === 'active') return task.status !== 'Completed';
-    if (taskTab === 'completed') return task.status === 'Completed';
-    if (taskTab === 'scheduled') return task.due && task.status !== 'Completed';
+    // When viewing ALL tasks, show everything - don't filter by status
+    if (taskTab === 'all') return true;
+    
+    // For scheduled view, show only tasks with due dates (regardless of completion status)
+    if (taskTab === 'scheduled') return task.due;
+        
+    // For completed view, still filter to show only completed tasks
+    if (taskTab === 'completed') return task.status === "Completed";
+    
     return true;
+  }).sort((a, b) => {
+    // Sort by completion status - completed tasks go to the bottom
+    const aCompleted = a.status === "Completed";
+    const bCompleted = b.status === "Completed";
+    
+    if (aCompleted && !bCompleted) return 1;
+    if (!aCompleted && bCompleted) return -1;
+    
+    // For tasks with due dates, sort by due date (most urgent first)
+    if (a.due && b.due) {
+      return new Date(a.due) - new Date(b.due);
+    }
+    
+    // Tasks with due dates come before tasks without due dates
+    if (a.due && !b.due) return -1;
+    if (!a.due && b.due) return 1;
+    
+    return 0;
   });
 
   const filteredProjects = projects.filter(project => {
@@ -310,167 +335,168 @@ const MainContent = ({
     </svg>
   );
 
-  // In MainContent.jsx, find the main return function and update the outer container
-return (
-  <div className="flex-1 flex flex-col overflow-hidden" style={{ backgroundColor: currentTheme.bgPrimary }}>
-    {/* Header */}
-    <div className="z-10 px-4 sm:px-6 lg:px-8 py-4" style={{
-      backgroundColor: currentTheme.bgSecondary,
-      borderBottom: `1px solid ${currentTheme.borderColor}`,
-      boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-    }}>
-      <div className="flex items-center justify-between">
-        {/* Toggle button (when panel is collapsed) */}
-        <div className="flex items-center">
-          {isCollapsed && (
-            <button
-              onClick={toggleCollapse}
-              className="mr-4 p-2 rounded transition-colors"
-              style={{
-                backgroundColor: currentTheme.bgSecondary,
-                color: currentTheme.textSecondary,
-                border: `1px solid ${currentTheme.borderColor}`,
-                borderRadius: currentTheme.radius,
-                boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-              }}
-            >
-              <ChevronRightIcon className="w-5 h-5" />
-            </button>
-          )}
-        </div>
-
-        {/* Search bar */}
-        <div className="flex justify-center flex-1">
-          <div className="relative w-full max-w-2xl">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon className="w-5 h-5" style={{ color: currentTheme.textSecondary }} />
-            </div>
-            <input
-              type="text"
-              placeholder="Search items..."
-              className="pl-10 pr-3 py-2 w-full focus:outline-none"
-              style={{
-                border: `1px solid ${currentTheme.borderColor}`,
-                borderRadius: currentTheme.radius,
-                backgroundColor: currentTheme.inputBg,
-                color: currentTheme.textPrimary,
-                boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-              }}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+  return (
+    <div className="flex-1 flex flex-col overflow-hidden" style={{ backgroundColor: currentTheme.bgPrimary }}>
+      {/* Header - Modified to remove background */}
+      <div className="z-10 px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex items-center justify-between">
+          {/* Toggle button (when panel is collapsed) */}
+          <div className="flex items-center">
+            {isCollapsed && (
+              <button
+                onClick={toggleCollapse}
+                className="mr-4 p-2 rounded transition-colors"
+                style={{
+                  backgroundColor: 'transparent',
+                  color: currentTheme.textSecondary,
+                  border: `1px solid ${currentTheme.borderColor}`,
+                  borderRadius: currentTheme.radius,
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                }}
+              >
+                <ChevronRightIcon className="w-5 h-5" />
+              </button>
+            )}
           </div>
+
+          {/* Search bar */}
+          <div className="flex justify-center flex-1">
+            <div className="relative w-full max-w-2xl">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <SearchIcon className="w-5 h-5" style={{ color: currentTheme.textSecondary }} />
+              </div>
+              <input
+                type="text"
+                placeholder="Search items..."
+                className="pl-10 pr-3 py-2 w-full focus:outline-none transition-colors duration-150"
+                style={{
+                  border: `1px solid ${currentTheme.borderColor}`,
+                  borderRadius: currentTheme.radius,
+                  backgroundColor: 'white',
+                  color: currentTheme.textPrimary,
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = currentTheme.primaryColor;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = currentTheme.borderColor;
+                }}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Add item button */}
+          <button
+            onClick={() => handleAddItem("task")}
+            className="ml-4 flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all"
+            style={{
+              background: `linear-gradient(135deg, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
+              color: '#ffffff',
+              borderRadius: currentTheme.radius,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            }}
+          >
+            <PlusIcon className="w-5 h-5" />
+            {isNeonTheme ? 'ADD ITEM' : 'Add Item'}
+          </button>
         </div>
+      </div>
 
-        {/* Add item button */}
-        <button
-          onClick={() => handleAddItem("task")}
-          className="ml-4 flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all"
-          style={{
-            background: `linear-gradient(135deg, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
-            color: '#ffffff',
-            borderRadius: currentTheme.radius,
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-          }}
-        >
-          <PlusIcon className="w-5 h-5" />
-          {isNeonTheme ? 'ADD ITEM' : 'Add Item'}
-        </button>
+      {/* Content with grid layout - this container is scrollable */}
+      <div className="flex-1 overflow-hidden pt-4 pb-6 px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full">
+          {/* Habits section - No tabs */}
+          <Section
+            title="Habits"
+            icon={habitIcon}
+            count={filteredHabits.length}
+            tabs={[
+              { value: 'all', label: 'All' },
+              { value: 'week', label: 'Week' },
+              { value: 'strong', label: 'Strong' }
+            ]}
+            activeTab={habitTab}
+            setActiveTab={setHabitTab}
+            items={filteredHabits}
+            emptyMessage="No habits found"
+            emptyDescription="Create your first habit to start building consistency"
+            footerText="Track regular activities with habits. Build streaks and earn rewards for consistency."
+            addButtonText="Add a Habit"
+            onAdd={() => handleAddItem("habit")}
+            renderItem={(habit) => (
+              <HabitItem
+                key={habit.id}
+                habit={habit}
+                onEdit={() => handleEditItem(habit, "habit")}
+                onToggle={handleToggleHabit}
+                onUpdateCount={handleUpdateHabitCount}
+              />
+            )}
+            showTabs={false} // This is the key change - hide tabs for habits
+          />
+
+          {/* Tasks section */}
+          <Section
+            title="Tasks"
+            icon={taskIcon}
+            count={filteredTasks.length}
+            tabs={[
+              { value: 'all', label: 'All' },
+              { value: 'scheduled', label: 'Scheduled' },
+              { value: 'completed', label: 'Done' }
+            ]}
+            activeTab={taskTab}
+            setActiveTab={setTaskTab}
+            items={filteredTasks}
+            emptyMessage="No tasks found"
+            emptyDescription="Tasks help you track individual items you need to complete"
+            footerText="Complete tasks to earn rewards. Higher difficulty tasks give more experience and coins."
+            addButtonText="Add a Task"
+            onAdd={() => handleAddItem("task")}
+            renderItem={(task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onComplete={handleCompleteTask}
+                onEdit={() => handleEditItem(task, "task")}
+              />
+            )}
+          />
+
+          {/* Projects section */}
+          <Section
+            title="Projects"
+            icon={projectIcon}
+            count={filteredProjects.length}
+            tabs={[
+              { value: 'all', label: 'All' },
+              { value: 'active', label: 'Active' },
+              { value: 'completed', label: 'Done' }
+            ]}
+            activeTab={projectTab}
+            setActiveTab={setProjectTab}
+            items={filteredProjects}
+            emptyMessage="No projects found"
+            emptyDescription="Projects help you track longer-term goals with multiple steps"
+            footerText="Track long-term goals with projects. Update progress as you complete each step."
+            addButtonText="Add a Project"
+            onAdd={() => handleAddItem("project")}
+            renderItem={(project) => (
+              <ProjectItem
+                key={project.id}
+                project={project}
+                onEdit={() => handleEditItem(project, "project")}
+                onClick={setSelectedProject}
+              />
+            )}
+          />
+        </div>
       </div>
     </div>
-
-    {/* Content with grid layout - this container is scrollable */}
-    <div className="flex-1 overflow-hidden pt-4 pb-6 px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full">
-        {/* Habits section - No tabs */}
-        <Section
-          title="Habits"
-          icon={habitIcon}
-          count={filteredHabits.length}
-          tabs={[
-            { value: 'all', label: 'All' },
-            { value: 'week', label: 'Week' },
-            { value: 'strong', label: 'Strong' }
-          ]}
-          activeTab={habitTab}
-          setActiveTab={setHabitTab}
-          items={filteredHabits}
-          emptyMessage="No habits found"
-          emptyDescription="Create your first habit to start building consistency"
-          footerText="Track regular activities with habits. Build streaks and earn rewards for consistency."
-          addButtonText="Add a Habit"
-          onAdd={() => handleAddItem("habit")}
-          renderItem={(habit) => (
-            <HabitItem
-              key={habit.id}
-              habit={habit}
-              onEdit={() => handleEditItem(habit, "habit")}
-              onToggle={handleToggleHabit}
-              onUpdateCount={handleUpdateHabitCount}
-            />
-          )}
-          showTabs={false} // This is the key change - hide tabs for habits
-        />
-
-        {/* Tasks section */}
-        <Section
-          title="Tasks"
-          icon={taskIcon}
-          count={filteredTasks.length}
-          tabs={[
-            { value: 'active', label: 'Active' },
-            { value: 'scheduled', label: 'Scheduled' },
-            { value: 'completed', label: 'Done' }
-          ]}
-          activeTab={taskTab}
-          setActiveTab={setTaskTab}
-          items={filteredTasks}
-          emptyMessage="No tasks found"
-          emptyDescription="Tasks help you track individual items you need to complete"
-          footerText="Complete tasks to earn rewards. Higher difficulty tasks give more experience and coins."
-          addButtonText="Add a Task"
-          onAdd={() => handleAddItem("task")}
-          renderItem={(task) => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              onComplete={handleCompleteTask}
-              onEdit={() => handleEditItem(task, "task")}
-            />
-          )}
-        />
-
-        {/* Projects section */}
-        <Section
-          title="Projects"
-          icon={projectIcon}
-          count={filteredProjects.length}
-          tabs={[
-            { value: 'all', label: 'All' },
-            { value: 'active', label: 'Active' },
-            { value: 'completed', label: 'Done' }
-          ]}
-          activeTab={projectTab}
-          setActiveTab={setProjectTab}
-          items={filteredProjects}
-          emptyMessage="No projects found"
-          emptyDescription="Projects help you track longer-term goals with multiple steps"
-          footerText="Track long-term goals with projects. Update progress as you complete each step."
-          addButtonText="Add a Project"
-          onAdd={() => handleAddItem("project")}
-          renderItem={(project) => (
-            <ProjectItem
-              key={project.id}
-              project={project}
-              onEdit={() => handleEditItem(project, "project")}
-              onClick={setSelectedProject}
-            />
-          )}
-        />
-      </div>
-    </div>
-  </div>
-);
+  );
 }
 
 export default MainContent;

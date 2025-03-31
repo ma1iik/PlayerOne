@@ -12,7 +12,7 @@ const TaskItem = ({ task, onComplete, onEdit }) => {
   const [isCompleted, setIsCompleted] = useState(task.status === "Completed");
   
   // Use completion status
-  const displayAsCompleted = isCompleted;
+  const displayAsCompleted = task.status === "Completed";
   
   // This effect updates the border directly on completion change
   // by manipulating the DOM element directly, bypassing React's transitions
@@ -32,7 +32,7 @@ const TaskItem = ({ task, onComplete, onEdit }) => {
         containerRef.current.style.borderLeft = baseBorder;
       }
     }
-  }, [displayAsCompleted, currentTheme, isNeonTheme, isCyberpunk, task.due]);
+  }, [displayAsCompleted, currentTheme, isNeonTheme, isCyberpunk, task.due, task.status]);
 
   // Check if task is due soon (within 48 hours)
   const isDueSoon = () => {
@@ -184,6 +184,22 @@ const TaskItem = ({ task, onComplete, onEdit }) => {
           
           {/* Task metadata */}
           <div className="flex items-center mt-1">
+            {/* Status badge - Added for completed task */}
+            {displayAsCompleted && (
+              <span 
+                className="text-xs font-medium px-1.5 py-0.5 mr-2 transition-all duration-300" 
+                style={{
+                  backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : 'rgba(16, 185, 129, 0.1)',
+                  color: '#10b981', // green color
+                  borderRadius: currentTheme.radius,
+                  border: isNeonTheme || isCyberpunk ? `1px solid #10b981` : 'none',
+                  opacity: 0.8
+                }}
+              >
+                {isNeonTheme ? 'COMPLETED' : 'Completed'}
+              </span>
+            )}
+            
             {/* Recurrence type */}
             <span 
               className="text-xs font-medium px-1.5 py-0.5 transition-all duration-300" 
