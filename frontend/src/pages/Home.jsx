@@ -1,13 +1,15 @@
 // src/pages/Home.jsx
 import React, { useState, useContext } from "react";
-import ProfilePanel from "../components/ProfilePanel";
+import ProfilePanel from "../components/layout/ProfilePanel";
 import MainContent from "../components/MainContent";
-import AddItemModal from "../components/AddItemModal";
+import AddItemModal from "../components/modals/AddItemModal";
 import ThemeContext from "../context/ThemeContext";
-import ProjectDetail from "../components/ProjectDetail";
+import ProjectDetail from "../components/projects/ProjectDetail";
 
 const Home = () => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   
   const [isCollapsed, setIsCollapsed] = useState(false); // Keep panel expanded by default
   const [showAddModal, setShowAddModal] = useState(false);

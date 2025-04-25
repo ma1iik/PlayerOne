@@ -11,7 +11,7 @@ import ThemeContext from "../context/ThemeContext";
 import ItemGrid from "../components/shared/ItemGrid";
 import ItemList from "../components/shared/ItemList";
 import ItemDetail from "../components/inventory/ItemDetail";
-import FilterPanel from "../components/shared/FilterPanel";
+import FilterPanel from "../components/ui/FilterPanel";
 import { sampleInventoryItems } from "../data/inventoryData";
 import { 
   filterOptions, 
@@ -21,6 +21,8 @@ import {
 
 const Inventory = () => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 

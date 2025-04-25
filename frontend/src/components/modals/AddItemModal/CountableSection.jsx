@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import ThemeContext from "../../context/ThemeContext";
+import React, { useContext } from "react"; 
+import ThemeContext from "../../../context/ThemeContext";
 import { ThemedButton, FormLabel } from "./FormComponents";
 import { CounterInput } from "./FormComponents";
 
@@ -11,6 +11,8 @@ const CountableSection = ({
   errors 
 }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   const isNeonTheme = currentTheme.id.includes('neon');
 
   return (

@@ -16,6 +16,8 @@ const Login = () => {
   const { login } = useAuth();
   const { currentTheme } = useContext(ThemeContext);
 
+
+
   // Check for saved email on mount
   useEffect(() => {
     const savedEmail = authService.getSavedEmail();

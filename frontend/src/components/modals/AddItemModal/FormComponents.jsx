@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import ThemeContext from "../../context/ThemeContext";
+import React, { useContext } from "react"; 
+import ThemeContext from "../../../context/ThemeContext";
 import { PlusIcon, MinusIcon } from "@heroicons/react/outline";
 
 // Utility function for rendering themed buttons
@@ -13,6 +13,8 @@ export const ThemedButton = ({
   disabled = false
 }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
   
@@ -43,6 +45,8 @@ export const ThemedButton = ({
 // Utility function for form labels
 export const FormLabel = ({ htmlFor, children }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   
   return (
     <label 
@@ -68,6 +72,8 @@ export const FormInput = ({
   maxLength = null
 }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   
   return (
     <div>
@@ -100,6 +106,8 @@ export const FormInput = ({
 // Counter input component for numeric values
 export const CounterInput = ({ name, value, onChange, min = 0, error = false, label = "" }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 

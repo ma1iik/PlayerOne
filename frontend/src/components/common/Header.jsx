@@ -8,6 +8,8 @@ const Header = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const { logout } = useAuth();
   const { currentTheme } = useContext(ThemeContext);
+
+
   const profileRef = useRef(null);
   const location = useLocation();
   const [notificationCount, setNotificationCount] = useState(3); // Example notification count

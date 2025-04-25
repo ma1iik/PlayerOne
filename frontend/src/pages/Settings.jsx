@@ -6,6 +6,8 @@ import ThemeContext from "../context/ThemeContext";
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("theme");
   const { currentTheme } = useContext(ThemeContext);
+
+
   
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';

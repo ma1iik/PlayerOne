@@ -1,6 +1,6 @@
-import React, { useContext } from "react";
+import React, { useContext } from "react"; 
 import { PencilIcon } from "@heroicons/react/outline";
-import ThemeContext from "../context/ThemeContext";
+import ThemeContext from "../../context/ThemeContext";
 
 // Dynamic Segmented Progress Bar Component
 const SegmentedProgressBar = ({ project, currentTheme }) => {
@@ -30,6 +30,8 @@ const SegmentedProgressBar = ({ project, currentTheme }) => {
 
 const ProjectItem = ({ project, onEdit, onClick }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 

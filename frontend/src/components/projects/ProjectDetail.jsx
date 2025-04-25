@@ -7,7 +7,7 @@ import {
   PencilIcon,
   TrashIcon
 } from "@heroicons/react/outline";
-import ThemeContext from "../context/ThemeContext";
+import ThemeContext from "../../context/ThemeContext";
 
 const ProjectDetail = ({ 
   project, 
@@ -21,6 +21,8 @@ const ProjectDetail = ({
   if (!project) return null;
   
   const { currentTheme } = useContext(ThemeContext);
+
+
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
   

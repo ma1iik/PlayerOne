@@ -16,9 +16,9 @@ const handleUpdateHabitCount = (id, newCount) => {
   );
 };import React, { useContext, useState } from "react";
 import { PlusIcon, SearchIcon, ChevronRightIcon } from "@heroicons/react/outline";
-import HabitItem from "./HabitItem";
-import TaskItem from "./TaskItem";
-import ProjectItem from "./ProjectItem";
+import HabitItem from "./habits/HabitItem";
+import TaskItem from "./tasks/TaskItem";
+import ProjectItem from "./projects/ProjectItem";
 import ThemeContext from "../context/ThemeContext";
 
 
@@ -43,6 +43,8 @@ const Section = ({
   showTabs = true
   }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   const isNeonTheme = currentTheme.id.includes('neon');
   
   return (
@@ -212,6 +214,8 @@ const MainContent = ({
   setSelectedProject
 }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   const isNeonTheme = currentTheme.id.includes('neon');
 
   // Tab states for each section - Keep habits tab functionality but don't show it

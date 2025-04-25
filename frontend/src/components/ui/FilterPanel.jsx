@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext } from "react"; 
 import { ArrowSmDownIcon, ArrowSmUpIcon } from "@heroicons/react/outline";
 import ThemeContext from "../../context/ThemeContext";
 import { getRarityColor } from "../../utils/itemUtils";
@@ -14,6 +14,8 @@ const FilterPanel = ({
   mode = "shop" // "shop" or "inventory"
 }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 

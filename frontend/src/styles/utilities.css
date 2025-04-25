@@ -1,0 +1,183 @@
+/* Utility classes */
+.card-container {
+	border-radius: var(--radius);
+	background-color: var(--bgSecondary);
+	border: var(--borderWidth) solid var(--borderColor);
+	box-shadow: var(--shadow);
+	transition: all 0.2s ease;
+  }
+  
+  .card-container:hover {
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+	transform: translateY(-2px);
+  }
+  
+  /* New Button Styles */
+  .btn-primary {
+	background-color: var(--primaryColor);
+	color: white;
+	border-radius: var(--radius);
+	padding: 0.5rem 1rem;
+	font-weight: 500;
+	transition: all 0.2s ease;
+  }
+  
+  .btn-primary:hover {
+	filter: brightness(1.1);
+	box-shadow: 0 2px 5px var(--shadowColor);
+  }
+  
+  .btn-secondary {
+	background-color: var(--secondaryColor);
+	color: white;
+	border-radius: var(--radius);
+	padding: 0.5rem 1rem;
+	font-weight: 500;
+	transition: all 0.2s ease;
+  }
+  
+  .btn-outline {
+	background-color: transparent;
+	color: var(--primaryColor);
+	border: 1px solid var(--primaryColor);
+	border-radius: var(--radius);
+	padding: 0.5rem 1rem;
+	font-weight: 500;
+	transition: all 0.2s ease;
+  }
+  
+  .btn-outline:hover {
+	background-color: rgba(var(--primaryColor), 0.1);
+  }
+  
+  /* Form elements */
+  .input-styled {
+	background-color: var(--inputBg);
+	border: var(--borderWidth) solid var(--inputBorder);
+	border-radius: var(--radius);
+	padding: 0.5rem;
+	color: var(--textPrimary);
+	transition: all 0.2s ease;
+  }
+  
+  .input-styled:focus {
+	border-color: var(--primaryColor);
+	box-shadow: 0 0 0 2px rgba(var(--primaryColor), 0.2);
+	outline: none;
+  }
+  
+  /* Progress bars */
+  .progress-bar {
+	height: 8px;
+	background-color: rgba(var(--primaryColor), 0.1);
+	border-radius: 4px;
+	overflow: hidden;
+  }
+  
+  .progress-bar-fill {
+	height: 100%;
+	background-color: var(--primaryColor);
+	transition: width 0.3s ease-in-out;
+  }
+  
+  /* General utility classes */
+  .text-primary { color: var(--primaryColor); }
+  .text-secondary { color: var(--secondaryColor); }
+  .text-accent { color: var(--accentColor); }
+  .bg-primary { background-color: var(--bgPrimary); }
+  .bg-secondary { background-color: var(--bgSecondary); }
+  .bg-tertiary { background-color: var(--bgTertiary); }
+  .border-themed { border-color: var(--borderColor); }
+  
+  .bg-gradient-primary {
+	background: linear-gradient(135deg, var(--primaryColor), var(--secondaryColor));
+  }
+  
+  .text-gradient {
+	background-clip: text;
+	-webkit-background-clip: text;
+	color: transparent;
+	background-image: linear-gradient(135deg, var(--primaryColor), var(--accentColor));
+  }
+  
+  /* Animations */
+  .animate-fade-in {
+	animation: fade-in 0.3s ease-out;
+  }
+  
+  @keyframes fade-in {
+	from { opacity: 0; transform: translateY(-10px); }
+	to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Scan line animation */
+  .sl-scan-line {
+	position: relative;
+	overflow: hidden;
+  }
+  
+  .sl-scan-line:after {
+	content: '';
+	position: absolute;
+	height: 5px;
+	left: 0;
+	right: 0;
+	top: -10%;
+	background: linear-gradient(to right, 
+	  transparent, 
+	  var(--primaryColor), 
+	  transparent
+	);
+	opacity: 0.5;
+	animation: scan 2s linear infinite;
+  }
+  
+  /* Glowing text animations */
+  .sl-glow-text {
+	text-shadow: 0 0 5px var(--theme-glow-color);
+	animation: pulse-glow 2s infinite alternate;
+  }
+  
+  /* Custom scrollbar styling */
+  .custom-scrollbar::-webkit-scrollbar {
+	width: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+	background: var(--bgTertiary);
+	border-radius: 10px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+	background: var(--borderColor);
+	border-radius: 10px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+	background: var(--textSecondary);
+  }
+  
+  /* For Firefox */
+  .custom-scrollbar {
+	scrollbar-width: thin;
+	scrollbar-color: var(--borderColor) var(--bgTertiary);
+  }
+  
+  /* Hide scrollbar when not needed */
+  .no-scrollbar {
+	-ms-overflow-style: none;  /* IE and Edge */
+	scrollbar-width: none;  /* Firefox */
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+	display: none;  /* Chrome, Safari and Opera */
+  }
+  
+  /* Glass morphism effect */
+  .glass {
+	background: rgba(255, 255, 255, 0.05);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  }

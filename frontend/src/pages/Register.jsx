@@ -15,6 +15,8 @@ const Register = () => {
   const { register } = useAuth();
   const { currentTheme } = useContext(ThemeContext);
 
+
+
   const handleRegister = async (e) => {
     e.preventDefault();
     

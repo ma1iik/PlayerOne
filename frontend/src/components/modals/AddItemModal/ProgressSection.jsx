@@ -1,9 +1,11 @@
-import React, { useContext } from "react";
-import ThemeContext from "../../context/ThemeContext";
+import React, { useContext } from "react"; 
+import ThemeContext from "../../../context/ThemeContext";
 import { FormLabel } from "./FormComponents";
 
 const ProgressSection = ({ formData, handleInputChange, errors }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
 
   return (
     <div>

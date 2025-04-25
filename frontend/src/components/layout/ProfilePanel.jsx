@@ -1,9 +1,11 @@
-import React, { useContext } from "react";
+import React, { useContext } from "react"; 
 import { ChevronLeftIcon, CheckIcon } from "@heroicons/react/outline";
-import ThemeContext from "../context/ThemeContext";
+import ThemeContext from "../../context/ThemeContext";
 
 const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   
   // Assuming the user is online and has checked in for the day
   const hasCheckedIn = true; 

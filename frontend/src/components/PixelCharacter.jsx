@@ -20,6 +20,8 @@ const BODY_PARTS = {
 
 const PixelCharacter = ({ size = 200, editable = false }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   const [character, setCharacter] = useState({
     head: BODY_PARTS.heads[0],
     body: BODY_PARTS.bodies[0],

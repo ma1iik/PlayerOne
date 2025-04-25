@@ -1,7 +1,7 @@
-// frontend/src/layout/Layout.jsx
-import React from "react";
-import Header from "../components/common/Header";
-import Footer from "../components/common/Footer";
+// src/components/layout/Layout.jsx
+import React, { useContext } from "react"; 
+import Header from "../common/Header";
+import Footer from "../common/Footer";
 
 const Layout = ({ children }) => {
   return (

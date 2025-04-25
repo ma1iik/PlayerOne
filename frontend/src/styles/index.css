@@ -1,0 +1,61 @@
+@import "tailwindcss";
+@import "./theme.css";
+@import "./utilities.css";
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--bgPrimary);
+  color: var(--textPrimary);
+  font-family: var(--font);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* App specific styles */
+#root {
+  height: 100vh;
+  width: 100%;
+}
+
+/* Keyframe animations */
+@keyframes scan {
+  0% { top: -10%; }
+  100% { top: 110%; }
+}
+
+@keyframes pulse-glow {
+  from { text-shadow: 0 0 5px var(--theme-glow-color); }
+  to { text-shadow: 0 0 15px var(--theme-glow-color), 0 0 20px var(--theme-glow-color); }
+}
+
+@keyframes intense-pulse-glow {
+  from { 
+    text-shadow: 0 0 5px var(--theme-glow-color), 0 0 10px var(--theme-glow-color);
+  }
+  to { 
+    text-shadow: 0 0 10px var(--theme-glow-color), 0 0 20px var(--theme-glow-color), 0 0 30px var(--theme-glow-color);
+  }
+}
+
+/* Custom scan line */
+.sl-scan-line-custom {
+  position: relative;
+  overflow: hidden;
+}
+
+.sl-scan-line-custom:after {
+  content: '';
+  position: absolute;
+  height: 5px;
+  left: 0;
+  right: 0;
+  top: -10%;
+  background: linear-gradient(to right, 
+    transparent, 
+    var(--scan-line-color, var(--primaryColor)), 
+    transparent
+  );
+  opacity: 0.5;
+  animation: scan 2s linear infinite;
+}

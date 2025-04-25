@@ -12,7 +12,7 @@ import {
 import ThemeContext from "../context/ThemeContext";
 import ItemGrid from "../components/shared/ItemGrid";
 import ItemList from "../components/shared/ItemList";
-import FilterPanel from "../components/shared/FilterPanel";
+import FilterPanel from "../components/ui/FilterPanel";
 import CategoryBar from "../components/shop/CategoryBar";
 import CartModal from "../components/shop/CartModal";
 import ItemDetail from "../components/shop/ItemDetail";
@@ -26,6 +26,8 @@ import {
 
 const Shop = () => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 

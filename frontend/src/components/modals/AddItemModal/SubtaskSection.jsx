@@ -1,10 +1,12 @@
 import React, { useContext, useState } from "react";
 import { PlusIcon, XIcon, CheckIcon, TrashIcon, PencilIcon } from "@heroicons/react/outline";
-import ThemeContext from "../../context/ThemeContext";
+import ThemeContext from "../../../context/ThemeContext";
 import { FormLabel } from "./FormComponents";
 
 const SubtaskSection = ({ formData, setFormData }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
   

@@ -1,9 +1,11 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { PencilIcon } from "@heroicons/react/outline";
-import ThemeContext from "../context/ThemeContext";
+import ThemeContext from "../../context/ThemeContext";
 
 const TaskItem = ({ task, onComplete, onEdit }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
   const containerRef = useRef(null);

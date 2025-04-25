@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { XIcon, PlusIcon, SaveIcon } from "@heroicons/react/outline";
-import ThemeContext from "../context/ThemeContext";
+import ThemeContext from "../../context/ThemeContext";
 
 import { ThemedButton, FormLabel, FormInput } from "./AddItemModal/FormComponents";
 import RecurrenceSection from "./AddItemModal/RecurrenceSection";
@@ -18,6 +18,8 @@ const AddItemModal = ({
   setEditingItem
 }) => {
   const { currentTheme } = useContext(ThemeContext);
+
+
   const [selectedType, setSelectedType] = useState("task");
   const [formData, setFormData] = useState({ ...DEFAULT_FORM_DATA });
   const [errors, setErrors] = useState({});
