@@ -3,6 +3,7 @@ import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
+import { DragProvider } from "./context/DragContext";
 import AppRoutes from "./routes";
 
 const App = () => {
@@ -10,7 +11,9 @@ const App = () => {
     <ThemeProvider>
       <Router>
         <AuthProvider>
-          <AppRoutes />
+          <DragProvider>
+            <AppRoutes />
+          </DragProvider>
         </AuthProvider>
       </Router>
     </ThemeProvider>

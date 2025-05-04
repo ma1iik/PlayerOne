@@ -1,26 +1,14 @@
-// Handle toggling a habit completion
-const handleToggleHabit = (id) => {
-  setHabits(
-    habits.map((h) =>
-      h.id === id ? { ...h, completed: !h.completed } : h
-    )
-  );
-};
-
-// Handle updating a countable habit
-const handleUpdateHabitCount = (id, newCount) => {
-  setHabits(
-    habits.map((h) =>
-      h.id === id ? { ...h, currentCount: newCount } : h
-    )
-  );
-};import React, { useContext, useState } from "react";
+// src/components/MainContent.jsx
+import React, { useContext, useState } from "react";
 import { PlusIcon, SearchIcon, ChevronRightIcon } from "@heroicons/react/outline";
 import HabitItem from "./habits/HabitItem";
 import TaskItem from "./tasks/TaskItem";
 import ProjectItem from "./projects/ProjectItem";
 import ThemeContext from "../context/ThemeContext";
-
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import SortableItem from './dnd/SortableItem';
+import { useDrag } from "../context/DragContext";
 
 // Section component for DRY code - with optional tabs
 // In MainContent.jsx, find the Section component and modify the div structure to support scrolling
@@ -40,10 +28,12 @@ const Section = ({
   addButtonText,
   onAdd,
   renderItem,
-  showTabs = true
+  showTabs = true,
+  onDragEnd,
+  itemType
   }) => {
   const { currentTheme } = useContext(ThemeContext);
-
+  const { sensors } = useDrag();
 
   const isNeonTheme = currentTheme.id.includes('neon');
   
@@ -181,9 +171,21 @@ const Section = ({
               </div>
             </div>
           ) : (
-            <div className="space-y-3 py-2 pb-16">
-              {items.map(item => renderItem(item))}
-            </div>
+            <DndContext 
+              sensors={sensors} 
+              collisionDetection={closestCenter}
+              onDragEnd={(event) => onDragEnd(event, itemType)}
+            >
+              <SortableContext items={items.map(item => item.id)} strategy={verticalListSortingStrategy}>
+                <div className="space-y-3 py-2 pb-16">
+                  {items.map(item => (
+                    <SortableItem key={item.id} id={item.id}>
+                      {renderItem(item)}
+                    </SortableItem>
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           )}
         </div>
         
@@ -205,8 +207,8 @@ const MainContent = ({
   habits,
   tasks,
   projects,
-  setTasks,
   setHabits,
+  setTasks,
   setProjects,
   isCollapsed,
   toggleCollapse,
@@ -214,7 +216,7 @@ const MainContent = ({
   setSelectedProject
 }) => {
   const { currentTheme } = useContext(ThemeContext);
-
+  const { handleDragEnd } = useDrag();
 
   const isNeonTheme = currentTheme.id.includes('neon');
 
@@ -261,6 +263,48 @@ const MainContent = ({
     setEditingItem({ type, item: null });
     setShowAddModal(true);
   };
+
+  const handleItemDragEnd = (event, itemType) => {
+    console.log(`Drag ended for itemType: ${itemType}`, event);
+    
+    let currentItems, setItemsFunction;
+    
+    switch(itemType) {
+      case 'habit':
+        currentItems = habits;
+        setItemsFunction = setHabits;
+        break;
+      case 'task':
+        currentItems = tasks;
+        setItemsFunction = setTasks;
+        break;
+      case 'project':
+        currentItems = projects;
+        setItemsFunction = setProjects;
+        break;
+      default:
+        console.error(`Unknown item type: ${itemType}`);
+        return;
+    }
+    
+    // Log the relevant item arrays before update
+    console.log(`${itemType} array before update:`, currentItems);
+    
+    // Call the drag handler
+    handleDragEnd(event, currentItems, setItemsFunction);
+    
+    // For tasks specifically - add extra validation
+    if (itemType === 'task') {
+      console.log('Verifying task IDs are correct:');
+      currentItems.forEach(task => {
+        if (typeof task.id !== 'number' && task.id === undefined) {
+          console.error('Task has invalid ID:', task);
+        } else {
+          console.log(`Task ID: ${task.id}, Title: ${task.title}`);
+        }
+      });
+    }
+  }
 
   // Filter items based on search query and active tab
   const filteredHabits = habits.filter(habit => 
@@ -440,6 +484,8 @@ const MainContent = ({
               />
             )}
             showTabs={false} // This is the key change - hide tabs for habits
+            onDragEnd={handleItemDragEnd}
+            itemType="habit"
           />
 
           {/* Tasks section */}
@@ -468,6 +514,8 @@ const MainContent = ({
                 onEdit={() => handleEditItem(task, "task")}
               />
             )}
+            onDragEnd={handleItemDragEnd}
+            itemType="task"
           />
 
           {/* Projects section */}
@@ -496,6 +544,8 @@ const MainContent = ({
                 onClick={setSelectedProject}
               />
             )}
+            onDragEnd={handleItemDragEnd}
+            itemType="project"
           />
         </div>
       </div>

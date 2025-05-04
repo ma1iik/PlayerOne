@@ -30,8 +30,6 @@ const SegmentedProgressBar = ({ project, currentTheme }) => {
 
 const ProjectItem = ({ project, onEdit, onClick }) => {
   const { currentTheme } = useContext(ThemeContext);
-
-
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
@@ -110,6 +108,21 @@ const ProjectItem = ({ project, onEdit, onClick }) => {
       }}
       onClick={() => onClick && onClick(project)}
     >
+      {/* Drag handle indicator */}
+      <div 
+        className="absolute left-1 top-0 bottom-0 flex items-center justify-center opacity-0 group-hover:opacity-30 transition-opacity cursor-grab active:cursor-grabbing"
+        style={{ color: currentTheme.textSecondary, width: '12px' }}
+      >
+        <svg width="12" height="20" viewBox="0 0 12 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="2.5" cy="2.5" r="1.5" fill="currentColor" />
+          <circle cx="2.5" cy="9.5" r="1.5" fill="currentColor" />
+          <circle cx="2.5" cy="16.5" r="1.5" fill="currentColor" />
+          <circle cx="9.5" cy="2.5" r="1.5" fill="currentColor" />
+          <circle cx="9.5" cy="9.5" r="1.5" fill="currentColor" />
+          <circle cx="9.5" cy="16.5" r="1.5" fill="currentColor" />
+        </svg>
+      </div>
+
       <div className="flex items-start">
         <div className="ml-1 flex-1">
           <div className="flex items-center">

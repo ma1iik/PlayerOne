@@ -4,8 +4,6 @@ import ThemeContext from "../../context/ThemeContext";
 
 const HabitItem = ({ habit, onEdit, onToggle, onUpdateCount }) => {
   const { currentTheme } = useContext(ThemeContext);
-
-
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
   const containerRef = useRef(null);
@@ -118,6 +116,21 @@ const HabitItem = ({ habit, onEdit, onToggle, onUpdateCount }) => {
       className={`group relative transition-all duration-300 hover:translate-y-[-2px] ${displayAsCompleted ? 'opacity-75' : ''}`}
       style={getStyles()}
     >
+      {/* Drag handle indicator */}
+      <div 
+        className="absolute left-1 top-0 bottom-0 flex items-center justify-center opacity-0 group-hover:opacity-30 transition-opacity cursor-grab active:cursor-grabbing"
+        style={{ color: currentTheme.textSecondary, width: '12px' }}
+      >
+        <svg width="12" height="20" viewBox="0 0 12 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="2.5" cy="2.5" r="1.5" fill="currentColor" />
+          <circle cx="2.5" cy="9.5" r="1.5" fill="currentColor" />
+          <circle cx="2.5" cy="16.5" r="1.5" fill="currentColor" />
+          <circle cx="9.5" cy="2.5" r="1.5" fill="currentColor" />
+          <circle cx="9.5" cy="9.5" r="1.5" fill="currentColor" />
+          <circle cx="9.5" cy="16.5" r="1.5" fill="currentColor" />
+        </svg>
+      </div>
+
       <div className="flex items-center">
         {/* Main content */}
         <div className="flex-1 pl-7 pr-3 py-3">

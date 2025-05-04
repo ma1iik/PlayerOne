@@ -13,6 +13,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@heroicons/react": "^1.0.6",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
