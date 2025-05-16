@@ -101,24 +101,26 @@ const Footer = () => {
                 </svg>
               </a>
             </div>
+          </div>
+        </div>
+        
+        {/* Description and mission - Modified to show support button on same line */}
+        <div className="border-t border-gray-700 pt-6 mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-center">
+            <p className="text-gray-400 text-sm max-w-3xl sm:mb-0 mb-4">
+              PlayerOne is an open source project that depends on our users for support. The gems and coins you purchase help us keep
+              the servers running, maintain a small staff, develop new features, and provide incentives for our volunteers.
+            </p>
             
-            {/* Donate Button */}
+            {/* Support button - moved here to be on same line */}
             <a 
               href="#" 
-              className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 text-sm font-medium transition-colors"
+              className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap"
             >
               <span role="img" aria-label="Heart">💜</span>
               Support the Game
             </a>
           </div>
-        </div>
-        
-        {/* Description and mission */}
-        <div className="border-t border-gray-700 pt-6 mb-6">
-          <p className="text-gray-400 text-sm max-w-3xl">
-            PlayerOne is an open source project that depends on our users for support. The gems and coins you purchase help us keep
-            the servers running, maintain a small staff, develop new features, and provide incentives for our volunteers.
-          </p>
         </div>
         
         {/* Bottom footer with copyright */}

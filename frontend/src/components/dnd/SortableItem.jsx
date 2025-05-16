@@ -12,8 +12,14 @@ const SortableItem = ({ id, children }) => {
     isDragging,
   } = useSortable({ id });
 
+  // Modify the transform to only allow vertical movement (y-axis)
+  const modifiedTransform = transform ? {
+    ...transform,
+    x: 0 // Force x coordinate to always be 0
+  } : null;
+
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Transform.toString(modifiedTransform),
     transition,
     opacity: isDragging ? 0.5 : 1,
     position: 'relative',

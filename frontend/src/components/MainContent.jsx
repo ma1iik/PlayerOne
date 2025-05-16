@@ -324,33 +324,29 @@ const MainContent = ({
       return false;
     }
     
-    // When viewing ALL tasks, show everything - don't filter by status
-    if (taskTab === 'all') return true;
-    
-    // For scheduled view, show only tasks with due dates (regardless of completion status)
-    if (taskTab === 'scheduled') return task.due;
-        
-    // For completed view, still filter to show only completed tasks
-    if (taskTab === 'completed') return task.status === "Completed";
-    
-    return true;
+    switch(taskTab) {
+      case 'scheduled':
+        return task.due;
+      case 'completed':
+        return task.status === "Completed";
+      default: // 'all'
+        return true;
+    }
   }).sort((a, b) => {
-    // Sort by completion status - completed tasks go to the bottom
+    // First sort by completion status
     const aCompleted = a.status === "Completed";
     const bCompleted = b.status === "Completed";
     
-    if (aCompleted && !bCompleted) return 1;
-    if (!aCompleted && bCompleted) return -1;
-    
-    // For tasks with due dates, sort by due date (most urgent first)
-    if (a.due && b.due) {
+    if (aCompleted !== bCompleted) {
+      return aCompleted ? 1 : -1;
+    }
+  
+    // In scheduled view, sort by due date
+    if (taskTab === 'scheduled' && a.due && b.due) {
       return new Date(a.due) - new Date(b.due);
     }
     
-    // Tasks with due dates come before tasks without due dates
-    if (a.due && !b.due) return -1;
-    if (!a.due && b.due) return 1;
-    
+    // Otherwise maintain current order (for drag and drop)
     return 0;
   });
 
