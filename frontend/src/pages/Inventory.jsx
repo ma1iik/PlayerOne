@@ -28,51 +28,194 @@ const ShieldIcon = ({ className }) => (
   </svg>
 );
 
-// Equipment slot component with hover effect
-const EquipmentSlot = ({ item, onSelect, hasEquipped, slotType, label }) => {
+// Enhanced Equipment Slot component - with shared borders
+const EquipmentSlot = ({ item, onSelect, hasEquipped, slotType, borderConfig }) => {
   const { currentTheme } = useContext(ThemeContext);
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
+  // Get slot label text
+  const getSlotLabel = (slotType) => {
+    const labels = {
+      helmet: "Helmet",
+      armor: "Armor", 
+      boots: "Boots",
+      weapon: "Weapon",
+      offhand: "Off-hand",
+      accessory: "Accessory"
+    };
+    return labels[slotType] || "Slot";
+  };
+
+  // Calculate reduced border radius (half of current radius)
+  const reducedRadius = currentTheme.radius.replace(/[\d.]+/, (match) => 
+    (parseFloat(match) / 2).toString()
+  );
+
+  // Build border style based on configuration
+  const borderStyle = `2px dashed ${hasEquipped ? currentTheme.primaryColor : currentTheme.borderColor}`;
+  const getBorderStyles = () => {
+    const styles = {
+      backgroundColor: currentTheme.bgSecondary,
+      borderRadius: borderConfig.radius || '0'
+    };
+    
+    if (borderConfig.top) styles.borderTop = borderStyle;
+    if (borderConfig.right) styles.borderRight = borderStyle;
+    if (borderConfig.bottom) styles.borderBottom = borderStyle;
+    if (borderConfig.left) styles.borderLeft = borderStyle;
+    
+    return styles;
+  };
+
   return (
-    <div className="flex flex-col items-center gap-1">
-      <div 
-        className={`w-16 h-16 md:w-20 md:h-20 flex items-center justify-center cursor-pointer transition-all duration-200`}
-        style={{
-          backgroundColor: currentTheme.bgPrimary,
-          border: `2px solid ${hasEquipped ? currentTheme.primaryColor : currentTheme.borderColor}`,
-          borderRadius: currentTheme.radius,
-          boxShadow: hasEquipped ? `0 0 8px ${isNeonTheme || isCyberpunk ? currentTheme.primaryColor + '70' : 'rgba(0,0,0,0.1)'}` : 'none'
-        }}
-        onClick={() => item && onSelect(item)}
-        onMouseEnter={(e) => {
-          if (item) {
-            e.currentTarget.style.boxShadow = `0 4px 12px rgba(0,0,0,0.15), 0 0 0 1px ${currentTheme.borderColor}`;
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (item) {
-            e.currentTarget.style.boxShadow = hasEquipped ? `0 0 8px ${isNeonTheme || isCyberpunk ? currentTheme.primaryColor + '70' : 'rgba(0,0,0,0.1)'}` : 'none';
-          }
-        }}
-      >
-        {item ? (
-          <img 
-            src={item.image} 
-            alt={item.name}
-            className="w-3/5 h-3/5 object-contain"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center opacity-30">
-            <CogIcon className="w-8 h-8" style={{ color: currentTheme.textSecondary }} />
-          </div>
-        )}
-      </div>
-      {label && (
-        <span className="text-xs" style={{ color: currentTheme.textSecondary }}>
-          {isNeonTheme ? label.toUpperCase() : label}
-        </span>
+    <div 
+      className={`w-20 h-20 md:w-24 md:h-24 flex flex-col items-center justify-center cursor-pointer transition-all duration-200`}
+      style={{
+        ...getBorderStyles(),
+        boxShadow: hasEquipped ? `0 0 8px ${isNeonTheme || isCyberpunk ? currentTheme.primaryColor + '70' : 'rgba(0,0,0,0.1)'}` : 'none'
+      }}
+      onClick={() => item && onSelect(item)}
+      onMouseEnter={(e) => {
+        if (item) {
+          e.currentTarget.style.boxShadow = `0 4px 12px rgba(0,0,0,0.15), 0 0 0 1px ${currentTheme.borderColor}`;
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (item) {
+          e.currentTarget.style.boxShadow = hasEquipped ? `0 0 8px ${isNeonTheme || isCyberpunk ? currentTheme.primaryColor + '70' : 'rgba(0,0,0,0.1)'}` : 'none';
+        }
+      }}
+    >
+      {item ? (
+        <img 
+          src={item.image} 
+          alt={item.name}
+          className="w-4/5 h-4/5 object-contain"
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center">
+          <span className="text-xs text-center px-1" style={{ color: currentTheme.textSecondary }}>
+            {isNeonTheme ? getSlotLabel(slotType).toUpperCase() : getSlotLabel(slotType)}
+          </span>
+        </div>
       )}
+    </div>
+  );
+};
+
+// Enhanced Character equipment section
+const CharacterEquipmentSection = ({ equippedItems, setSelectedItem, currentTheme, isNeonTheme, isCyberpunk }) => {
+  // Calculate reduced border radius (half of current radius)
+  const reducedRadius = currentTheme.radius.replace(/[\d.]+/, (match) => 
+    (parseFloat(match) / 2).toString()
+  );
+
+  return (
+    <div className="flex-shrink-0 p-3 border-b" style={{ borderColor: currentTheme.borderColor }}>
+      <h3 className={`text-lg font-semibold mb-3 text-center ${isNeonTheme ? 'sl-glow-text' : ''}`}
+          style={{ color: currentTheme.textPrimary }}>
+        {isNeonTheme ? 'EQUIPMENT' : 'Equipment'}
+      </h3>
+      
+      <div className="flex">
+        {/* Left side equipment slots - shared borders */}
+        <div className="w-1/4 flex flex-col justify-center items-center">
+          <EquipmentSlot 
+            item={equippedItems.helmet} 
+            onSelect={setSelectedItem}
+            hasEquipped={!!equippedItems.helmet}
+            slotType="helmet"
+            borderConfig={{
+              top: true,
+              left: true,
+              right: true,
+              bottom: true,
+              radius: `${reducedRadius} 0 0 0`
+            }}
+          />
+          <EquipmentSlot 
+            item={equippedItems.armor} 
+            onSelect={setSelectedItem}
+            hasEquipped={!!equippedItems.armor}
+            slotType="armor"
+            borderConfig={{
+              top: false,
+              left: true,
+              right: true,
+              bottom: true
+            }}
+          />
+          <EquipmentSlot 
+            item={equippedItems.boots} 
+            onSelect={setSelectedItem}
+            hasEquipped={!!equippedItems.boots}
+            slotType="boots"
+            borderConfig={{
+              top: false,
+              left: true,
+              right: true,
+              bottom: true,
+              radius: `0 0 0 ${reducedRadius}`
+            }}
+          />
+        </div>
+        
+        {/* Middle area - Character display */}
+        <div className="w-2/4 flex flex-col items-center justify-center px-2"
+             style={{ 
+               borderTop: `2px dashed ${currentTheme.borderColor}`,
+               borderBottom: `2px dashed ${currentTheme.borderColor}`,
+               minHeight: "200px",
+               backgroundColor: currentTheme.bgSecondary
+             }}>
+          <p className="text-sm text-center" style={{ color: currentTheme.textSecondary }}>
+            {isNeonTheme ? 'CHARACTER' : 'Character'}
+          </p>
+        </div>
+        
+        {/* Right side equipment slots - shared borders */}
+        <div className="w-1/4 flex flex-col justify-center items-center">
+          <EquipmentSlot 
+            item={equippedItems.accessory} 
+            onSelect={setSelectedItem}
+            hasEquipped={!!equippedItems.accessory}
+            slotType="accessory"
+            borderConfig={{
+              top: true,
+              left: true,
+              right: true,
+              bottom: true,
+              radius: `0 ${reducedRadius} 0 0`
+            }}
+          />
+          <EquipmentSlot 
+            item={equippedItems.weapon} 
+            onSelect={setSelectedItem}
+            hasEquipped={!!equippedItems.weapon}
+            slotType="weapon"
+            borderConfig={{
+              top: false,
+              left: true,
+              right: true,
+              bottom: true
+            }}
+          />
+          <EquipmentSlot 
+            item={equippedItems.offhand} 
+            onSelect={setSelectedItem}
+            hasEquipped={!!equippedItems.offhand}
+            slotType="offhand"
+            borderConfig={{
+              top: false,
+              left: true,
+              right: true,
+              bottom: true,
+              radius: `0 0 ${reducedRadius} 0`
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 };
@@ -731,84 +874,13 @@ const Inventory = () => {
               }}
             >
               {/* Character equipment - Fixed size */}
-              <div className="flex-shrink-0 p-4 border-b" style={{ borderColor: currentTheme.borderColor }}>
-                <h3 className={`text-lg font-semibold mb-4 text-center ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                    style={{ color: currentTheme.textPrimary }}>
-                  {isNeonTheme ? 'EQUIPMENT' : 'Equipment'}
-                </h3>
-                
-                <div className="flex mb-6">
-                  {/* Left side equipment slots */}
-                  <div className="w-1/4 flex flex-col justify-center items-center gap-5">
-                    <EquipmentSlot 
-                      item={equippedItems.helmet} 
-                      onSelect={setSelectedItem}
-                      hasEquipped={!!equippedItems.helmet}
-                      slotType="helmet"
-                      label="Helmet"
-                    />
-                    <EquipmentSlot 
-                      item={equippedItems.armor} 
-                      onSelect={setSelectedItem}
-                      hasEquipped={!!equippedItems.armor}
-                      slotType="armor"
-                      label="Armor"
-                    />
-                    <EquipmentSlot 
-                      item={equippedItems.boots} 
-                      onSelect={setSelectedItem}
-                      hasEquipped={!!equippedItems.boots}
-                      slotType="boots"
-                      label="Boots"
-                    />
-                  </div>
-                  
-                  {/* Middle area - Character display */}
-                  <div className="w-2/4 flex flex-col items-center justify-center my-2 mx-4"
-                       style={{ 
-                         border: `2px dashed ${currentTheme.borderColor}`,
-                         borderRadius: currentTheme.radius,
-                         minHeight: "220px"
-                       }}>
-                    <div className="flex items-center justify-center rounded-lg"
-                         style={{ 
-                           width: "100px",
-                           height: "100px",
-                           backgroundColor: isNeonTheme || isCyberpunk ? 'rgba(255, 255, 255, 0.05)' : currentTheme.bgTertiary
-                         }}>
-                      <UserIcon className="w-12 h-12 opacity-30" style={{ color: currentTheme.textSecondary }} />
-                    </div>
-                    <p className="text-sm mt-4" style={{ color: currentTheme.textSecondary }}>
-                      {isNeonTheme ? 'CHARACTER' : 'Character'}
-                    </p>
-                  </div>
-                  
-                  {/* Right side equipment slots */}
-                  <div className="w-1/4 flex flex-col justify-center items-center gap-5">
-                    <EquipmentSlot 
-                      item={equippedItems.accessory} 
-                      onSelect={setSelectedItem}
-                      hasEquipped={!!equippedItems.accessory}
-                      slotType="accessory"
-                      label="Accessory"
-                    />
-                    <EquipmentSlot 
-                      item={equippedItems.weapon} 
-                      onSelect={setSelectedItem}
-                      hasEquipped={!!equippedItems.weapon}
-                      slotType="weapon"
-                      label="Weapon"
-                    />
-                    <EquipmentSlot 
-                      item={equippedItems.offhand} 
-                      onSelect={setSelectedItem}
-                      hasEquipped={!!equippedItems.offhand}
-                      slotType="offhand"
-                      label="Off-hand"
-                    />
-                  </div>
-                </div>
-              </div>
+              <CharacterEquipmentSection 
+                equippedItems={equippedItems}
+                setSelectedItem={setSelectedItem}
+                currentTheme={currentTheme}
+                isNeonTheme={isNeonTheme}
+                isCyberpunk={isCyberpunk}
+              />
               
               {/* Character stats - Scrollable if needed */}
               <div className="flex-1 min-h-0 overflow-y-auto">
