@@ -45,7 +45,6 @@ const ItemList = ({
 }) => {
   const { currentTheme } = useContext(ThemeContext);
 
-
   const isNeonTheme = currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
@@ -104,28 +103,82 @@ const ItemList = ({
     }
   };
 
-  // Render item row based on mode (shop or inventory)
-  const renderItemList = () => {
-    // Shared column definitions
-    const columns = {
+  // Enhanced column definitions with icons and better styling
+  const getColumnConfig = () => {
+    const baseConfig = {
       shop: [
-        { name: "ITEM", span: 5 },
-        { name: "TYPE", span: 2 },
-        { name: "RARITY", span: 2 },
-        { name: "PRICE", span: 1 },
-        { name: "ACTIONS", span: 2 }
+        { 
+          name: "ITEM", 
+          span: 5, 
+          icon: "🎒",
+          description: "Item details and information"
+        },
+        { 
+          name: "CATEGORY", 
+          span: 2, 
+          icon: "📂",
+          description: "Item type and classification"
+        },
+        { 
+          name: "RARITY", 
+          span: 2, 
+          icon: "⭐",
+          description: "Item rarity and quality"
+        },
+        { 
+          name: "PRICE", 
+          span: 1, 
+          icon: "💰",
+          description: "Cost to purchase"
+        },
+        { 
+          name: "ACTIONS", 
+          span: 2, 
+          icon: "⚡",
+          description: "Available actions"
+        }
       ],
       inventory: [
-        { name: "ITEM", span: 4 },
-        { name: "TYPE", span: 2 },
-        { name: "RARITY", span: 2 },
-        { name: "QTY", span: 1 },
-        { name: "ACTIONS", span: 3 }
+        { 
+          name: "EQUIPMENT", 
+          span: 4, 
+          icon: "⚔️",
+          description: "Your gear and items"
+        },
+        { 
+          name: "CLASS", 
+          span: 2, 
+          icon: "🏷️",
+          description: "Equipment category"
+        },
+        { 
+          name: "QUALITY", 
+          span: 2, 
+          icon: "💎",
+          description: "Item rarity tier"
+        },
+        { 
+          name: "STOCK", 
+          span: 1, 
+          icon: "📦",
+          description: "Quantity owned"
+        },
+        { 
+          name: "MANAGE", 
+          span: 3, 
+          icon: "🔧",
+          description: "Item management"
+        }
       ]
     };
 
-    const currentColumns = columns[mode];
+    return baseConfig[mode];
+  };
 
+  const currentColumns = getColumnConfig();
+
+  // Render item list based on mode (shop or inventory)
+  const renderItemList = () => {
     return (
       <motion.div 
         className="flex flex-col space-y-2"
@@ -133,19 +186,63 @@ const ItemList = ({
         initial="hidden"
         animate="visible"
       >
-        {/* Table header */}
-        <div className="grid grid-cols-12 gap-2 p-3 mb-2 font-medium"
+        {/* Enhanced Table header */}
+        <div className="grid grid-cols-12 gap-2 p-4 mb-3 font-medium relative overflow-hidden"
              style={{ 
-               backgroundColor: currentTheme.bgSecondary,
+               backgroundColor: isNeonTheme || isCyberpunk 
+                 ? 'rgba(0, 0, 0, 0.3)' 
+                 : currentTheme.bgSecondary,
                borderRadius: currentTheme.radius,
-               color: currentTheme.textSecondary,
+               color: currentTheme.textPrimary,
                fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
                            isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                           currentTheme.font
+                           currentTheme.font,
+               border: `1px solid ${currentTheme.borderColor}`,
+               boxShadow: isNeonTheme || isCyberpunk 
+                 ? `0 0 10px ${currentTheme.shadowColor}` 
+                 : currentTheme.shadow
              }}>
+          
+          {/* Background decoration for neon/cyberpunk themes */}
+          {(isNeonTheme || isCyberpunk) && (
+            <div 
+              className="absolute inset-0 opacity-10"
+              style={{
+                background: `linear-gradient(45deg, ${currentTheme.primaryColor}20, transparent, ${currentTheme.secondaryColor}20)`
+              }}
+            />
+          )}
+          
           {currentColumns.map((col, index) => (
-            <div key={index} className={`col-span-${col.span} ${col.span === 1 ? "text-center" : ""}`}>
-              {isNeonTheme ? `[ ${col.name} ]` : isCyberpunk ? col.name : col.name.charAt(0) + col.name.slice(1).toLowerCase()}
+            <div key={index} 
+                 className={`col-span-${col.span} ${col.span === 1 ? "text-center" : ""} relative flex items-center gap-2 group`}
+                 title={col.description}>
+              
+              {/* Icon for each column */}
+              <span className="text-lg opacity-70 group-hover:opacity-100 transition-opacity">
+                {col.icon}
+              </span>
+              
+              {/* Column title with enhanced styling */}
+              <span className={`font-semibold tracking-wide ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                    style={{ 
+                      color: currentTheme.primaryColor,
+                      textShadow: isNeonTheme || isCyberpunk 
+                        ? `0 0 8px ${currentTheme.primaryColor}50` 
+                        : 'none'
+                    }}>
+                {isNeonTheme ? `[ ${col.name} ]` : 
+                 isCyberpunk ? col.name : 
+                 col.name.charAt(0) + col.name.slice(1).toLowerCase()}
+              </span>
+              
+              {/* Decorative underline for active theme */}
+              {(isNeonTheme || isCyberpunk) && (
+                <div 
+                  className="absolute bottom-0 left-0 right-0 h-px opacity-50"
+                  style={{ backgroundColor: currentTheme.primaryColor }}
+                />
+              )}
             </div>
           ))}
         </div>
