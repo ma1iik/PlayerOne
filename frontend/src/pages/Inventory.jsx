@@ -22,6 +22,12 @@ import {
   filterOptions
 } from "../utils/itemUtils";
 
+const ShieldIcon = ({ className }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+    <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+  </svg>
+);
+
 // Equipment slot component with hover effect
 const EquipmentSlot = ({ item, onSelect, hasEquipped, slotType, label }) => {
   const { currentTheme } = useContext(ThemeContext);
@@ -117,142 +123,195 @@ const SectionedInventoryGrid = ({ filteredItems, setSelectedItem, toggleEquip, c
     return Object.entries(sections).filter(([_, items]) => items.length > 0);
   };
 
-  const InventoryCard = ({ item, onClick, toggleEquip }) => {
-    const [isHovered, setIsHovered] = useState(false);
+const InventoryCard = ({ item, onClick, toggleEquip }) => {
+  const [isButtonHovered, setIsButtonHovered] = useState(false);
+  const [isCardHovered, setIsCardHovered] = useState(false);
 
-    // Get rarity color
-    const getRarityColor = (rarity) => {
-      switch(rarity) {
-        case "Common": return "#64748b";
-        case "Uncommon": return "#10b981";
-        case "Rare": return "#3b82f6";
-        case "Epic": return "#8b5cf6";
-        case "Legendary": return "#f59e0b";
-        default: return "#64748b";
-      }
+  const getRarityColor = (rarity) => {
+    switch(rarity) {
+      case "Common": return "#64748b";
+      case "Uncommon": return "#10b981";
+      case "Rare": return "#3b82f6";
+      case "Epic": return "#8b5cf6";
+      case "Legendary": return "#f59e0b";
+      default: return "#64748b";
+    }
+  };
+
+  const rarityColor = getRarityColor(item.rarity);
+
+  const handleEquipToggle = (e) => {
+    e.stopPropagation();
+    toggleEquip(item.id);
+  };
+
+  const getButtonStyle = () => {
+    const baseStyle = {
+      border: '3px solid white',
+      zIndex: 10,
+      transition: 'all 0.2s ease'
     };
 
-    const rarityColor = getRarityColor(item.rarity);
+    // Determine visibility
+    const shouldShow = item.equipped || isCardHovered;
+    
+    if (!shouldShow) {
+      return {
+        ...baseStyle,
+        backgroundColor: '#6b7280',
+        opacity: 0,
+        visibility: 'hidden',
+        transform: 'scale(0.8)'
+      };
+    }
 
-    const handleEquipToggle = (e) => {
-      e.stopPropagation();
-      toggleEquip(item.id);
-    };
+    // Button is visible, now determine color/state
+    if (item.equipped && isButtonHovered) {
+      return {
+        ...baseStyle,
+        backgroundColor: '#ef4444',
+        opacity: 1,
+        visibility: 'visible',
+        transform: 'scale(1)'
+      };
+    } else if (item.equipped) {
+      return {
+        ...baseStyle,
+        backgroundColor: '#3b82f6',
+        opacity: 1,
+        visibility: 'visible',
+        transform: 'scale(1)'
+      };
+    } else {
+      return {
+        ...baseStyle,
+        backgroundColor: '#6b7280',
+        opacity: 0.7,
+        visibility: 'visible',
+        transform: 'scale(1)'
+      };
+    }
+  };
 
-    return (
-      <div className="relative">
+  const getButtonIcon = () => {
+    if (item.equipped && isButtonHovered) {
+      return <MinusIcon className="w-5 h-5 text-white" />;
+    } else if (item.equipped) {
+      return <ShieldIcon className="w-5 h-5 text-white" />;
+    } else {
+      return <PlusIcon className="w-5 h-5 text-white" />;
+    }
+  };
+
+  return (
+    <div 
+      className="relative"
+      onMouseEnter={() => setIsCardHovered(true)}
+      onMouseLeave={() => setIsCardHovered(false)}
+    >
+      <div 
+        className="relative transition-all duration-150 cursor-pointer overflow-hidden hover:translate-y-[-2px]"
+        style={{ 
+          backgroundColor: currentTheme.bgSecondary,
+          border: `1px solid ${currentTheme.borderColor}`,
+          borderRadius: currentTheme.radius,
+          height: '180px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}
+        onClick={onClick}
+      >
         <div 
-          className="group relative transition-all duration-150 cursor-pointer overflow-hidden hover:translate-y-[-2px]"
+          className="absolute top-0 left-0 right-0 h-1"
           style={{ 
-            backgroundColor: currentTheme.bgSecondary,
-            border: `1px solid ${currentTheme.borderColor}`,
-            borderRadius: currentTheme.radius,
-            height: '180px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            background: `linear-gradient(90deg, ${rarityColor}4D, ${rarityColor})`,
+            borderTopLeftRadius: currentTheme.radius,
+            borderTopRightRadius: currentTheme.radius
           }}
-          onClick={onClick}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          {/* Rarity accent line - top */}
-          <div 
-            className="absolute top-0 left-0 right-0 h-1"
-            style={{ 
-              background: `linear-gradient(90deg, ${rarityColor}4D, ${rarityColor})`,
-              borderTopLeftRadius: currentTheme.radius,
-              borderTopRightRadius: currentTheme.radius
-            }}
-          />
+        />
 
-          <div className="p-3 flex flex-col h-full relative z-[2]">
-            {/* Image container */}
-            <div 
-              className="flex items-center justify-center mb-3 relative" 
+        <div className="p-3 flex flex-col h-full relative z-[2]">
+          <div 
+            className="flex items-center justify-center mb-3 relative" 
+            style={{ 
+              backgroundColor: `${currentTheme.bgTertiary}`,
+              borderRadius: `calc(${currentTheme.radius} - 2px)`,
+              aspectRatio: '1',
+              width: '100%',
+              maxHeight: '120px'
+            }}
+          >
+            <img 
+              src={item.image} 
+              alt={item.name}
+              className="w-4/5 h-4/5 object-contain"
+              style={{
+                filter: item.rarity === 'Legendary' ? 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.3))' :
+                       item.rarity === 'Epic' ? 'drop-shadow(0 0 6px rgba(139, 92, 246, 0.2))' : 'none'
+              }}
+            />
+          </div>
+          
+          <div className="flex-1 flex flex-col justify-between">
+            <h3 
+              className="text-sm font-medium text-center leading-tight mb-2"
               style={{ 
-                backgroundColor: `${currentTheme.bgTertiary}`,
-                borderRadius: `calc(${currentTheme.radius} - 2px)`,
-                aspectRatio: '1',
-                width: '100%',
-                maxHeight: '120px'
+                color: currentTheme.textPrimary,
+                lineHeight: '1.2',
+                height: '2.4em',
+                overflow: 'hidden',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical'
               }}
             >
-              <img 
-                src={item.image} 
-                alt={item.name}
-                className="w-4/5 h-4/5 object-contain"
-                style={{
-                  filter: item.rarity === 'Legendary' ? 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.3))' :
-                         item.rarity === 'Epic' ? 'drop-shadow(0 0 6px rgba(139, 92, 246, 0.2))' : 'none'
-                }}
-              />
-            </div>
+              {item.name}
+            </h3>
             
-            {/* Content area */}
-            <div className="flex-1 flex flex-col justify-between">
-              {/* Item name */}
-              <h3 
-                className="text-sm font-medium text-center leading-tight mb-2"
+            <div className="text-center space-y-1">
+              <div 
+                className="inline-block px-2 py-1 text-xs font-medium rounded-full"
                 style={{ 
-                  color: currentTheme.textPrimary,
-                  lineHeight: '1.2',
-                  height: '2.4em',
-                  overflow: 'hidden',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical'
+                  backgroundColor: `${rarityColor}15`,
+                  color: rarityColor,
+                  border: `1px solid ${rarityColor}30`
                 }}
               >
-                {item.name}
-              </h3>
+                {item.rarity}
+              </div>
               
-              {/* Bottom info */}
-              <div className="text-center space-y-1">
-                {/* Rarity */}
-                <div 
-                  className="inline-block px-2 py-1 text-xs font-medium rounded-full"
-                  style={{ 
-                    backgroundColor: `${rarityColor}15`,
-                    color: rarityColor,
-                    border: `1px solid ${rarityColor}30`
-                  }}
-                >
-                  {item.rarity}
-                </div>
-                
-                {/* Type */}
-                <div className="text-xs" style={{ color: currentTheme.textSecondary }}>
-                  {item.type}
-                </div>
+              <div className="text-xs" style={{ color: currentTheme.textSecondary }}>
+                {item.type}
               </div>
             </div>
           </div>
         </div>
-
-        {/* Equipment toggle button - positioned outside the card but relative to it */}
-        {(isHovered || item.equipped) && (
-          <div 
-            className="absolute -top-3 -right-3 w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200"
-            style={{
-              backgroundColor: currentTheme.primaryColor,
-              opacity: isHovered ? 1 : (item.equipped ? 0.9 : 0),
-              border: '3px solid white',
-              zIndex: 1000
-            }}
-            onClick={handleEquipToggle}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            {item.equipped ? (
-              <MinusIcon className="w-5 h-5 text-white" />
-            ) : (
-              <PlusIcon className="w-5 h-5 text-white" />
-            )}
-          </div>
-        )}
       </div>
-    );
-  };
 
+      <div 
+        className="absolute -top-3 -right-3 w-9 h-9 rounded-full flex items-center justify-center cursor-pointer"
+        style={getButtonStyle()}
+        onClick={handleEquipToggle}
+        onMouseEnter={() => {
+          if (item.equipped) {
+            setIsButtonHovered(true);
+          }
+        }}
+        onMouseLeave={() => {
+          if (item.equipped) {
+            setIsButtonHovered(false);
+          }
+        }}
+        title={
+          item.equipped 
+            ? (isButtonHovered ? "Unequip item" : "Item equipped") 
+            : "Equip item"
+        }
+      >
+        {getButtonIcon()}
+      </div>
+    </div>
+  );
+};
   const categorizedSections = categorizeItems(filteredItems);
 
   return (
