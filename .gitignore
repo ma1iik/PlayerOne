@@ -14,3 +14,4 @@ dist/
 frontend/dist/
 npm-debug.log
 yarn-error.log
+progress.md
