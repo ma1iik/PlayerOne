@@ -1,6 +1,6 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { XIcon, PlusIcon, SaveIcon } from "@heroicons/react/outline";
-import ThemeContext from "../../context/ThemeContext";
+import { useThemeStyles } from "../../context/ThemeProvider";
 
 import { ThemedButton, FormLabel, FormInput } from "./AddItemModal/FormComponents";
 import RecurrenceSection from "./AddItemModal/RecurrenceSection";
@@ -17,15 +17,19 @@ const AddItemModal = ({
   editingItem = null,
   setEditingItem
 }) => {
-  const { currentTheme } = useContext(ThemeContext);
+  const { theme: currentTheme } = useThemeStyles();
 
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
 
   const [selectedType, setSelectedType] = useState("task");
   const [formData, setFormData] = useState({ ...DEFAULT_FORM_DATA });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
   const isEditMode = editingItem?.item !== null && editingItem?.item !== undefined;
 

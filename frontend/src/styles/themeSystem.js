@@ -1,8 +1,5 @@
 // frontend/src/styles/themeSystem.js
 
-import { useContext } from 'react';
-import ThemeContext from '../context/ThemeContext';
-
 /**
  * Theme-Agnostic Design System
  * No hard-coded theme names - everything is driven by theme properties
@@ -118,6 +115,11 @@ export const THEMES = {
   })
 };
 
+// Legacy exports for backwards compatibility
+export const LIGHT = THEMES.LIGHT;
+export const NEON_VIOLET = THEMES.NEON_VIOLET;
+export const CYBERPUNK = THEMES.CYBERPUNK;
+
 // Style Generators based on features, not theme names
 export const generateStyles = (theme) => {
   const { features } = theme;
@@ -224,34 +226,29 @@ export const generateStyles = (theme) => {
           repeating-linear-gradient(45deg, rgba(30, 30, 41, 0.2) 0px, rgba(30, 30, 41, 0.2) 1px, transparent 1px, transparent 10px)
         `
       } : {},
-    }
-  };
-};
+    },
 
-// Hook for using theme styles
-export const useThemeStyles = () => {
-  const { currentTheme } = useContext(ThemeContext);
-  const styles = generateStyles(currentTheme);
-  
-  return {
-    theme: currentTheme,
-    styles,
-    features: currentTheme.features || {},
-    
-    // Helper functions
-    getCardStyle: (variant = 'default') => ({
-      ...styles.card.base,
-      ...styles.card[variant] || styles.card.default
-    }),
-    
-    getButtonStyle: (variant = 'primary', state = 'default') => ({
-      ...styles.button.base,
-      ...styles.button[variant]?.[state] || styles.button.primary.default
-    }),
-    
-    getTextStyle: () => styles.text,
-    
+    // Helper functions for common patterns
+    getTextClass: (isHighlighted = false) => {
+      let classes = '';
+      if (features.hasGlowEffects && isHighlighted) {
+        classes += 'sl-glow-text ';
+      }
+      if (features.useUppercaseText) {
+        classes += 'uppercase ';
+      }
+      return classes.trim();
+    },
+
+    getCardStyle: (variant = 'default') => {
+      const cardVariant = theme.variants?.card || 'default';
+      return {
+        ...generateStyles(theme).card.base,
+        ...generateStyles(theme).card[cardVariant === 'default' ? variant : cardVariant]
+      };
+    },
+
     shouldTransform: (text) => 
-      currentTheme.features?.useUppercaseText ? text.toUpperCase() : text,
+      text && features.useUppercaseText ? text.toUpperCase() : (text || ''),
   };
 };

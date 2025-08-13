@@ -1,10 +1,9 @@
-import React, { useContext } from "react"; 
-import ThemeContext from "../../../context/ThemeContext";
-import { FormLabel } from "./FormComponents";
+import React from "react";
+import { useThemeStyles } from "../../../context/ThemeProvider";
+import { FormLabel, FormInput } from "./FormComponents";
 
-const ProgressSection = ({ formData, handleInputChange, errors }) => {
-  const { currentTheme } = useContext(ThemeContext);
-
+const ProgressSection = ({ formData, setFormData }) => {
+  const { theme: currentTheme } = useThemeStyles();
 
 
   return (
@@ -22,13 +21,13 @@ const ProgressSection = ({ formData, handleInputChange, errors }) => {
         min="0"
         max="100"
         step="5"
-        className={`w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer ${errors.progress ? 'border border-red-500' : ''}`}
+        className={`w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer`}
         style={{
           backgroundColor: `${currentTheme.primaryColor}20`,
           accentColor: currentTheme.primaryColor
         }}
         value={formData.progress || 0}
-        onChange={handleInputChange}
+        onChange={(e) => setFormData({ ...formData, progress: e.target.value })}
       />
       <div className="flex gap-0.5 w-full h-2 mt-2">
         {[...Array(10)].map((_, index) => (
@@ -43,11 +42,6 @@ const ProgressSection = ({ formData, handleInputChange, errors }) => {
           ></div>
         ))}
       </div>
-      {errors.progress && (
-        <p className="mt-1 text-xs text-red-500">
-          Progress must be between 0 and 100.
-        </p>
-      )}
     </div>
   );
 };

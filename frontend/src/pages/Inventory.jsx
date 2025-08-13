@@ -1,20 +1,20 @@
 // src/pages/Inventory.jsx
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { 
-  BriefcaseIcon, 
   SearchIcon, 
-  CogIcon,
-  ChevronDownIcon,
-  UserIcon,
-  ViewGridIcon,
+  FilterIcon, 
+  ViewGridIcon, 
   ViewListIcon,
-  FilterIcon,
-  PlusIcon,
-  MinusIcon
+  CogIcon,
+  UserIcon,
+  ShieldCheckIcon,
+  StarIcon,
+  SparklesIcon
 } from "@heroicons/react/outline";
 import ItemDetail from "../components/inventory/ItemDetail";
 import ItemList from "../components/shared/ItemList";
-import ThemeContext from "../context/ThemeContext";
+import { useThemeStyles } from "../context/ThemeProvider";
 import { sampleInventoryItems } from "../data/inventoryData";
 import { 
   filterItems, 
@@ -30,8 +30,14 @@ const ShieldIcon = ({ className }) => (
 
 // Enhanced Equipment Slot component - with shared borders
 const EquipmentSlot = ({ item, onSelect, hasEquipped, slotType, borderConfig }) => {
-  const { currentTheme } = useContext(ThemeContext);
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const { theme: currentTheme } = useThemeStyles();
+  
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
   // Get slot label text
@@ -338,11 +344,11 @@ const InventoryCard = ({ item, onClick, toggleEquip }) => {
 
   const getButtonIcon = () => {
     if (item.equipped && isButtonHovered) {
-      return <MinusIcon className="w-5 h-5 text-white" />;
+      return <ShieldCheckIcon className="w-5 h-5 text-white" />;
     } else if (item.equipped) {
       return <ShieldIcon className="w-5 h-5 text-white" />;
     } else {
-      return <PlusIcon className="w-5 h-5 text-white" />;
+      return <ShieldCheckIcon className="w-5 h-5 text-white" />;
     }
   };
 
@@ -497,9 +503,15 @@ const InventoryCard = ({ item, onClick, toggleEquip }) => {
 
 // Character stats component with progress bars
 const CharacterStats = () => {
-  const { currentTheme } = useContext(ThemeContext);
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const { theme: currentTheme } = useThemeStyles();
   
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
+
   // Sample character stats
   const stats = {
     level: 28,
@@ -562,8 +574,14 @@ const CharacterStats = () => {
 };
 
 const FilterButton = ({ active, onClick, children }) => {
-  const { currentTheme } = useContext(ThemeContext);
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const { theme: currentTheme } = useThemeStyles();
+  
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
   
   return (
@@ -587,10 +605,16 @@ const FilterButton = ({ active, onClick, children }) => {
 };
 
 const Inventory = () => {
-  const { currentTheme } = useContext(ThemeContext);
-  const isNeonTheme = currentTheme.id.includes('neon');
-  const isCyberpunk = currentTheme.id === 'cyberpunk';
+  const { theme: currentTheme } = useThemeStyles();
   
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
+  const isCyberpunk = currentTheme.id === 'cyberpunk';
+
   // State for inventory management
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -759,7 +783,7 @@ const Inventory = () => {
           {/* Page header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
             <div className="flex items-center gap-2">
-              <BriefcaseIcon className="w-6 h-6" style={{ color: currentTheme.primaryColor }} />
+              <ShieldCheckIcon className="w-6 h-6" style={{ color: currentTheme.primaryColor }} />
               <h1 className={`text-xl font-semibold ${isNeonTheme ? 'sl-glow-text' : ''}`}
                   style={{ color: currentTheme.textPrimary }}>
                 {isNeonTheme ? 'INVENTORY' : 'Inventory'}
@@ -851,7 +875,7 @@ const Inventory = () => {
                   }}
                   onClick={() => setShowStats(!showStats)}
                 >
-                  <ChevronDownIcon className="w-5 h-5" />
+                  <ShieldCheckIcon className="w-5 h-5" />
                 </button>
               </div>
             </div>
@@ -1006,7 +1030,7 @@ const Inventory = () => {
                          borderRadius: currentTheme.radius,
                          border: `1px solid ${currentTheme.borderColor}`
                        }}>
-                    <BriefcaseIcon className="w-12 h-12 mb-4" style={{ color: currentTheme.textSecondary }} />
+                    <ShieldCheckIcon className="w-12 h-12 mb-4" style={{ color: currentTheme.textSecondary }} />
                     <p className={`text-lg mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
                        style={{ color: currentTheme.textPrimary }}>
                       {isNeonTheme ? 'NO ITEMS FOUND' : 'No items found'}

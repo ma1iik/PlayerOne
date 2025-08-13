@@ -1,16 +1,20 @@
-import React, { useContext } from "react"; 
+import React from "react"; 
 import { motion } from "framer-motion";
 import { CogIcon, TrashIcon, XIcon, ExternalLinkIcon } from "@heroicons/react/outline";
-import ThemeContext from "../../context/ThemeContext";
+import { useThemeStyles } from "../../context/ThemeProvider";
 import { getRarityColor } from "../../utils/itemUtils.js";
 
 const ItemDetail = ({ item, onClose, toggleEquip }) => {
+  const { theme: currentTheme } = useThemeStyles();
+  
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
   if (!item) return null;
   
-  const { currentTheme } = useContext(ThemeContext);
-
-
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
   // Get themed detail panel style

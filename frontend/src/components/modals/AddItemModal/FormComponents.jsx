@@ -1,38 +1,34 @@
-import React, { useContext } from "react"; 
-import ThemeContext from "../../../context/ThemeContext";
+import React from "react"; 
+import { useThemeStyles } from "../../../context/ThemeProvider";
 import { PlusIcon, MinusIcon } from "@heroicons/react/outline";
 
 // Utility function for rendering themed buttons
-export const ThemedButton = ({ 
-  onClick, 
-  isActive = false, 
-  children, 
-  color = null,
-  fullWidth = false,
-  className = "",
-  disabled = false
-}) => {
-  const { currentTheme } = useContext(ThemeContext);
-
-
-  const isNeonTheme = currentTheme.id.includes('neon');
+export const ThemedButton = ({ children, onClick, isActive, fullWidth, className, ...props }) => {
+  const { theme: currentTheme } = useThemeStyles();
+  
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
   
   return (
     <button
       type="button"
       onClick={onClick}
-      disabled={disabled}
-      className={`py-2 text-sm font-medium ${fullWidth ? 'w-full' : ''} ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+      disabled={props.disabled}
+      className={`py-2 text-sm font-medium ${fullWidth ? 'w-full' : ''} ${className} ${props.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       style={{
         backgroundColor: isActive 
-          ? (isNeonTheme || isCyberpunk ? 'rgba(255, 255, 255, 0.1)' : color ? `${color}` : currentTheme.primaryColor)
+          ? (isNeonTheme || isCyberpunk ? 'rgba(255, 255, 255, 0.1)' : props.color ? `${props.color}` : currentTheme.primaryColor)
           : (isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary),
         color: isActive 
-          ? (isNeonTheme || isCyberpunk ? color || currentTheme.primaryColor : 'white')
+          ? (isNeonTheme || isCyberpunk ? props.color || currentTheme.primaryColor : 'white')
           : currentTheme.textSecondary,
         border: isNeonTheme || isCyberpunk 
-          ? `1px solid ${isActive ? (color || currentTheme.primaryColor) : currentTheme.borderColor}` 
+          ? `1px solid ${isActive ? (props.color || currentTheme.primaryColor) : currentTheme.borderColor}` 
           : 'none',
         borderRadius: currentTheme.radius
       }}
@@ -44,7 +40,7 @@ export const ThemedButton = ({
 
 // Utility function for form labels
 export const FormLabel = ({ htmlFor, children }) => {
-  const { currentTheme } = useContext(ThemeContext);
+  const { theme: currentTheme } = useThemeStyles();
 
 
   
@@ -71,7 +67,7 @@ export const FormInput = ({
   error = false,
   maxLength = null
 }) => {
-  const { currentTheme } = useContext(ThemeContext);
+  const { theme: currentTheme } = useThemeStyles();
 
 
   
@@ -105,10 +101,14 @@ export const FormInput = ({
 
 // Counter input component for numeric values
 export const CounterInput = ({ name, value, onChange, min = 0, error = false, label = "" }) => {
-  const { currentTheme } = useContext(ThemeContext);
+  const { theme: currentTheme } = useThemeStyles();
 
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
 
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
   const handleDecrement = () => {

@@ -1,10 +1,16 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
-import { PencilIcon } from "@heroicons/react/outline";
-import ThemeContext from "../../context/ThemeContext";
+import React, { useState, useEffect, useRef } from "react";
+import { CheckIcon, PencilIcon, CalendarIcon } from "@heroicons/react/outline";
+import { useThemeStyles } from "../../context/ThemeProvider";
 
 const TaskItem = ({ task, onComplete, onEdit }) => {
-  const { currentTheme } = useContext(ThemeContext);
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const { theme: currentTheme } = useThemeStyles();
+  
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
   const containerRef = useRef(null);
   

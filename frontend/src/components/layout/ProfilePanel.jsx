@@ -1,9 +1,10 @@
-import React, { useContext } from "react"; 
-import { ChevronLeftIcon, CheckIcon } from "@heroicons/react/outline";
-import ThemeContext from "../../context/ThemeContext";
+import React, { useState } from "react";
+import { ChevronLeftIcon, ChevronRightIcon, CheckIcon } from "@heroicons/react/outline";
+import { useThemeStyles } from "../../context/ThemeProvider";
+import PixelCharacter from "../PixelCharacter";
 
 const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
-  const { currentTheme } = useContext(ThemeContext);
+  const { theme: currentTheme } = useThemeStyles();
 
 
   

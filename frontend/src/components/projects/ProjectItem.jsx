@@ -1,6 +1,6 @@
-import React, { useContext } from "react"; 
+import React from "react"; 
 import { PencilIcon } from "@heroicons/react/outline";
-import ThemeContext from "../../context/ThemeContext";
+import { useThemeStyles } from "../../context/ThemeProvider";
 
 // Dynamic Segmented Progress Bar Component
 const SegmentedProgressBar = ({ project, currentTheme }) => {
@@ -29,8 +29,14 @@ const SegmentedProgressBar = ({ project, currentTheme }) => {
 };
 
 const ProjectItem = ({ project, onEdit, onClick }) => {
-  const { currentTheme } = useContext(ThemeContext);
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const { theme: currentTheme } = useThemeStyles();
+  
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
   // Get difficulty indicator with stars based on level (1-4)

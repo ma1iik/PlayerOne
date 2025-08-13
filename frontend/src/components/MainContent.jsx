@@ -1,10 +1,10 @@
 // src/components/MainContent.jsx
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { PlusIcon, SearchIcon, ChevronRightIcon } from "@heroicons/react/outline";
 import HabitItem from "./habits/HabitItem";
 import TaskItem from "./tasks/TaskItem";
 import ProjectItem from "./projects/ProjectItem";
-import ThemeContext from "../context/ThemeContext";
+import { useThemeStyles } from "../context/ThemeProvider";
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortableItem from './dnd/SortableItem';
@@ -32,10 +32,16 @@ const Section = ({
   onDragEnd,
   itemType
   }) => {
-  const { currentTheme } = useContext(ThemeContext);
+  const { theme: currentTheme } = useThemeStyles();
+  
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
   const { sensors } = useDrag();
 
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -109,7 +115,7 @@ const Section = ({
             }}
             onMouseOver={(e) => {
               // Slightly darken background and border on hover, keeping same color family
-              if (currentTheme.id.includes('neon') || currentTheme.id === 'cyberpunk') {
+              if ((currentTheme.id && currentTheme.id.includes('neon')) || currentTheme.id === 'cyberpunk') {
                 // For neon/cyberpunk themes - just slightly increase opacity
                 e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
                 e.currentTarget.style.borderColor = `${currentTheme.borderColor}`;
@@ -215,10 +221,16 @@ const MainContent = ({
   setEditingItem,
   setSelectedProject
 }) => {
-  const { currentTheme } = useContext(ThemeContext);
+  const { theme: currentTheme } = useThemeStyles();
+  
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
   const { handleDragEnd } = useDrag();
 
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
 
   // Tab states for each section - Keep habits tab functionality but don't show it
   const [habitTab, setHabitTab] = useState('all');

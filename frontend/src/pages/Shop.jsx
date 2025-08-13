@@ -1,21 +1,22 @@
 // src/pages/Shop.jsx - Updated styling only
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { 
-  ShoppingBagIcon, 
-  FilterIcon, 
   SearchIcon, 
-  ViewGridIcon, 
-  ViewListIcon,
+  FilterIcon, 
   ShoppingCartIcon,
-  PlusIcon
+  SortAscendingIcon,
+  SortDescendingIcon,
+  ViewGridIcon,
+  ViewListIcon
 } from "@heroicons/react/outline";
-import ThemeContext from "../context/ThemeContext";
+import { useThemeStyles } from "../context/ThemeProvider";
+import CategoryBar from "../components/shop/CategoryBar";
+import ItemDetail from "../components/shop/ItemDetail";
+import CartModal from "../components/shop/CartModal";
+import FilterPanel from "../components/ui/FilterPanel";
 import ItemGrid from "../components/shared/ItemGrid";
 import ItemList from "../components/shared/ItemList";
-import FilterPanel from "../components/ui/FilterPanel";
-import CategoryBar from "../components/shop/CategoryBar";
-import CartModal from "../components/shop/CartModal";
-import ItemDetail from "../components/shop/ItemDetail";
 import { sampleShopItems } from "../data/shopData";
 import { 
   filterOptions, 
@@ -25,10 +26,14 @@ import {
 } from "../utils/itemUtils";
 
 const Shop = () => {
-  const { currentTheme } = useContext(ThemeContext);
+  const { theme: currentTheme } = useThemeStyles();
 
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
 
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
   // State for shop items, filters, sorting, categories, and view mode
@@ -94,7 +99,7 @@ const Shop = () => {
 
   // Get cart item count
   const getCartItemCount = () => {
-    return cart.reduce((count, item) => count + item.quantity, 0);
+    return cart.reduce((total, item) => total + item.quantity, 0);
   };
 
   // Update category filter when changing category
@@ -181,7 +186,7 @@ const Shop = () => {
             zIndex: 10
           }}>
           <div className="flex items-center gap-2">
-            <ShoppingBagIcon className="w-6 h-6" style={{ color: currentTheme.primaryColor }} />
+            <ShoppingCartIcon className="w-6 h-6" style={{ color: currentTheme.primaryColor }} />
             <h2 className={`text-xl font-semibold ${isNeonTheme ? 'sl-glow-text' : ''}`}
                 style={{ 
                   color: currentTheme.textPrimary,
@@ -373,7 +378,7 @@ const Shop = () => {
                    borderRadius: currentTheme.radius,
                    border: `1px solid ${currentTheme.borderColor}`
                  }}>
-              <ShoppingBagIcon className="w-12 h-12 mb-4" style={{ color: currentTheme.textSecondary }} />
+              <ShoppingCartIcon className="w-12 h-12 mb-4" style={{ color: currentTheme.textSecondary }} />
               <p className={`text-lg mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
                  style={{ 
                    color: currentTheme.textPrimary,

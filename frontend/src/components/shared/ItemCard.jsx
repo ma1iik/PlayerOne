@@ -1,7 +1,6 @@
-import React, { useContext } from "react"; 
+import React from "react";
 import { motion } from "framer-motion";
-import { PlusIcon } from "@heroicons/react/outline";
-import ThemeContext from "../../context/ThemeContext";
+import { useThemeStyles } from "../../context/ThemeProvider";
 import { getRarityColor, getScanLineClass, getScanLineStyle } from "../../utils/itemUtils";
 
 const ItemCard = ({ 
@@ -10,10 +9,14 @@ const ItemCard = ({
   actionButton, 
   mode = "shop", // "shop" or "inventory"
 }) => {
-  const { currentTheme } = useContext(ThemeContext);
-
-
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const { theme: currentTheme } = useThemeStyles();
+  
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
   // Get themed item card style

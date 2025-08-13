@@ -1,19 +1,17 @@
-import React, { useContext } from "react"; 
-import ThemeContext from "../../../context/ThemeContext";
+import React, { useState } from "react";
+import { useThemeStyles } from "../../../context/ThemeProvider";
 import { ThemedButton, FormLabel } from "./FormComponents";
 import { CounterInput } from "./FormComponents";
 
-const CountableSection = ({ 
-  formData, 
-  isEditMode, 
-  handleInputChange, 
-  handleNumberChange, 
-  errors 
-}) => {
-  const { currentTheme } = useContext(ThemeContext);
-
-
-  const isNeonTheme = currentTheme.id.includes('neon');
+const CountableSection = ({ formData, isEditMode, handleInputChange, handleNumberChange, errors }) => {
+  const { theme: currentTheme } = useThemeStyles();
+  
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
 
   return (
     <>
@@ -28,13 +26,7 @@ const CountableSection = ({
             <ThemedButton
               key={option.value}
               onClick={() => {
-                const event = {
-                  target: {
-                    name: "countable",
-                    value: option.value
-                  }
-                };
-                handleInputChange(event);
+                setFormData({ ...formData, countable: option.value === "true" });
               }}
               isActive={String(formData.countable) === option.value}
             >
@@ -56,24 +48,22 @@ const CountableSection = ({
           <CounterInput
             name="targetCount"
             value={formData.targetCount}
-            onChange={handleNumberChange}
+            onChange={(name, value) => setFormData({ ...formData, [name]: value })}
             min={1}
-            error={errors.targetCount}
             label="per day"
           />
         </div>
       )}
       
       {/* Current count for countable habits (edit mode only) */}
-      {formData.countable && isEditMode && (
+      {formData.countable && formData.id && (
         <div>
           <FormLabel htmlFor="currentCount">Current Count</FormLabel>
           <CounterInput
             name="currentCount"
             value={formData.currentCount}
-            onChange={handleNumberChange}
+            onChange={(name, value) => setFormData({ ...formData, [name]: value })}
             min={0}
-            error={errors.currentCount}
             label={`of ${formData.targetCount} target`}
           />
         </div>

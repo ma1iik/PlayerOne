@@ -1,12 +1,16 @@
-import React, { useContext } from "react"; 
-import ThemeContext from "../../../context/ThemeContext";
+import React from "react";
+import { useThemeStyles } from "../../../context/ThemeProvider";
 import { ThemedButton, FormLabel } from "./FormComponents";
 
 const DifficultySection = ({ formData, handleInputChange, errors }) => {
-  const { currentTheme } = useContext(ThemeContext);
-
-
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const { theme: currentTheme } = useThemeStyles();
+  
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
   // Get difficulty indicator based on level (1-4)
@@ -58,11 +62,11 @@ const DifficultySection = ({ formData, handleInputChange, errors }) => {
           );
         })}
       </div>
-      {errors.difficulty && (
+      {/* errors.difficulty && (
         <p className="mt-1 text-xs text-red-500">
           Please select a valid difficulty level.
         </p>
-      )}
+      ) */}
     </div>
   );
 };

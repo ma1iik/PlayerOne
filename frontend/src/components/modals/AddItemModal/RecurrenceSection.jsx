@@ -1,12 +1,16 @@
-import React, { useContext } from "react"; 
-import ThemeContext from "../../../context/ThemeContext";
+import React from "react";
+import { useThemeStyles } from "../../../context/ThemeProvider";
 import { ThemedButton, FormLabel } from "./FormComponents";
 
 const RecurrenceSection = ({ formData, setFormData, selectedType, errors, handleInputChange }) => {
-  const { currentTheme } = useContext(ThemeContext);
-
-
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const { theme: currentTheme } = useThemeStyles();
+  
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   
   // Weekdays and monthdays for appropriate recurrence options
   const weekdays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
@@ -62,7 +66,7 @@ const RecurrenceSection = ({ formData, setFormData, selectedType, errors, handle
               borderRadius: currentTheme.radius
             }}
             value={formData.weekday}
-            onChange={handleInputChange}
+            onChange={(e) => setFormData({ ...formData, weekday: e.target.value })}
           >
             {weekdays.map(day => (
               <option key={day} value={day}>
@@ -80,15 +84,15 @@ const RecurrenceSection = ({ formData, setFormData, selectedType, errors, handle
           <select
             id="monthday"
             name="monthday"
-            className={`w-full px-4 py-2 border rounded-lg text-sm focus:outline-none ${errors.monthday ? 'border-red-500 focus:border-red-500' : 'focus:border-purple-500'}`}
+            className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none"
             style={{ 
               backgroundColor: currentTheme.inputBg,
               color: currentTheme.textPrimary,
-              borderColor: errors.monthday ? '#ef4444' : currentTheme.borderColor,
+              borderColor: currentTheme.borderColor,
               borderRadius: currentTheme.radius
             }}
             value={formData.monthday}
-            onChange={handleInputChange}
+            onChange={(e) => setFormData({ ...formData, monthday: e.target.value })}
           >
             {monthdays.map(day => (
               <option key={day} value={day}>
@@ -96,11 +100,6 @@ const RecurrenceSection = ({ formData, setFormData, selectedType, errors, handle
               </option>
             ))}
           </select>
-          {errors.monthday && (
-            <p className="mt-1 text-xs text-red-500">
-              Please select a valid day of the month.
-            </p>
-          )}
         </div>
       )}
     </>

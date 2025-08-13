@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import ThemeContext from '../context/ThemeContext';
+import React, { useState } from 'react';
+import { useThemeStyles } from '../context/ThemeProvider';
 
 
 const BODY_PARTS = {
@@ -18,8 +18,15 @@ const BODY_PARTS = {
   ],
 };
 
-const PixelCharacter = ({ size = 200, editable = false }) => {
-  const { currentTheme } = useContext(ThemeContext);
+const PixelCharacter = ({ 
+  profile, 
+  size = "large", 
+  showStats = true, 
+  showEquipment = true,
+  className = "",
+  style = {}
+}) => {
+  const { theme: currentTheme } = useThemeStyles();
 
 
   const [character, setCharacter] = useState({
@@ -35,4 +42,60 @@ const PixelCharacter = ({ size = 200, editable = false }) => {
     }));
   };
 
-  return
+  return (
+    <div 
+      className={`pixel-character ${className}`}
+      style={{
+        width: size === "large" ? "200px" : size === "medium" ? "150px" : "100px",
+        height: size === "large" ? "200px" : size === "medium" ? "150px" : "100px",
+        backgroundColor: currentTheme.bgSecondary,
+        border: `2px solid ${currentTheme.borderColor}`,
+        borderRadius: currentTheme.radius,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        ...style
+      }}
+    >
+      {/* Character Avatar */}
+      <div 
+        className="character-avatar"
+        style={{
+          width: "80%",
+          height: "80%",
+          backgroundColor: currentTheme.primaryColor,
+          borderRadius: "50%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: size === "large" ? "48px" : size === "medium" ? "36px" : "24px"
+        }}
+      >
+        👤
+      </div>
+      
+      {/* Stats overlay if enabled */}
+      {showStats && profile && (
+        <div 
+          className="character-stats"
+          style={{
+            position: "absolute",
+            bottom: "8px",
+            left: "8px",
+            right: "8px",
+            backgroundColor: `${currentTheme.bgPrimary}90`,
+            borderRadius: currentTheme.radius,
+            padding: "4px 8px",
+            fontSize: "12px",
+            color: currentTheme.textPrimary
+          }}
+        >
+          Lv.{profile.level || 1}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default PixelCharacter;

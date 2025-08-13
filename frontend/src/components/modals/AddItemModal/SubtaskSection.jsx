@@ -1,13 +1,17 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { PlusIcon, XIcon, CheckIcon, TrashIcon, PencilIcon } from "@heroicons/react/outline";
-import ThemeContext from "../../../context/ThemeContext";
+import { useThemeStyles } from "../../../context/ThemeProvider";
 import { FormLabel } from "./FormComponents";
 
 const SubtaskSection = ({ formData, setFormData }) => {
-  const { currentTheme } = useContext(ThemeContext);
+  const { theme: currentTheme } = useThemeStyles();
 
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
 
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
   
   const [newSubtaskTitle, setNewSubtaskTitle] = useState("");

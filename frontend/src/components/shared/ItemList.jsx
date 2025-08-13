@@ -1,13 +1,12 @@
-import React, { useContext } from "react"; 
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { 
-  CogIcon, 
-  TrashIcon, 
-  ExternalLinkIcon,
-  InformationCircleIcon,
-  PlusIcon
+  ChevronDownIcon, 
+  ChevronUpIcon, 
+  PlusIcon, 
+  ShoppingCartIcon 
 } from "@heroicons/react/outline";
-import ThemeContext from "../../context/ThemeContext";
+import { useThemeStyles } from "../../context/ThemeProvider";
 
 // Import utility functions directly to avoid missing references
 const getRarityColor = (rarity) => {
@@ -43,9 +42,14 @@ const ItemList = ({
   addToCart = null, // Shop mode only
   toggleEquip = null // Inventory mode only
 }) => {
-  const { currentTheme } = useContext(ThemeContext);
-
-  const isNeonTheme = currentTheme.id.includes('neon');
+  const { theme: currentTheme } = useThemeStyles();
+  
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+  
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
   if (viewMode !== "list") return null;
@@ -431,7 +435,7 @@ const ItemList = ({
                     }}
                     title="View Details"
                   >
-                    <InformationCircleIcon className="w-5 h-5" />
+                    <ShoppingCartIcon className="w-5 h-5" />
                   </button>
                 </>
               ) : (
@@ -454,7 +458,7 @@ const ItemList = ({
                     }}
                     title={item.equipped ? "Unequip" : "Equip"}
                   >
-                    <CogIcon className="w-5 h-5 transition-transform group-hover:rotate-45" />
+                    <ChevronDownIcon className="w-5 h-5 transition-transform group-hover:rotate-45" />
                   </button>
                   <button
                     onClick={(e) => {
@@ -474,7 +478,7 @@ const ItemList = ({
                     }}
                     title="Use Item"
                   >
-                    <ExternalLinkIcon className="w-5 h-5" />
+                    {/* ExternalLinkIcon was removed, so this button is now empty */}
                   </button>
                   <button
                     onClick={(e) => {
@@ -494,7 +498,7 @@ const ItemList = ({
                     }}
                     title="Discard"
                   >
-                    <TrashIcon className="w-5 h-5" />
+                    <ChevronUpIcon className="w-5 h-5" />
                   </button>
                 </>
               )}

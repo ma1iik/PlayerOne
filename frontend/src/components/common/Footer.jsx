@@ -1,7 +1,9 @@
-import React, { useContext } from "react"; 
+import React from "react";
+import { useThemeStyles } from "../../context/ThemeProvider";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
+  const { theme: currentTheme } = useThemeStyles();
   return (
     <footer className="bg-gray-800 text-gray-300 pt-10 pb-8">
       <div className="max-w-7xl mx-auto px-6">

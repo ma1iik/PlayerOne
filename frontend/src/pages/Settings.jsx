@@ -1,16 +1,11 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { CogIcon, BellIcon, LockClosedIcon, UserIcon, SunIcon } from "@heroicons/react/outline";
 import ThemeSettings from "../components/ThemeSettings";
-import ThemeContext from "../context/ThemeContext";
+import { useThemeStyles } from "../context/ThemeProvider";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("theme");
-  const { currentTheme } = useContext(ThemeContext);
-
-
-  
-  const isNeonTheme = currentTheme.id.includes('neon');
-  const isCyberpunk = currentTheme.id === 'cyberpunk';
+  const { theme, styles } = useThemeStyles();
 
   const tabs = {
     account: {
@@ -31,6 +26,26 @@ const Settings = () => {
     }
   };
 
+  // Helper to get text with proper styling based on theme features
+  const getThemedText = (text, isHighlighted = false) => {
+    const transformed = styles.shouldTransform(text);
+    return theme.features.useUppercaseText && isHighlighted 
+      ? `[ ${transformed} ]` 
+      : transformed;
+  };
+
+  // Helper to get classes for text elements
+  const getTextClasses = (baseClasses = '', isHighlighted = false) => {
+    let classes = baseClasses;
+    if (theme.features.hasGlowEffects && isHighlighted) {
+      classes += ' sl-glow-text';
+    }
+    return classes.trim();
+  };
+
+  // Get font family based on theme
+  const getThemeFont = () => theme.font;
+
   return (
     <div className="flex flex-1 bg-bg-primary font-sans p-6">
       <div className="card w-full max-w-4xl mx-auto shadow-lg pixel-shadow">
@@ -38,7 +53,9 @@ const Settings = () => {
         <div className="p-4 flex flex-col items-center">
           <div className="flex items-center gap-2 mb-2">
             <CogIcon className="w-6 h-6 text-primary" />
-            <h2 className={`text-xl font-semibold ${isNeonTheme ? 'sl-glow-text' : ''}`}>Settings</h2>
+            <h2 className={getTextClasses('text-xl font-semibold', true)}>
+              {getThemedText('Settings')}
+            </h2>
           </div>
           <div className="h-px bg-gray-200 w-15/16"></div>
         </div>
@@ -48,125 +65,117 @@ const Settings = () => {
           <div className="md:col-span-1 space-y-1">
             {Object.entries(tabs).map(([id, tab]) => (
               <button 
-                key={id}
-                className={`w-full text-left p-3 rounded-lg transition-colors flex items-center gap-2 ${
-                  activeTab === id 
-                    ? `bg-gradient-primary text-text-primary ${isNeonTheme ? 'sl-glow-text' : ''}`
-                    : `hover:bg-bg-secondary text-text-secondary ${isNeonTheme ? 'sl-glow-text' : ''}`
-                }`}
-                style={{ 
-                  fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                            isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                            currentTheme.font,
-                  letterSpacing: isNeonTheme || isCyberpunk ? '0.05em' : 'normal'
-                }}
+                key={id} 
                 onClick={() => setActiveTab(id)}
+                className={`w-full text-left py-3 px-4 rounded transition-colors ${
+                  activeTab === id 
+                    ? `bg-gradient-primary text-text-primary ${getTextClasses('', true)}`
+                    : `hover:bg-bg-secondary text-text-secondary ${getTextClasses('', false)}`
+                }`}
+                style={{
+                  fontFamily: getThemeFont(),
+                  letterSpacing: theme.features.useMonospaceFont ? '0.05em' : 'normal'
+                }}
               >
-                <tab.icon className="w-5 h-5" />
-                {isNeonTheme ? `[ ${tab.title.toUpperCase()} ]` : tab.title}
+                <div className="flex items-center gap-3">
+                  <tab.icon className="w-5 h-5" />
+                  {getThemedText(tab.title)}
+                </div>
               </button>
             ))}
           </div>
 
-          {/* Main Content */}
+          {/* Content Area */}
           <div className="md:col-span-2">
-            {activeTab === "theme" && <ThemeSettings />}
-            
             {activeTab === "account" && (
-              <div className="space-y-6">
-                <h3 className={`text-lg font-bold ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                    style={{ 
-                      fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                                isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                                currentTheme.font
-                    }}>
-                  {isNeonTheme ? '[ ACCOUNT INFORMATION ]' : 'Account Information'}
+              <div>
+                <h3 className={getTextClasses('text-lg font-bold', true)}
+                  style={{
+                    fontFamily: getThemeFont(),
+                    letterSpacing: theme.features.useMonospaceFont ? '0.05em' : 'normal'
+                  }}
+                >
+                  {getThemedText('Account Information')}
                 </h3>
-                <div className="space-y-4">
+                
+                <div className="mt-4 space-y-4">
                   <div>
-                    <label className={`text-sm block mb-1 ${isNeonTheme ? 'sl-glow-text' : 'text-text-secondary'}`}>Username</label>
-                    <input
-                      type="text"
-                      className="input"
-                      defaultValue="PixelHero99"
+                    <label className={getTextClasses('text-sm block mb-1', theme.features.hasGlowEffects) || 'text-text-secondary'}>
+                      {getThemedText('Username')}
+                    </label>
+                    <input 
+                      type="text" 
+                      className="input w-full" 
+                      defaultValue="PlayerOne"
+                      style={{ fontFamily: getThemeFont() }}
                     />
                   </div>
                   <div>
-                    <label className={`text-sm block mb-1 ${isNeonTheme ? 'sl-glow-text' : 'text-text-secondary'}`}>Email</label>
-                    <input
-                      type="email"
-                      className="input"
+                    <label className={getTextClasses('text-sm block mb-1', theme.features.hasGlowEffects) || 'text-text-secondary'}>
+                      {getThemedText('Email')}
+                    </label>
+                    <input 
+                      type="email" 
+                      className="input w-full" 
                       defaultValue="player@example.com"
+                      style={{ fontFamily: getThemeFont() }}
                     />
                   </div>
                   <div>
-                    <label className={`text-sm block mb-1 ${isNeonTheme ? 'sl-glow-text' : 'text-text-secondary'}`}>Avatar</label>
-                    <div className="flex items-center gap-4">
-                      <img 
-                        src="https://via.placeholder.com/80" 
-                        alt="Avatar" 
-                        className="w-20 h-20 rounded-lg pixel-border"
-                        style={{ borderRadius: currentTheme.radius }}
-                      />
-                      <button className={`btn ${isNeonTheme ? 'sl-glow-text' : ''}`}>
-                        {isNeonTheme ? '[ UPLOAD ]' : 'Upload New'}
+                    <label className={getTextClasses('text-sm block mb-1', theme.features.hasGlowEffects) || 'text-text-secondary'}>
+                      {getThemedText('Avatar')}
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
+                      <button className={`btn ${getTextClasses('', theme.features.hasGlowEffects)}`}>
+                        {getThemedText('Upload')}
                       </button>
                     </div>
                   </div>
-                  <button className={`btn btn-accent w-full mt-4 ${isNeonTheme ? 'sl-glow-text' : ''}`}>
-                    {isNeonTheme ? '[ SAVE CHANGES ]' : 'Save Changes'}
+                  <button className={`btn btn-accent w-full mt-4 ${getTextClasses('', theme.features.hasGlowEffects)}`}>
+                    {getThemedText('Save Changes')}
                   </button>
                 </div>
               </div>
             )}
 
             {activeTab === "notifications" && (
-              <div className="space-y-6">
-                <h3 className={`text-lg font-bold ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                    style={{ 
-                      fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                                isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                                currentTheme.font
-                    }}>
-                  {isNeonTheme ? '[ NOTIFICATION PREFERENCES ]' : 'Notification Preferences'}
+              <div>
+                <h3 className={getTextClasses('text-lg font-bold', true)}
+                  style={{
+                    fontFamily: getThemeFont(),
+                    letterSpacing: theme.features.useMonospaceFont ? '0.05em' : 'normal'
+                  }}
+                >
+                  {getThemedText('Notification Preferences')}
                 </h3>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between p-3 hover:bg-bg-secondary rounded-lg transition-colors">
-                    <div className="flex flex-col">
-                      <span className={`font-medium ${isNeonTheme ? 'sl-glow-text' : ''}`}>
-                        {isNeonTheme ? '[ TASK REMINDERS ]' : 'Task Reminders'}
-                      </span>
-                      <span className="text-sm text-text-secondary">Get notified when tasks are due</span>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-bg-secondary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-color-primary"></div>
+                
+                <div className="mt-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className={getTextClasses('font-medium', true)}>
+                      {getThemedText('Task Reminders')}
+                    </span>
+                    <label className="switch">
+                      <input type="checkbox" defaultChecked />
+                      <span className="slider round"></span>
                     </label>
                   </div>
-
-                  <div className="flex items-center justify-between p-3 hover:bg-bg-secondary rounded-lg transition-colors">
-                    <div className="flex flex-col">
-                      <span className={`font-medium ${isNeonTheme ? 'sl-glow-text' : ''}`}>
-                        {isNeonTheme ? '[ ACHIEVEMENT UNLOCKED ]' : 'Achievement Unlocked'}
-                      </span>
-                      <span className="text-sm text-text-secondary">Get notified when you earn achievements</span>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-bg-secondary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-color-primary"></div>
+                  <div className="flex items-center justify-between">
+                    <span className={getTextClasses('font-medium', true)}>
+                      {getThemedText('Achievement Unlocked')}
+                    </span>
+                    <label className="switch">
+                      <input type="checkbox" defaultChecked />
+                      <span className="slider round"></span>
                     </label>
                   </div>
-
-                  <div className="flex items-center justify-between p-3 hover:bg-bg-secondary rounded-lg transition-colors">
-                    <div className="flex flex-col">
-                      <span className={`font-medium ${isNeonTheme ? 'sl-glow-text' : ''}`}>
-                        {isNeonTheme ? '[ WEEKLY SUMMARY ]' : 'Weekly Summary'}
-                      </span>
-                      <span className="text-sm text-text-secondary">Receive weekly progress reports</span>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" />
-                      <div className="w-11 h-6 bg-bg-secondary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-color-primary"></div>
+                  <div className="flex items-center justify-between">
+                    <span className={getTextClasses('font-medium', true)}>
+                      {getThemedText('Weekly Summary')}
+                    </span>
+                    <label className="switch">
+                      <input type="checkbox" />
+                      <span className="slider round"></span>
                     </label>
                   </div>
                 </div>
@@ -174,68 +183,74 @@ const Settings = () => {
             )}
 
             {activeTab === "security" && (
-              <div className="space-y-6">
-                <h3 className={`text-lg font-bold ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                    style={{ 
-                      fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                                isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                                currentTheme.font
-                    }}>
-                  {isNeonTheme ? '[ SECURITY SETTINGS ]' : 'Security Settings'}
+              <div>
+                <h3 className={getTextClasses('text-lg font-bold', true)}
+                  style={{
+                    fontFamily: getThemeFont(),
+                    letterSpacing: theme.features.useMonospaceFont ? '0.05em' : 'normal'
+                  }}
+                >
+                  {getThemedText('Security Settings')}
                 </h3>
                 
-                <div className="space-y-4">
+                <div className="mt-4 space-y-4">
                   <div>
-                    <label className={`text-sm block mb-1 ${isNeonTheme ? 'sl-glow-text' : 'text-text-secondary'}`}>Current Password</label>
-                    <input
-                      type="password"
-                      className="input"
-                      placeholder="••••••••"
+                    <label className={getTextClasses('text-sm block mb-1', theme.features.hasGlowEffects) || 'text-text-secondary'}>
+                      {getThemedText('Current Password')}
+                    </label>
+                    <input 
+                      type="password" 
+                      className="input w-full"
+                      style={{ fontFamily: getThemeFont() }}
                     />
                   </div>
                   <div>
-                    <label className={`text-sm block mb-1 ${isNeonTheme ? 'sl-glow-text' : 'text-text-secondary'}`}>New Password</label>
-                    <input
-                      type="password"
-                      className="input"
-                      placeholder="••••••••"
+                    <label className={getTextClasses('text-sm block mb-1', theme.features.hasGlowEffects) || 'text-text-secondary'}>
+                      {getThemedText('New Password')}
+                    </label>
+                    <input 
+                      type="password" 
+                      className="input w-full"
+                      style={{ fontFamily: getThemeFont() }}
                     />
                   </div>
                   <div>
-                    <label className={`text-sm block mb-1 ${isNeonTheme ? 'sl-glow-text' : 'text-text-secondary'}`}>Confirm New Password</label>
-                    <input
-                      type="password"
-                      className="input"
-                      placeholder="••••••••"
+                    <label className={getTextClasses('text-sm block mb-1', theme.features.hasGlowEffects) || 'text-text-secondary'}>
+                      {getThemedText('Confirm New Password')}
+                    </label>
+                    <input 
+                      type="password" 
+                      className="input w-full"
+                      style={{ fontFamily: getThemeFont() }}
                     />
                   </div>
-                  <button className={`btn w-full mt-4 ${isNeonTheme ? 'sl-glow-text' : ''}`}>
-                    {isNeonTheme ? '[ UPDATE PASSWORD ]' : 'Update Password'}
+                  <button className={`btn w-full mt-4 ${getTextClasses('', theme.features.hasGlowEffects)}`}>
+                    {getThemedText('Update Password')}
                   </button>
                 </div>
 
-                <div className="border-t border-border-themed pt-6 mt-6">
-                  <h3 className={`text-lg font-bold mb-4 ${isNeonTheme ? 'sl-glow-text text-color-accent' : 'text-color-accent'}`}
-                      style={{ 
-                        fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                                  isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                                  currentTheme.font
-                      }}>
-                    {isNeonTheme ? '[ DANGER ZONE ]' : 'Danger Zone'}
+                <div className="mt-8">
+                  <h3 className={getTextClasses('text-lg font-bold mb-4', true) + ' text-color-accent'}
+                    style={{
+                      fontFamily: getThemeFont(),
+                      letterSpacing: theme.features.useMonospaceFont ? '0.05em' : 'normal'
+                    }}
+                  >
+                    {getThemedText('Danger Zone')}
                   </h3>
-                  <div className="space-y-3">
-                    <button className="w-full text-left p-3 rounded-lg border border-red-500 text-red-500 hover:bg-red-500/10 transition-colors"
-                            style={{ borderRadius: currentTheme.radius }}>
-                      {isNeonTheme ? '[ DELETE ACCOUNT ]' : 'Delete Account'}
+                  <div className="space-y-2">
+                    <button className="btn btn-destructive w-full">
+                      {getThemedText('Delete Account')}
                     </button>
-                    <button className="w-full text-left p-3 rounded-lg border border-orange-500 text-orange-500 hover:bg-orange-500/10 transition-colors"
-                            style={{ borderRadius: currentTheme.radius }}>
-                      {isNeonTheme ? '[ LOG OUT ALL DEVICES ]' : 'Log Out All Devices'}
+                    <button className="btn btn-destructive w-full">
+                      {getThemedText('Log Out All Devices')}
                     </button>
                   </div>
                 </div>
               </div>
             )}
+
+            {activeTab === "theme" && <ThemeSettings />}
           </div>
         </div>
       </div>

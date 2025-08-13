@@ -1,23 +1,19 @@
 // src/pages/Home.jsx
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import ProfilePanel from "../components/layout/ProfilePanel";
 import MainContent from "../components/MainContent";
 import AddItemModal from "../components/modals/AddItemModal";
-import ThemeContext from "../context/ThemeContext";
+import { useThemeStyles } from "../context/ThemeProvider";
 import ProjectDetail from "../components/projects/ProjectDetail";
 
 const Home = () => {
-  const { currentTheme } = useContext(ThemeContext);
+  const { theme } = useThemeStyles();
 
-
-  
   const [isCollapsed, setIsCollapsed] = useState(false); // Keep panel expanded by default
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProject, setSelectedProject] = useState(null);
-
-
 
   // Placeholder profile data
   const [profile] = useState({
@@ -270,7 +266,10 @@ const handleUpdateProject = (updatedProject) => {
 };
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-gray-50">
+    <div 
+      className="flex h-full w-full overflow-hidden" 
+      style={{ backgroundColor: theme.bgPrimary }}
+    >
       {/* Profile Panel */}
       <ProfilePanel
         profile={profile}

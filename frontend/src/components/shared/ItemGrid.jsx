@@ -1,15 +1,24 @@
-import React, { useContext } from "react"; 
+import React from "react";
 import { motion } from "framer-motion";
+import { useThemeStyles } from "../../context/ThemeProvider";
 import ItemCard from "./ItemCard";
 import { PlusIcon } from "@heroicons/react/outline";
 
 const ItemGrid = ({ 
   items, 
+  viewMode, 
   onSelectItem, 
-  viewMode,
-  mode = "shop", // "shop" or "inventory"
-  addToCart = null, // Only for shop mode
+  addToCart, 
+  mode = "inventory",
+  toggleEquip = null 
 }) => {
+  const { theme: currentTheme } = useThemeStyles();
+  
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+
   if (viewMode !== "grid") return null;
 
   // Animation variants for container

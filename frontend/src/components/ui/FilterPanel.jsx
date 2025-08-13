@@ -1,48 +1,70 @@
-import React, { useContext } from "react"; 
+import React, { useState } from "react";
+import { useThemeStyles } from "../../context/ThemeProvider";
 import { ArrowSmDownIcon, ArrowSmUpIcon } from "@heroicons/react/outline";
-import ThemeContext from "../../context/ThemeContext";
-import { getRarityColor } from "../../utils/itemUtils";
 
 const FilterPanel = ({ 
-  showFilters, 
-  activeFilters, 
-  handleFilterChange, 
-  sortOption, 
-  handleSort, 
+  showFilters,
+  activeFilters,
+  handleFilterChange,
+  sortOption,
+  handleSort,
   resetFilters,
   filterOptions,
   mode = "shop" // "shop" or "inventory"
 }) => {
-  const { currentTheme } = useContext(ThemeContext);
+  const { theme, styles } = useThemeStyles();
 
+  // Helper function to get rarity color
+  const getRarityColor = (rarity) => {
+    switch(rarity) {
+      case "Common": return "#9ca3af"; // gray-400
+      case "Uncommon": return "#22c55e"; // green-500
+      case "Rare": return "#3b82f6"; // blue-500
+      case "Epic": return "#a855f7"; // purple-500
+      case "Legendary": return "#f59e0b"; // amber-500
+      default: return "#9ca3af"; // gray-400
+    }
+  };
 
-  const isNeonTheme = currentTheme.id.includes('neon');
-  const isCyberpunk = currentTheme.id === 'cyberpunk';
+  const isNeonTheme = theme.id.includes('neon');
+  const isCyberpunk = theme.id === 'cyberpunk';
 
   if (!showFilters) return null;
+
+  // Use the passed filters or create default ones
+  const filters = activeFilters || {
+    types: ['All', 'Weapon', 'Armor', 'Accessory', 'Consumable'],
+    rarities: ['All', 'Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'],
+    type: '',
+    rarity: '',
+    minPrice: 0,
+    maxPrice: 1000,
+    featured: false,
+    showEquipped: false
+  };
 
   // Get themed filter/sort panel style
   const getFilterPanelStyle = () => {
     if (isNeonTheme) {
       return {
         backgroundColor: 'rgba(10, 10, 16, 0.9)',
-        border: `1px solid ${currentTheme.borderColor}`,
-        boxShadow: `0 0 15px ${currentTheme.shadowColor}`,
-        borderRadius: currentTheme.radius,
+        border: `1px solid ${theme.borderColor}`,
+        boxShadow: `0 0 15px ${theme.shadowColor}`,
+        borderRadius: theme.radius,
       };
     } else if (isCyberpunk) {
       return {
         backgroundColor: 'rgba(15, 23, 42, 0.9)',
-        border: `1px solid ${currentTheme.primaryColor}`,
-        boxShadow: `0 0 10px ${currentTheme.shadowColor}`,
+        border: `1px solid ${theme.primaryColor}`,
+        boxShadow: `0 0 10px ${theme.shadowColor}`,
         borderRadius: '0',
       };
     } else {
       return {
-        backgroundColor: currentTheme.bgSecondary,
-        border: `1px solid ${currentTheme.borderColor}`,
-        boxShadow: currentTheme.shadow,
-        borderRadius: currentTheme.radius,
+        backgroundColor: theme.bgSecondary,
+        border: `1px solid ${theme.borderColor}`,
+        boxShadow: theme.shadow,
+        borderRadius: theme.radius,
       };
     }
   };
@@ -53,29 +75,29 @@ const FilterPanel = ({
       return {
         backgroundColor: isActive ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
         color: isActive 
-          ? (color || currentTheme.primaryColor)
-          : (color || currentTheme.textSecondary),
-        borderRadius: currentTheme.radius,
+          ? (color || theme.primaryColor)
+          : (color || theme.textSecondary),
+        borderRadius: theme.radius,
         border: `1px solid ${isActive 
-          ? (color || currentTheme.primaryColor) 
-          : currentTheme.borderColor}`,
+          ? (color || theme.primaryColor) 
+          : theme.borderColor}`,
         fontFamily: isNeonTheme 
           ? "'Orbitron', 'Rajdhani', sans-serif" 
           : isCyberpunk 
           ? "'Audiowide', 'Rajdhani', sans-serif" 
-          : currentTheme.font
+          : theme.font
       };
     }
     
     return {
       backgroundColor: isActive 
-        ? (color ? `${color}20` : `${currentTheme.primaryColor}20`) 
-        : currentTheme.bgTertiary,
+        ? (color ? `${color}20` : `${theme.primaryColor}20`) 
+        : theme.bgTertiary,
       color: isActive 
-        ? (color || currentTheme.primaryColor)
-        : currentTheme.textSecondary,
-      borderRadius: currentTheme.radius,
-      fontFamily: currentTheme.font
+        ? (color || theme.primaryColor)
+        : theme.textSecondary,
+      borderRadius: theme.radius,
+      fontFamily: theme.font
     };
   };
 
@@ -86,20 +108,20 @@ const FilterPanel = ({
         <div>
           <label className={`block text-sm mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
                  style={{ 
-                   color: currentTheme.textSecondary,
+                   color: theme.textSecondary,
                    fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
                                isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                               currentTheme.font
+                               theme.font
                  }}>
             {isNeonTheme ? '[ TYPE ]' : isCyberpunk ? 'TYPE' : 'Type'}
           </label>
           <div className="flex flex-wrap gap-2">
-            {filterOptions.types.map(type => (
+            {filters.types.map(type => (
               <button
                 key={type}
                 onClick={() => handleFilterChange('type', type === 'All' ? '' : type)}
                 className="px-3 py-1.5 text-sm transition-colors"
-                style={getFilterButtonStyle(activeFilters.type === (type === 'All' ? '' : type))}
+                style={getFilterButtonStyle(filters.type === (type === 'All' ? '' : type))}
               >
                 {isNeonTheme ? type.toUpperCase() : type}
               </button>
@@ -111,21 +133,21 @@ const FilterPanel = ({
         <div>
           <label className={`block text-sm mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
                  style={{ 
-                   color: currentTheme.textSecondary,
+                   color: theme.textSecondary,
                    fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
                                isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                               currentTheme.font
+                               theme.font
                  }}>
             {isNeonTheme ? '[ RARITY ]' : isCyberpunk ? 'RARITY' : 'Rarity'}
           </label>
           <div className="flex flex-wrap gap-2">
-            {filterOptions.rarities.map(rarity => (
+            {filters.rarities.map(rarity => (
               <button
                 key={rarity}
                 onClick={() => handleFilterChange('rarity', rarity === 'All' ? '' : rarity)}
                 className="px-3 py-1.5 text-sm transition-colors"
                 style={getFilterButtonStyle(
-                  activeFilters.rarity === (rarity === 'All' ? '' : rarity),
+                  filters.rarity === (rarity === 'All' ? '' : rarity),
                   rarity !== 'All' ? getRarityColor(rarity) : null
                 )}
               >
@@ -142,10 +164,10 @@ const FilterPanel = ({
             <div>
               <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
                     style={{ 
-                      color: currentTheme.textSecondary,
+                      color: theme.textSecondary,
                       fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
                                   isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                                  currentTheme.font
+                                  theme.font
                     }}>
                 {isNeonTheme ? '[ PRICE RANGE ]' : isCyberpunk ? 'PRICE RANGE' : 'Price Range'}
               </label>
@@ -154,37 +176,37 @@ const FilterPanel = ({
                   type="number"
                   min="0"
                   max="1000"
-                  value={activeFilters.minPrice}
+                  value={filters.minPrice}
                   onChange={(e) => handleFilterChange('minPrice', parseInt(e.target.value) || 0)}
                   className={`w-20 px-2 py-1 text-sm ${isNeonTheme ? 'sl-glow-text' : ''}`}
                   style={{ 
-                    backgroundColor: currentTheme.inputBg,
-                    color: currentTheme.textPrimary,
-                    borderColor: currentTheme.inputBorder,
-                    borderRadius: currentTheme.radius,
-                    border: `1px solid ${currentTheme.borderColor}`,
+                    backgroundColor: theme.inputBg,
+                    color: theme.textPrimary,
+                    borderColor: theme.inputBorder,
+                    borderRadius: theme.radius,
+                    border: `1px solid ${theme.borderColor}`,
                     fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
                                 isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                                currentTheme.font
+                                theme.font
                   }}
                 />
-                <span style={{ color: currentTheme.textSecondary }}>to</span>
+                <span style={{ color: theme.textSecondary }}>to</span>
                 <input
                   type="number"
                   min="0"
                   max="1000"
-                  value={activeFilters.maxPrice}
+                  value={filters.maxPrice}
                   onChange={(e) => handleFilterChange('maxPrice', parseInt(e.target.value) || 0)}
                   className={`w-20 px-2 py-1 text-sm ${isNeonTheme ? 'sl-glow-text' : ''}`}
                   style={{ 
-                    backgroundColor: currentTheme.inputBg,
-                    color: currentTheme.textPrimary,
-                    borderColor: currentTheme.inputBorder,
-                    borderRadius: currentTheme.radius,
-                    border: `1px solid ${currentTheme.borderColor}`,
+                    backgroundColor: theme.inputBg,
+                    color: theme.textPrimary,
+                    borderColor: theme.inputBorder,
+                    borderRadius: theme.radius,
+                    border: `1px solid ${theme.borderColor}`,
                     fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
                                 isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                                currentTheme.font
+                                theme.font
                   }}
                 />
               </div>
@@ -194,18 +216,18 @@ const FilterPanel = ({
             <div>
               <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
                     style={{ 
-                      color: currentTheme.textSecondary,
+                      color: theme.textSecondary,
                       fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
                                   isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                                  currentTheme.font
+                                  theme.font
                     }}>
                 {isNeonTheme ? '[ OPTIONS ]' : isCyberpunk ? 'OPTIONS' : 'Options'}
               </label>
               <div>
                 <button
-                  onClick={() => handleFilterChange('featured', !activeFilters.featured)}
+                  onClick={() => handleFilterChange('featured', !filters.featured)}
                   className="px-3 py-1.5 text-sm transition-colors"
-                  style={getFilterButtonStyle(activeFilters.featured)}
+                  style={getFilterButtonStyle(filters.featured)}
                 >
                   {isNeonTheme ? '[ FEATURED ONLY ]' : isCyberpunk ? 'FEATURED ONLY' : 'Featured Only'}
                 </button>
@@ -216,18 +238,18 @@ const FilterPanel = ({
           <div>
             <label className={`block text-sm mb-1 ${isNeonTheme ? 'sl-glow-text' : ''}`}
                    style={{ 
-                     color: currentTheme.textSecondary,
+                     color: theme.textSecondary,
                      fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
                                  isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                                 currentTheme.font
+                                 theme.font
                    }}>
               {isNeonTheme ? '[ STATUS ]' : isCyberpunk ? 'STATUS' : 'Status'}
             </label>
             <div>
               <button
-                onClick={() => handleFilterChange('showEquipped', !activeFilters.showEquipped)}
+                onClick={() => handleFilterChange('showEquipped', !filters.showEquipped)}
                 className="px-3 py-1.5 text-sm transition-colors"
-                style={getFilterButtonStyle(activeFilters.showEquipped)}
+                style={getFilterButtonStyle(filters.showEquipped)}
               >
                 {isNeonTheme ? '[ EQUIPPED ONLY ]' : isCyberpunk ? 'EQUIPPED ONLY' : 'Equipped Only'}
               </button>
@@ -239,10 +261,10 @@ const FilterPanel = ({
         <div>
           <label className={`block text-sm mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
                  style={{ 
-                   color: currentTheme.textSecondary,
+                   color: theme.textSecondary,
                    fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
                                isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                               currentTheme.font
+                               theme.font
                  }}>
             {isNeonTheme ? '[ SORT BY ]' : isCyberpunk ? 'SORT BY' : 'Sort By'}
           </label>
@@ -278,11 +300,11 @@ const FilterPanel = ({
           style={{ 
             backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : 'rgba(239, 68, 68, 0.1)',
             color: '#ef4444',
-            borderRadius: currentTheme.radius,
+            borderRadius: theme.radius,
             border: isNeonTheme || isCyberpunk ? `1px solid #ef4444` : 'none',
             fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
                         isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                        currentTheme.font
+                        theme.font
           }}
         >
           {isNeonTheme ? '[ RESET FILTERS ]' : isCyberpunk ? 'RESET FILTERS' : 'Reset Filters'}
