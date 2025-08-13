@@ -29,7 +29,7 @@ const ShieldIcon = ({ className }) => (
 );
 
 // Enhanced Equipment Slot component - with shared borders
-const EquipmentSlot = ({ item, onSelect, hasEquipped, slotType, borderConfig }) => {
+const EquipmentSlot = ({ item, onSelect, hasEquipped, slotType, borderConfig, adjacentEquipped = {} }) => {
   const { theme: currentTheme } = useThemeStyles();
   
   // Add null checks to prevent React Error #31
@@ -66,10 +66,34 @@ const EquipmentSlot = ({ item, onSelect, hasEquipped, slotType, borderConfig }) 
       borderRadius: borderConfig.radius || '0'
     };
     
-    if (borderConfig.top) styles.borderTop = borderStyle;
-    if (borderConfig.right) styles.borderRight = borderStyle;
-    if (borderConfig.bottom) styles.borderBottom = borderStyle;
-    if (borderConfig.left) styles.borderLeft = borderStyle;
+    if (hasEquipped) {
+      // When equipped, show all borders by default
+      styles.borderTop = borderStyle;
+      styles.borderRight = borderStyle;
+      styles.borderBottom = borderStyle;
+      styles.borderLeft = borderStyle;
+      
+      // Only hide borders if BOTH this item and the adjacent item are equipped
+      // This creates shared borders between equipped items
+      if (!borderConfig.top && adjacentEquipped.top) {
+        styles.borderTop = 'none';
+      }
+      if (!borderConfig.right && adjacentEquipped.right) {
+        styles.borderRight = 'none';
+      }
+      if (!borderConfig.bottom && adjacentEquipped.bottom) {
+        styles.borderBottom = 'none';
+      }
+      if (!borderConfig.left && adjacentEquipped.left) {
+        styles.borderLeft = 'none';
+      }
+    } else {
+      // When no item is equipped, use the borderConfig as before
+      if (borderConfig.top) styles.borderTop = borderStyle;
+      if (borderConfig.right) styles.borderRight = borderStyle;
+      if (borderConfig.bottom) styles.borderBottom = borderStyle;
+      if (borderConfig.left) styles.borderLeft = borderStyle;
+    }
     
     return styles;
   };
@@ -79,17 +103,21 @@ const EquipmentSlot = ({ item, onSelect, hasEquipped, slotType, borderConfig }) 
       className={`w-20 h-20 md:w-24 md:h-24 flex flex-col items-center justify-center cursor-pointer transition-all duration-200`}
       style={{
         ...getBorderStyles(),
-        boxShadow: hasEquipped ? `0 0 8px ${isNeonTheme || isCyberpunk ? currentTheme.primaryColor + '70' : 'rgba(0,0,0,0.1)'}` : 'none'
+        boxShadow: hasEquipped ? `0 0 8px ${isNeonTheme || isCyberpunk ? currentTheme.primaryColor + '70' : 'rgba(0,0,0,0.1)'}` : 'none',
+        position: 'relative',
+        zIndex: 1
       }}
       onClick={() => item && onSelect(item)}
       onMouseEnter={(e) => {
         if (item) {
-          e.currentTarget.style.boxShadow = `0 4px 12px rgba(0,0,0,0.15), 0 0 0 1px ${currentTheme.borderColor}`;
+          e.currentTarget.style.boxShadow = `4px 0 8px rgba(0,0,0,0.15), -4px 0 8px rgba(0,0,0,0.15), 0 0 0 1px ${currentTheme.borderColor}`;
+          e.currentTarget.style.zIndex = '0'; // Lower z-index on hover so shadow goes behind
         }
       }}
       onMouseLeave={(e) => {
         if (item) {
           e.currentTarget.style.boxShadow = hasEquipped ? `0 0 8px ${isNeonTheme || isCyberpunk ? currentTheme.primaryColor + '70' : 'rgba(0,0,0,0.1)'}` : 'none';
+          e.currentTarget.style.zIndex = '1'; // Restore z-index
         }
       }}
     >
@@ -139,6 +167,9 @@ const CharacterEquipmentSection = ({ equippedItems, setSelectedItem, currentThem
               bottom: true,
               radius: `${reducedRadius} 0 0 0`
             }}
+            adjacentEquipped={{ 
+              bottom: !!equippedItems.armor  // helmet is above armor
+            }}
           />
           <EquipmentSlot 
             item={equippedItems.armor} 
@@ -150,6 +181,10 @@ const CharacterEquipmentSection = ({ equippedItems, setSelectedItem, currentThem
               left: true,
               right: true,
               bottom: true
+            }}
+            adjacentEquipped={{ 
+              top: !!equippedItems.helmet,    // armor is below helmet
+              bottom: !!equippedItems.boots   // armor is above boots
             }}
           />
           <EquipmentSlot 
@@ -163,6 +198,9 @@ const CharacterEquipmentSection = ({ equippedItems, setSelectedItem, currentThem
               right: true,
               bottom: true,
               radius: `0 0 0 ${reducedRadius}`
+            }}
+            adjacentEquipped={{ 
+              top: !!equippedItems.armor  // boots is below armor
             }}
           />
         </div>
@@ -194,6 +232,9 @@ const CharacterEquipmentSection = ({ equippedItems, setSelectedItem, currentThem
               bottom: true,
               radius: `0 ${reducedRadius} 0 0`
             }}
+            adjacentEquipped={{ 
+              bottom: !!equippedItems.weapon  // accessory is above weapon
+            }}
           />
           <EquipmentSlot 
             item={equippedItems.weapon} 
@@ -205,6 +246,10 @@ const CharacterEquipmentSection = ({ equippedItems, setSelectedItem, currentThem
               left: true,
               right: true,
               bottom: true
+            }}
+            adjacentEquipped={{ 
+              top: !!equippedItems.accessory,  // weapon is below accessory
+              bottom: !!equippedItems.offhand  // weapon is above offhand
             }}
           />
           <EquipmentSlot 
@@ -218,6 +263,9 @@ const CharacterEquipmentSection = ({ equippedItems, setSelectedItem, currentThem
               right: true,
               bottom: true,
               radius: `0 0 ${reducedRadius} 0`
+            }}
+            adjacentEquipped={{ 
+              top: !!equippedItems.weapon  // offhand is below weapon
             }}
           />
         </div>

@@ -3,7 +3,7 @@ import { useThemeStyles } from "../../../context/ThemeProvider";
 import { ThemedButton, FormLabel } from "./FormComponents";
 import { CounterInput } from "./FormComponents";
 
-const CountableSection = ({ formData, isEditMode, handleInputChange, handleNumberChange, errors }) => {
+const CountableSection = ({ formData, setFormData, isEditMode, handleInputChange, handleNumberChange, errors }) => {
   const { theme: currentTheme } = useThemeStyles();
   
   // Add null checks to prevent React Error #31

@@ -12,6 +12,7 @@ export const THEME_FEATURES = {
   hasSharpCorners: false,
   hasGlassEffect: false,
   hasGridBackground: false,
+  hasGradientBackground: false,
   useUppercaseText: false,
   useMonospaceFont: false,
   hasBorderAnimations: false,
@@ -112,6 +113,55 @@ export const THEMES = {
       input: 'cyber',
       text: 'cyber',
     }
+  }),
+
+  NIGHT: createTheme({
+    id: "night",
+    name: "Midnight",
+    primaryColor: "#8b5cf6", // Rich purple
+    secondaryColor: "#06b6d4", // Cyan accent
+    bgPrimary: "#0f0f23", // Deep midnight blue
+    bgSecondary: "#1a1a2e", // Dark navy
+    bgTertiary: "#16213e", // Slate blue
+    textPrimary: "#f1f5f9", // Crisp white
+    textSecondary: "#94a3b8", // Cool gray
+    borderColor: "#475569", // Subtle blue-gray
+    radius: "0.5rem",
+    font: "'JetBrains Mono', 'Fira Code', monospace",
+    features: {
+      hasGlassEffect: true,
+      useMonospaceFont: true,
+    },
+    variants: {
+      card: 'glass',
+      button: 'default',
+      input: 'default',
+      text: 'default',
+    }
+  }),
+
+  ROSE: createTheme({
+    id: "rose",
+    name: "Rose Quartz",
+    primaryColor: "#e11d48", // Deep rose
+    secondaryColor: "#ec4899", // Pink accent
+    bgPrimary: "#fdf2f8", // Very light rose
+    bgSecondary: "#ffffff", // Pure white
+    bgTertiary: "#fce7f3", // Soft pink
+    textPrimary: "#881337", // Dark rose
+    textSecondary: "#be185d", // Medium rose
+    borderColor: "#f9a8d4", // Light pink border
+    radius: "0.5rem", // Normal rounding, not excessive
+    font: "'Inter', 'Segoe UI', sans-serif", // Clean modern font
+    features: {
+      // Clean and elegant
+    },
+    variants: {
+      card: 'default',
+      button: 'default',
+      input: 'default',
+      text: 'default',
+    }
   })
 };
 
@@ -119,6 +169,8 @@ export const THEMES = {
 export const LIGHT = THEMES.LIGHT;
 export const NEON_VIOLET = THEMES.NEON_VIOLET;
 export const CYBERPUNK = THEMES.CYBERPUNK;
+export const NIGHT = THEMES.NIGHT;
+export const ROSE = THEMES.ROSE;
 
 // Style Generators based on features, not theme names
 export const generateStyles = (theme) => {
@@ -150,10 +202,11 @@ export const generateStyles = (theme) => {
         clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))',
       },
       glass: {
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        backdropFilter: 'blur(12px)',
+        backgroundColor: 'rgba(26, 26, 31, 0.7)', // Dark glass for Night theme
+        backdropFilter: 'blur(16px)',
         border: '1px solid rgba(255, 255, 255, 0.1)',
-      }
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+      },
     },
     
     // Button styles
@@ -185,7 +238,7 @@ export const generateStyles = (theme) => {
           border: 'none',
           position: 'relative',
           overflow: 'hidden',
-        }
+        },
       },
       secondary: {
         default: {
@@ -202,7 +255,7 @@ export const generateStyles = (theme) => {
           backgroundColor: 'transparent',
           color: theme.secondaryColor,
           border: `1px solid ${theme.secondaryColor}`,
-        }
+        },
       }
     },
     

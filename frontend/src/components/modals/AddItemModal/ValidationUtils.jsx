@@ -13,8 +13,11 @@ export const DEFAULT_FORM_DATA = {
 	currentCount: 0,
 	weekday: "monday",
 	monthday: 1,
+	// Enhanced recurrence fields
+	recurrenceType: "weekly", // "weekly" or "monthly" for tasks
+	lateTaskBehavior: "immediate", // "immediate" or "delayed"
 	subtasks: [], // Added subtasks array
-  };
+};
 	
   // Input validation functions
   export const validateInput = (name, value) => {

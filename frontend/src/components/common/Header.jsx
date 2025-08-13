@@ -6,8 +6,10 @@ import { BellIcon, UserIcon } from "@heroicons/react/outline";
 
 const Header = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [isNotificationHovered, setIsNotificationHovered] = useState(false);
+  const [isProfileHovered, setIsProfileHovered] = useState(false);
   const { logout } = useAuth();
-  const { theme: currentTheme } = useThemeStyles();
+  const { theme: currentTheme, styles } = useThemeStyles();
 
   const profileRef = useRef(null);
   const location = useLocation();
@@ -29,6 +31,10 @@ const Header = () => {
     return location.pathname === path;
   };
 
+  const getThemedText = (text) => {
+    return styles.shouldTransform(text);
+  };
+
   return (
     <header 
       className="border-b"
@@ -41,47 +47,41 @@ const Header = () => {
         <div className="flex justify-between items-center h-16">
           {/* Left: Navigation Links with better active indicators */}
           <nav className="flex items-center gap-6">
-            <Link 
-              to="/home" 
-              className={`text-base font-medium py-3 border-b-2 transition-colors ${
-                isActive('/home') 
-                  ? 'text-purple-700' 
-                  : 'hover:text-purple-600'
-              }`}
+            <Link
+              to="/home"
+              className="text-base font-medium py-3 border-b-2 transition-colors"
               style={{
                 borderColor: isActive('/home') ? currentTheme.primaryColor : 'transparent',
-                color: isActive('/home') ? currentTheme.primaryColor : currentTheme.textPrimary
+                color: isActive('/home') ? currentTheme.primaryColor : currentTheme.textPrimary,
+                textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none',
+                fontFamily: currentTheme.font
               }}
             >
-              Home
+              {getThemedText('Home')}
             </Link>
-            <Link 
-              to="/inventory" 
-              className={`text-base font-medium py-3 border-b-2 transition-colors ${
-                isActive('/inventory') 
-                  ? 'text-purple-700' 
-                  : 'hover:text-purple-600'
-              }`}
+            <Link
+              to="/inventory"
+              className="text-base font-medium py-3 border-b-2 transition-colors"
               style={{
                 borderColor: isActive('/inventory') ? currentTheme.primaryColor : 'transparent',
-                color: isActive('/inventory') ? currentTheme.primaryColor : currentTheme.textPrimary
+                color: isActive('/inventory') ? currentTheme.primaryColor : currentTheme.textPrimary,
+                textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none',
+                fontFamily: currentTheme.font
               }}
             >
-              Inventory
+              {getThemedText('Inventory')}
             </Link>
-            <Link 
-              to="/shop" 
-              className={`text-base font-medium py-3 border-b-2 transition-colors ${
-                isActive('/shop') 
-                  ? 'text-purple-700' 
-                  : 'hover:text-purple-600'
-              }`}
+            <Link
+              to="/shop"
+              className="text-base font-medium py-3 border-b-2 transition-colors"
               style={{
                 borderColor: isActive('/shop') ? currentTheme.primaryColor : 'transparent',
-                color: isActive('/shop') ? currentTheme.primaryColor : currentTheme.textPrimary
+                color: isActive('/shop') ? currentTheme.primaryColor : currentTheme.textPrimary,
+                textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none',
+                fontFamily: currentTheme.font
               }}
             >
-              Shop
+              {getThemedText('Shop')}
             </Link>
           </nav>
           
@@ -90,16 +90,21 @@ const Header = () => {
             <div 
               className="h-10 w-10 flex items-center justify-center text-white font-semibold text-lg"
               style={{ 
-                background: `linear-gradient(to right, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})` 
+                background: `linear-gradient(to right, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
+                borderRadius: currentTheme.features?.hasSharpCorners ? '0' : '4px'
               }}
             >
               P1
             </div>
             <span 
               className="ml-3 text-xl font-bold"
-              style={{ color: currentTheme.textPrimary }}
+              style={{ 
+                color: currentTheme.textPrimary,
+                fontFamily: currentTheme.font,
+                textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+              }}
             >
-              PlayerOne
+              {getThemedText('PlayerOne')}
             </span>
           </div>
 
@@ -111,7 +116,10 @@ const Header = () => {
                 className="flex items-center gap-2 px-3 py-1.5 text-base"
                 style={{ 
                   backgroundColor: currentTheme.bgTertiary,
-                  color: currentTheme.textPrimary
+                  color: currentTheme.textPrimary,
+                  borderRadius: currentTheme.features?.hasSharpCorners ? '0' : '6px',
+                  border: `1px solid ${currentTheme.borderColor}`,
+                  fontFamily: currentTheme.font
                 }}
               >
                 <span role="img" aria-label="Coin" title="Coins" className="text-base">🪙</span>
@@ -121,7 +129,10 @@ const Header = () => {
                 className="flex items-center gap-2 px-3 py-1.5 text-base"
                 style={{ 
                   backgroundColor: currentTheme.bgTertiary,
-                  color: currentTheme.textPrimary
+                  color: currentTheme.textPrimary,
+                  borderRadius: currentTheme.features?.hasSharpCorners ? '0' : '6px',
+                  border: `1px solid ${currentTheme.borderColor}`,
+                  fontFamily: currentTheme.font
                 }}
               >
                 <span role="img" aria-label="Gem" title="Gems" className="text-base">💎</span>
@@ -133,16 +144,20 @@ const Header = () => {
             <button 
               className="relative p-1.5 transition-colors"
               style={{ 
-                color: currentTheme.textSecondary,
+                color: isNotificationHovered ? currentTheme.primaryColor : currentTheme.textSecondary,
+                borderRadius: currentTheme.features?.hasSharpCorners ? '0' : '6px'
               }}
-              onMouseEnter={(e) => e.target.style.color = currentTheme.primaryColor}
-              onMouseLeave={(e) => e.target.style.color = currentTheme.textSecondary}
+              onMouseEnter={() => setIsNotificationHovered(true)}
+              onMouseLeave={() => setIsNotificationHovered(false)}
             >
               <BellIcon className="w-6 h-6" />
               {notificationCount > 0 && (
                 <span 
                   className="absolute top-0 right-0 block w-2.5 h-2.5"
-                  style={{ backgroundColor: '#ef4444', borderRadius: '50%' }}
+                  style={{ 
+                    backgroundColor: '#ef4444', 
+                    borderRadius: currentTheme.features?.hasSharpCorners ? '0' : '50%'
+                  }}
                 ></span>
               )}
             </button>
@@ -154,10 +169,11 @@ const Header = () => {
                 title="Profile"
                 onClick={() => setShowProfileDropdown((prev) => !prev)}
                 style={{ 
-                  color: currentTheme.textSecondary,
+                  color: isProfileHovered ? currentTheme.primaryColor : currentTheme.textSecondary,
+                  borderRadius: currentTheme.features?.hasSharpCorners ? '0' : '6px'
                 }}
-                onMouseEnter={(e) => e.target.style.color = currentTheme.primaryColor}
-                onMouseLeave={(e) => e.target.style.color = currentTheme.textSecondary}
+                onMouseEnter={() => setIsProfileHovered(true)}
+                onMouseLeave={() => setIsProfileHovered(false)}
               >
                 <UserIcon className="w-6 h-6" />
               </button>
@@ -166,50 +182,49 @@ const Header = () => {
                   className="absolute right-0 mt-2 w-48 shadow-lg border py-1 z-50"
                   style={{ 
                     backgroundColor: currentTheme.bgSecondary,
-                    borderColor: currentTheme.borderColor
+                    borderColor: currentTheme.borderColor,
+                    borderRadius: currentTheme.features?.hasSharpCorners ? '0' : '8px',
+                    boxShadow: currentTheme.features?.hasGlowEffects ? `0 0 20px ${currentTheme.primaryColor}30` : '0 4px 6px rgba(0, 0, 0, 0.1)'
                   }}
                 >
-                  <ul>
-                    <li>
-                      <Link 
-                        to="/profile"
-                        className="block px-4 py-2 text-sm hover:bg-opacity-50" 
-                        style={{ 
-                          color: currentTheme.textPrimary,
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = currentTheme.bgTertiary}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                      >
-                        Profile
-                      </Link>
-                    </li>
-                    <li>
-                      <Link 
-                        to="/settings"
-                        className="block px-4 py-2 text-sm hover:bg-opacity-50" 
-                        style={{ 
-                          color: currentTheme.textPrimary,
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = currentTheme.bgTertiary}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                      >
-                        Settings
-                      </Link>
-                    </li>
-                    <li>
-                      <button
-                        onClick={logout}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-opacity-50"
-                        style={{ 
-                          color: currentTheme.textPrimary,
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = currentTheme.bgTertiary}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                      >
-                        Log Out
-                      </button>
-                    </li>
-                  </ul>
+                  <Link
+                    to="/settings"
+                    className="block px-4 py-2 text-sm transition-colors"
+                    style={{ 
+                      color: currentTheme.textPrimary,
+                      fontFamily: currentTheme.font,
+                      textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = currentTheme.bgTertiary;
+                      e.target.style.color = currentTheme.primaryColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.color = currentTheme.textPrimary;
+                    }}
+                  >
+                    {getThemedText('Settings')}
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="block w-full text-left px-4 py-2 text-sm transition-colors"
+                    style={{ 
+                      color: currentTheme.textPrimary,
+                      fontFamily: currentTheme.font,
+                      textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = currentTheme.bgTertiary;
+                      e.target.style.color = currentTheme.primaryColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.color = currentTheme.textPrimary;
+                    }}
+                  >
+                    {getThemedText('Logout')}
+                  </button>
                 </div>
               )}
             </div>

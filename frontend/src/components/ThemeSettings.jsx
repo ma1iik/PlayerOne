@@ -1,285 +1,180 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React from 'react';
 import { useThemeStyles } from '../context/ThemeProvider';
 
 const ThemeSettings = () => {
   const { theme, styles, themes, setThemeId, themeId } = useThemeStyles();
-  const [activeTab, setActiveTab] = useState('themes');
 
-  const tabs = [
-    { id: 'themes', label: 'Themes' },
-    { id: 'preview', label: 'Preview' }
-  ];
-
-  // Get theme font
-  const getThemeFont = () => theme.font;
-
-  // Generate the color pill component for theme cards
-  const ColorPill = ({ color, label }) => (
-    <div className="flex items-center gap-1.5">
-      <div 
-        className="w-3 h-3 rounded-full" 
-        style={{ backgroundColor: color }}
-      />
-      <span className="text-xs" style={{ color: theme.textSecondary }}>{label}</span>
-    </div>
-  );
-
-  // Helper to get text classes
-  const getTextClasses = (baseClasses = '', isHighlighted = false) => {
-    let classes = baseClasses;
-    if (theme.features.hasGlowEffects && isHighlighted) {
-      classes += ' sl-glow-text';
-    }
-    return classes.trim();
-  };
-
-  // Helper to get themed text
   const getThemedText = (text) => styles.shouldTransform(text);
 
+  // Helper to get clean font name
+  const getCleanFontName = (fontString) => {
+    // Extract the first font name from the font string
+    const match = fontString.match(/'([^']+)'/);
+    if (match) {
+      return match[1];
+    }
+    // Fallback to the part before comma
+    return fontString.split(',')[0].replace(/'/g, '').trim();
+  };
+
   return (
-    <div className="rounded-lg overflow-hidden" style={styles.getCardStyle()}>
-      {/* Header with tabs */}
-      <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: theme.borderColor }}>
-        <h3 className={getTextClasses('text-lg font-semibold flex items-center gap-2', true)} style={{ color: theme.textPrimary, fontFamily: getThemeFont() }}>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-          </svg>
-          {getThemedText('Theme Settings')}
-        </h3>
-        
-        <div className="flex bg-bg-tertiary rounded-lg p-1" style={{ backgroundColor: theme.bgTertiary }}>
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-3 py-1.5 text-sm rounded transition-colors ${getTextClasses('', true)}`}
-              style={{
-                backgroundColor: activeTab === tab.id ? theme.primaryColor : 'transparent',
-                color: activeTab === tab.id ? '#ffffff' : theme.textSecondary,
-                fontFamily: getThemeFont(),
-              }}
-            >
-              {getThemedText(tab.label)}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-4">
-        {activeTab === 'themes' && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {themes.map((themeOption) => (
-                <motion.div
-                  key={themeOption.id}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`relative p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                    themeId === themeOption.id 
-                      ? 'ring-2 ring-offset-2' 
-                      : 'hover:shadow-lg'
-                  }`}
-                  style={{
-                    backgroundColor: themeOption.bgSecondary,
-                    borderColor: themeId === themeOption.id ? themeOption.primaryColor : themeOption.borderColor,
-                    borderRadius: themeOption.radius,
-                    ringColor: themeOption.primaryColor,
-                    boxShadow: themeOption.features?.hasGlowEffects && themeId === themeOption.id
-                      ? `0 0 20px ${themeOption.primaryColor}40`
-                      : undefined
-                  }}
-                  onClick={() => setThemeId(themeOption.id)}
-                >
-                  {/* Theme Preview */}
-                  <div className="mb-3 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className="w-6 h-6 rounded-full"
-                        style={{ backgroundColor: themeOption.primaryColor }}
-                      />
-                      <h4 className={getTextClasses('font-semibold', true)} style={{ 
-                        color: themeOption.textPrimary, 
-                        fontFamily: themeOption.font 
-                      }}>
-                        {styles.shouldTransform(themeOption.name)}
-                      </h4>
-                    </div>
-                    
-                    {/* Color palette */}
-                    <div className="flex gap-1">
-                      <ColorPill color={themeOption.primaryColor} label="Primary" />
-                      <ColorPill color={themeOption.secondaryColor} label="Secondary" />
-                    </div>
-                  </div>
-
-                  {/* Feature badges */}
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {themeOption.features?.hasGlowEffects && (
-                      <span className="px-2 py-1 text-xs rounded" style={{ 
-                        backgroundColor: `${themeOption.primaryColor}20`, 
-                        color: themeOption.primaryColor 
-                      }}>
-                        Glow Effects
-                      </span>
-                    )}
-                    {themeOption.features?.hasSharpCorners && (
-                      <span className="px-2 py-1 text-xs rounded" style={{ 
-                        backgroundColor: `${themeOption.secondaryColor}20`, 
-                        color: themeOption.secondaryColor 
-                      }}>
-                        Sharp Corners
-                      </span>
-                    )}
-                    {themeOption.features?.hasGridBackground && (
-                      <span className="px-2 py-1 text-xs rounded" style={{ 
-                        backgroundColor: `${themeOption.textSecondary}20`, 
-                        color: themeOption.textSecondary 
-                      }}>
-                        Grid BG
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Sample UI Elements */}
-                  <div className="space-y-2">
-                    <div 
-                      className="p-2 rounded text-xs"
-                      style={{ 
-                        backgroundColor: themeOption.bgTertiary,
-                        color: themeOption.textSecondary,
-                        borderRadius: themeOption.features?.hasSharpCorners ? '0' : themeOption.radius
-                      }}
-                    >
-                      Sample card
-                    </div>
-                    <button 
-                      className="w-full py-1 px-2 text-xs rounded transition-colors"
-                      style={{ 
-                        backgroundColor: themeOption.primaryColor,
-                        color: '#ffffff',
-                        borderRadius: themeOption.features?.hasSharpCorners ? '0' : themeOption.radius,
-                        fontFamily: themeOption.font,
-                        textTransform: themeOption.features?.useUppercaseText ? 'uppercase' : 'none'
-                      }}
-                    >
-                      {themeOption.features?.useUppercaseText ? 'BUTTON' : 'Button'}
-                    </button>
-                  </div>
-
-                  {/* Selected indicator */}
-                  {themeId === themeOption.id && (
-                    <div 
-                      className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: themeOption.primaryColor }}
-                    >
-                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  )}
-                </motion.div>
-              ))}
+    <div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+        {themes.map((themeOption) => (
+          <button
+            key={themeOption.id}
+            onClick={() => setThemeId(themeOption.id)}
+            style={{
+              padding: '16px',
+              borderRadius: '8px',
+              border: `2px solid ${themeId === themeOption.id ? themeOption.primaryColor : themeOption.borderColor}`,
+              backgroundColor: themeOption.bgSecondary,
+              cursor: 'pointer',
+              textAlign: 'left',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            {/* Theme name and color indicator */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <div 
+                style={{ 
+                  width: '16px', 
+                  height: '16px', 
+                  borderRadius: '50%',
+                  backgroundColor: themeOption.primaryColor
+                }}
+              />
+              <span style={{ 
+                fontSize: '14px', 
+                fontWeight: '600', 
+                color: themeOption.textPrimary,
+                fontFamily: themeOption.font,
+                textTransform: themeOption.features?.useUppercaseText ? 'uppercase' : 'none'
+              }}>
+                {themeOption.features?.useUppercaseText ? themeOption.name.toUpperCase() : themeOption.name}
+              </span>
+              {themeId === themeOption.id && (
+                <span style={{ 
+                  marginLeft: 'auto',
+                  fontSize: '12px',
+                  color: themeOption.primaryColor,
+                  fontWeight: '500'
+                }}>
+                  ✓ Active
+                </span>
+              )}
             </div>
-          </div>
-        )}
 
-        {activeTab === 'preview' && (
-          <div className="space-y-6">
-            <div>
-              <h4 className={getTextClasses('font-semibold mb-3', true)} style={{ color: theme.textPrimary, fontFamily: getThemeFont() }}>
-                {getThemedText('Current Theme Preview')}
-              </h4>
+            {/* Font name - always show the actual font */}
+            <div style={{ 
+              fontSize: '11px', 
+              color: themeOption.textSecondary,
+              marginBottom: '12px',
+              fontFamily: themeOption.font
+            }}>
+              Font: {getCleanFontName(themeOption.font)}
+            </div>
+
+            {/* Simple preview */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {/* Sample text */}
+              <div style={{ 
+                fontSize: '12px', 
+                color: themeOption.textSecondary,
+                fontFamily: themeOption.font
+              }}>
+                Sample text in this theme
+              </div>
               
-              {/* Theme info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                  <h5 className={getTextClasses('font-medium mb-2', true)} style={{ color: theme.textPrimary }}>
-                    {getThemedText('Theme Details')}
-                  </h5>
-                  <div className="space-y-1 text-sm">
-                    <div style={{ color: theme.textSecondary }}>
-                      <strong>Name:</strong> {theme.name}
-                    </div>
-                    <div style={{ color: theme.textSecondary }}>
-                      <strong>Font:</strong> {theme.font}
-                    </div>
-                    <div style={{ color: theme.textSecondary }}>
-                      <strong>Features:</strong> {Object.entries(theme.features || {})
-                        .filter(([_, value]) => value)
-                        .map(([key]) => key.replace(/([A-Z])/g, ' $1').toLowerCase())
-                        .join(', ') || 'None'}
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h5 className={getTextClasses('font-medium mb-2', true)} style={{ color: theme.textPrimary }}>
-                    {getThemedText('Color Palette')}
-                  </h5>
-                  <div className="grid grid-cols-2 gap-2">
-                    <ColorPill color={theme.primaryColor} label="Primary" />
-                    <ColorPill color={theme.secondaryColor} label="Secondary" />
-                    <ColorPill color={theme.bgPrimary} label="Background" />
-                    <ColorPill color={theme.textPrimary} label="Text" />
-                  </div>
-                </div>
+              {/* Sample button - consistent size for all themes */}
+              <div style={{ 
+                padding: '8px 12px',
+                borderRadius: themeOption.features?.hasSharpCorners ? '0' : '4px',
+                backgroundColor: themeOption.primaryColor,
+                color: '#ffffff',
+                fontSize: '11px',
+                fontWeight: '500',
+                textAlign: 'center',
+                fontFamily: themeOption.font,
+                textTransform: themeOption.features?.useUppercaseText ? 'uppercase' : 'none',
+                boxShadow: themeOption.features?.hasGlowEffects ? `0 0 8px ${themeOption.primaryColor}60` : 'none'
+              }}>
+                {themeOption.features?.useUppercaseText ? 'SAMPLE BUTTON' : 'Sample Button'}
               </div>
 
-              {/* UI Preview */}
-              <div className="space-y-4">
-                <h5 className={getTextClasses('font-medium', true)} style={{ color: theme.textPrimary }}>
-                  {getThemedText('UI Elements Preview')}
-                </h5>
-                
-                {/* Sample card */}
-                <div className="p-4 rounded-lg" style={styles.getCardStyle()}>
-                  <h6 className={getTextClasses('font-semibold mb-2', true)} style={{ color: theme.textPrimary }}>
-                    {getThemedText('Sample Card')}
-                  </h6>
-                  <p style={{ color: theme.textSecondary, marginBottom: '1rem' }}>
-                    This is how cards look in the current theme. Notice the styling, colors, and effects.
-                  </p>
-                  
-                  {/* Sample buttons */}
-                  <div className="flex gap-2 flex-wrap">
-                    <button 
-                      className="px-4 py-2 rounded transition-colors"
-                      style={{
-                        ...styles.button.base,
-                        ...styles.button.primary[theme.variants?.button || 'default']
-                      }}
-                    >
-                      {getThemedText('Primary Button')}
-                    </button>
-                    <button 
-                      className="px-4 py-2 rounded transition-colors"
-                      style={{
-                        ...styles.button.base,
-                        ...styles.button.secondary[theme.variants?.button || 'default']
-                      }}
-                    >
-                      {getThemedText('Secondary Button')}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Text effects demo */}
-                {theme.features?.hasGlowEffects && (
-                  <div className="p-4 rounded-lg" style={{ backgroundColor: theme.bgTertiary }}>
-                    <h6 className={getTextClasses('font-semibold mb-2', true)} style={{ color: theme.textPrimary }}>
-                      {getThemedText('Glow Effects Demo')}
-                    </h6>
-                    <p className="sl-glow-text selected" style={{ color: theme.textPrimary }}>SYSTEM INITIALIZED</p>
-                    <p className="sl-glow-text mb-2" style={{ color: theme.textPrimary }}>* CONNECTING TO MAINFRAME...</p>
-                    <p className="sl-glow-text" style={{ color: theme.textPrimary }}>ACCESS GRANTED</p>
-                  </div>
+              {/* Features - show for ALL themes, including Light Mode */}
+              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '4px', minHeight: '20px' }}>
+                {themeOption.features?.hasGlowEffects && (
+                  <span style={{ 
+                    fontSize: '10px',
+                    padding: '2px 6px',
+                    borderRadius: '3px',
+                    backgroundColor: themeOption.primaryColor + '20',
+                    color: themeOption.primaryColor
+                  }}>
+                    Glow
+                  </span>
+                )}
+                {themeOption.features?.hasSharpCorners && (
+                  <span style={{ 
+                    fontSize: '10px',
+                    padding: '2px 6px',
+                    borderRadius: '3px',
+                    backgroundColor: themeOption.textSecondary + '20',
+                    color: themeOption.textSecondary
+                  }}>
+                    Sharp
+                  </span>
+                )}
+                {themeOption.features?.hasGlassEffect && (
+                  <span style={{ 
+                    fontSize: '10px',
+                    padding: '2px 6px',
+                    borderRadius: '3px',
+                    backgroundColor: themeOption.primaryColor + '20',
+                    color: themeOption.primaryColor
+                  }}>
+                    Glass
+                  </span>
+                )}
+                {themeOption.features?.useMonospaceFont && (
+                  <span style={{ 
+                    fontSize: '10px',
+                    padding: '2px 6px',
+                    borderRadius: '3px',
+                    backgroundColor: themeOption.textSecondary + '20',
+                    color: themeOption.textSecondary
+                  }}>
+                    Mono
+                  </span>
+                )}
+                {themeOption.features?.hasGradientBackground && (
+                  <span style={{ 
+                    fontSize: '10px',
+                    padding: '2px 6px',
+                    borderRadius: '3px',
+                    backgroundColor: themeOption.primaryColor + '20',
+                    color: themeOption.primaryColor
+                  }}>
+                    Gradient
+                  </span>
+                )}
+                {/* Show "Clean" badge for themes with no special features */}
+                {!themeOption.features?.hasGlowEffects && !themeOption.features?.hasSharpCorners && !themeOption.features?.hasGlassEffect && !themeOption.features?.useMonospaceFont && !themeOption.features?.hasGradientBackground && (
+                  <span style={{ 
+                    fontSize: '10px',
+                    padding: '2px 6px',
+                    borderRadius: '3px',
+                    backgroundColor: themeOption.textSecondary + '20',
+                    color: themeOption.textSecondary
+                  }}>
+                    Clean
+                  </span>
                 )}
               </div>
             </div>
-          </div>
-        )}
+          </button>
+        ))}
       </div>
     </div>
   );

@@ -428,15 +428,24 @@ const MainContent = ({
                 style={{
                   border: `1px solid ${currentTheme.borderColor}`,
                   borderRadius: currentTheme.radius,
-                  backgroundColor: 'white',
+                  backgroundColor: currentTheme.bgSecondary,
                   color: currentTheme.textPrimary,
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                  boxShadow: currentTheme.features?.hasGlowEffects ? `0 0 8px ${currentTheme.primaryColor}20` : '0 1px 2px rgba(0,0,0,0.05)',
+                  fontFamily: currentTheme.font
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = currentTheme.primaryColor;
+                  if (currentTheme.features?.hasGlowEffects) {
+                    e.target.style.boxShadow = `0 0 12px ${currentTheme.primaryColor}40`;
+                  }
                 }}
                 onBlur={(e) => {
                   e.target.style.borderColor = currentTheme.borderColor;
+                  if (currentTheme.features?.hasGlowEffects) {
+                    e.target.style.boxShadow = `0 0 8px ${currentTheme.primaryColor}20`;
+                  } else {
+                    e.target.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+                  }
                 }}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}

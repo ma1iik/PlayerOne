@@ -10,6 +10,8 @@ const themes = {
   light: THEMES.LIGHT,
   'neon-violet': THEMES.NEON_VIOLET,
   cyberpunk: THEMES.CYBERPUNK,
+  night: THEMES.NIGHT,
+  rose: THEMES.ROSE,
 };
 
 const ThemeContext = createContext();

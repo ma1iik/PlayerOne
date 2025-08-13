@@ -4,9 +4,19 @@ import { useThemeStyles } from "../../context/ThemeProvider";
 import PixelCharacter from "../PixelCharacter";
 
 const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
-  const { theme: currentTheme } = useThemeStyles();
+  const { theme: currentTheme, styles } = useThemeStyles();
 
+  // Add null checks to prevent React Error #31
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
 
+  const getThemedText = (text) => {
+    return styles.shouldTransform(text);
+  };
+
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
+  const isCyberpunk = currentTheme.id === 'cyberpunk';
   
   // Assuming the user is online and has checked in for the day
   const hasCheckedIn = true; 
@@ -24,11 +34,13 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
     }`}>
       {/* Inner "sliding door" for the panel content */}
       <div
-        className={`absolute inset-0 border-r overflow-hidden bg-white shadow-sm
+        className={`absolute inset-0 border-r overflow-hidden shadow-sm
           transition-transform duration-300 ease-in-out
           ${isCollapsed ? "-translate-x-full" : "translate-x-0"}`}
         style={{ 
-          borderColor: "rgb(229, 231, 235)" // gray-200
+          backgroundColor: currentTheme.bgSecondary,
+          borderColor: currentTheme.borderColor,
+          boxShadow: currentTheme.features?.hasGlowEffects ? `0 0 20px ${currentTheme.primaryColor}20` : '0 1px 3px rgba(0,0,0,0.1)'
         }}
       >
         <div className="p-6 h-full flex flex-col">
@@ -38,67 +50,158 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
               <img
                 src={profile.avatar || "https://via.placeholder.com/150?text=Avatar"}
                 alt="Profile"
-                className="w-24 h-24 object-cover rounded-sm border-2 border-purple-100 shadow-sm"
+                className="w-24 h-24 object-cover border-2 shadow-sm"
+                style={{
+                  borderRadius: currentTheme.features?.hasSharpCorners ? '4px' : '8px',
+                  borderColor: currentTheme.primaryColor + '30',
+                  boxShadow: currentTheme.features?.hasGlowEffects ? `0 0 15px ${currentTheme.primaryColor}40` : '0 2px 4px rgba(0,0,0,0.1)'
+                }}
               />
               {/* Pixel-styled level badge */}
-              <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold px-2 py-1 rounded-sm shadow-sm">
-                LVL {profile.level}
+              <div 
+                className="absolute -bottom-2 -right-2 text-white text-xs font-bold px-2 py-1 shadow-sm"
+                style={{
+                  background: `linear-gradient(to right, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
+                  borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '4px',
+                  fontFamily: currentTheme.font,
+                  textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                }}
+              >
+                {getThemedText(`LVL ${profile.level}`)}
               </div>
             </div>
             
             {/* Name and Role */}
-            <h2 className="text-xl font-semibold mb-1 text-gray-900">
-              {profile.name}
+            <h2 
+              className="text-xl font-semibold mb-1"
+              style={{ 
+                color: currentTheme.textPrimary,
+                fontFamily: currentTheme.font,
+                textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+              }}
+            >
+              {getThemedText(profile.name)}
             </h2>
-            <p className="text-sm text-gray-500 mb-6">
-              {profile.role}
+            <p 
+              className="text-sm mb-6"
+              style={{ 
+                color: currentTheme.textSecondary,
+                fontFamily: currentTheme.font,
+                textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+              }}
+            >
+              {getThemedText(profile.role)}
             </p>
 
             {/* Daily Check-in Button with pixel-style */}
             <div className="w-full mb-6">
               <button 
-                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-sm ${
-                  hasCheckedIn 
-                    ? 'bg-green-50 text-green-600 border border-green-200' 
-                    : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white'
-                } text-sm font-medium transition-shadow`}
+                className={`w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-all`}
+                style={{
+                  backgroundColor: hasCheckedIn ? currentTheme.bgTertiary : `linear-gradient(to right, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
+                  background: hasCheckedIn ? currentTheme.bgTertiary : `linear-gradient(to right, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
+                  color: hasCheckedIn ? currentTheme.textSecondary : '#ffffff',
+                  border: hasCheckedIn ? `1px solid ${currentTheme.borderColor}` : 'none',
+                  borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '6px',
+                  fontFamily: currentTheme.font,
+                  textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none',
+                  boxShadow: currentTheme.features?.hasGlowEffects ? `0 0 10px ${currentTheme.primaryColor}30` : '0 2px 4px rgba(0,0,0,0.1)'
+                }}
                 disabled={hasCheckedIn}
               >
                 {hasCheckedIn ? (
                   <>
                     <CheckIcon className="w-5 h-5" />
-                    Daily Check-in Completed!
+                    {getThemedText('Daily Check-in Completed!')}
                   </>
                 ) : (
-                  <>Daily Check-in</>
+                  <>{getThemedText('Daily Check-in')}</>
                 )}
               </button>
             </div>
 
             {/* Stats section with pixel-style cards */}
             <div className="w-full space-y-5">
-              {/* Today's Progress */}
-              <div className="bg-purple-50 rounded-sm p-4">
-                <h3 className="text-sm font-semibold text-purple-700 mb-2 flex items-center">
+              
+              <div 
+                className="p-4"
+                style={{
+                  backgroundColor: currentTheme.bgTertiary,
+                  borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '8px',
+                  border: `1px solid ${currentTheme.borderColor}`
+                }}
+              >
+                <h3 
+                  className="text-sm font-semibold mb-2 flex items-center"
+                  style={{ 
+                    color: currentTheme.primaryColor,
+                    fontFamily: currentTheme.font,
+                    textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                  }}
+                >
                   <span role="img" aria-label="Today" className="mr-2">📅</span>
-                  Today's Progress
+                  {getThemedText("Today's Progress")}
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white p-2 rounded-sm shadow-sm flex items-center justify-between">
+                  <div 
+                    className="p-2 shadow-sm flex items-center justify-between"
+                    style={{
+                      backgroundColor: currentTheme.bgSecondary,
+                      borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '4px',
+                      border: `1px solid ${currentTheme.borderColor}`
+                    }}
+                  >
                     <div className="flex items-center">
                       <span role="img" aria-label="Tasks" className="mr-2">✅</span>
-                      <span className="text-xs text-gray-500">Tasks</span>
+                      <span 
+                        className="text-xs"
+                        style={{ 
+                          color: currentTheme.textSecondary,
+                          fontFamily: currentTheme.font,
+                          textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                        }}
+                      >
+                        {getThemedText('Tasks')}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-gray-700">
+                    <span 
+                      className="text-sm font-medium"
+                      style={{ 
+                        color: currentTheme.textPrimary,
+                        fontFamily: currentTheme.font
+                      }}
+                    >
                       {dailyStats.tasksCompleted}/{dailyStats.totalTasks}
                     </span>
                   </div>
-                  <div className="bg-white p-2 rounded-sm shadow-sm flex items-center justify-between">
+                  <div 
+                    className="p-2 shadow-sm flex items-center justify-between"
+                    style={{
+                      backgroundColor: currentTheme.bgSecondary,
+                      borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '4px',
+                      border: `1px solid ${currentTheme.borderColor}`
+                    }}
+                  >
                     <div className="flex items-center">
                       <span role="img" aria-label="Coins" className="mr-2">🪙</span>
-                      <span className="text-xs text-gray-500">Earned</span>
+                      <span 
+                        className="text-xs"
+                        style={{ 
+                          color: currentTheme.textSecondary,
+                          fontFamily: currentTheme.font,
+                          textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                        }}
+                      >
+                        {getThemedText('Earned')}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-gray-700">
+                    <span 
+                      className="text-sm font-medium"
+                      style={{ 
+                        color: currentTheme.textPrimary,
+                        fontFamily: currentTheme.font
+                      }}
+                    >
                       {dailyStats.coinsEarned}
                     </span>
                   </div>
@@ -108,73 +211,257 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
               {/* Level and XP with pixel-style progress bar */}
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-600 font-medium flex items-center">
+                  <span 
+                    className="flex items-center"
+                    style={{ 
+                      color: currentTheme.textPrimary,
+                      fontFamily: currentTheme.font,
+                      textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                    }}
+                  >
                     <span role="img" aria-label="Level" className="mr-2">⭐</span>
-                    Experience
+                    {getThemedText('Experience')}
                   </span>
-                  <span className="text-gray-500">
+                  <span 
+                    style={{ 
+                      color: currentTheme.textSecondary,
+                      fontFamily: currentTheme.font
+                    }}
+                  >
                     {profile.xp}/{profile.maxXP} XP
                   </span>
                 </div>
-                <div className="h-3 bg-gray-100 rounded-sm overflow-hidden">
+                <div 
+                  className="h-3 overflow-hidden"
+                  style={{
+                    backgroundColor: currentTheme.bgTertiary,
+                    borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '6px',
+                    border: `1px solid ${currentTheme.borderColor}`
+                  }}
+                >
                   <div
-                    className="h-full bg-gradient-to-r from-purple-600 to-indigo-600 transition-all duration-500"
-                    style={{ width: `${(profile.xp / profile.maxXP) * 100}%` }}
+                    className="h-full transition-all duration-500"
+                    style={{ 
+                      background: `linear-gradient(to right, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
+                      width: `${(profile.xp / profile.maxXP) * 100}%`,
+                      boxShadow: currentTheme.features?.hasGlowEffects ? `0 0 8px ${currentTheme.primaryColor}60` : 'none'
+                    }}
                   />
                 </div>
-                <div className="mt-1 text-xs text-gray-500 text-right">
-                  {profile.maxXP - profile.xp} XP to next level
+                <div 
+                  className="mt-1 text-xs text-right"
+                  style={{ 
+                    color: currentTheme.textSecondary,
+                    fontFamily: currentTheme.font,
+                    textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                  }}
+                >
+                  {getThemedText(`${profile.maxXP - profile.xp} XP to next level`)}
                 </div>
               </div>
 
               {/* Stats Grid with pixel-style cards */}
               <div className="grid grid-cols-3 gap-3">
-                <div className="p-3 bg-amber-50 rounded-sm col-span-1 flex flex-col items-center">
+                <div 
+                  className="p-3 col-span-1 flex flex-col items-center"
+                  style={{
+                    backgroundColor: currentTheme.bgTertiary,
+                    borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '6px',
+                    border: `1px solid ${currentTheme.borderColor}`
+                  }}
+                >
                   <div className="text-2xl mb-1">⚡</div>
-                  <p className="text-xs font-medium text-amber-700 mb-1">Energy</p>
-                  <p className="text-xl font-semibold text-amber-700">{profile.energy}%</p>
+                  <p 
+                    className="text-xs font-medium mb-1"
+                    style={{ 
+                      color: currentTheme.primaryColor,
+                      fontFamily: currentTheme.font,
+                      textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                    }}
+                  >
+                    {getThemedText('Energy')}
+                  </p>
+                  <p 
+                    className="text-xl font-semibold"
+                    style={{ 
+                      color: currentTheme.textPrimary,
+                      fontFamily: currentTheme.font
+                    }}
+                  >
+                    {profile.energy}%
+                  </p>
                 </div>
-                <div className="p-3 bg-red-50 rounded-sm col-span-1 flex flex-col items-center">
+                <div 
+                  className="p-3 col-span-1 flex flex-col items-center"
+                  style={{
+                    backgroundColor: currentTheme.bgTertiary,
+                    borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '6px',
+                    border: `1px solid ${currentTheme.borderColor}`
+                  }}
+                >
                   <div className="text-2xl mb-1">🔥</div>
-                  <p className="text-xs font-medium text-red-700 mb-1">Streak</p>
-                  <p className="text-xl font-semibold text-red-700">{profile.streak}</p>
+                  <p 
+                    className="text-xs font-medium mb-1"
+                    style={{ 
+                      color: currentTheme.primaryColor,
+                      fontFamily: currentTheme.font,
+                      textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                    }}
+                  >
+                    {getThemedText('Streak')}
+                  </p>
+                  <p 
+                    className="text-xl font-semibold"
+                    style={{ 
+                      color: currentTheme.textPrimary,
+                      fontFamily: currentTheme.font
+                    }}
+                  >
+                    {profile.streak}
+                  </p>
                 </div>
-                <div className="p-3 bg-blue-50 rounded-sm col-span-1 flex flex-col items-center">
+                <div 
+                  className="p-3 col-span-1 flex flex-col items-center"
+                  style={{
+                    backgroundColor: currentTheme.bgTertiary,
+                    borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '6px',
+                    border: `1px solid ${currentTheme.borderColor}`
+                  }}
+                >
                   <div className="text-2xl mb-1">📋</div>
-                  <p className="text-xs font-medium text-blue-700 mb-1">Tasks</p>
-                  <p className="text-xl font-semibold text-blue-700">{profile.completedTasks}</p>
+                  <p 
+                    className="text-xs font-medium mb-1"
+                    style={{ 
+                      color: currentTheme.primaryColor,
+                      fontFamily: currentTheme.font,
+                      textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                    }}
+                  >
+                    {getThemedText('Tasks')}
+                  </p>
+                  <p 
+                    className="text-xl font-semibold"
+                    style={{ 
+                      color: currentTheme.textPrimary,
+                      fontFamily: currentTheme.font
+                    }}
+                  >
+                    {profile.completedTasks}
+                  </p>
                 </div>
               </div>
               
               {/* Currency display with pixel-style */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-gray-50 rounded-sm flex items-center justify-between">
+                <div 
+                  className="p-3 flex items-center justify-between"
+                  style={{
+                    backgroundColor: currentTheme.bgTertiary,
+                    borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '6px',
+                    border: `1px solid ${currentTheme.borderColor}`
+                  }}
+                >
                   <div className="flex items-center">
                     <span role="img" aria-label="Coin" className="mr-2">🪙</span>
-                    <p className="text-xs text-gray-500">Coins</p>
+                    <p 
+                      className="text-xs"
+                      style={{ 
+                        color: currentTheme.textSecondary,
+                        fontFamily: currentTheme.font,
+                        textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                      }}
+                    >
+                      {getThemedText('Coins')}
+                    </p>
                   </div>
-                  <p className="text-md font-semibold text-gray-700">1,250</p>
+                  <p 
+                    className="text-md font-semibold"
+                    style={{ 
+                      color: currentTheme.textPrimary,
+                      fontFamily: currentTheme.font
+                    }}
+                  >
+                    1,250
+                  </p>
                 </div>
-                <div className="p-3 bg-gray-50 rounded-sm flex items-center justify-between">
+                <div 
+                  className="p-3 flex items-center justify-between"
+                  style={{
+                    backgroundColor: currentTheme.bgTertiary,
+                    borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '6px',
+                    border: `1px solid ${currentTheme.borderColor}`
+                  }}
+                >
                   <div className="flex items-center">
                     <span role="img" aria-label="Gem" className="mr-2">💎</span>
-                    <p className="text-xs text-gray-500">Gems</p>
+                    <p 
+                      className="text-xs"
+                      style={{ 
+                        color: currentTheme.textSecondary,
+                        fontFamily: currentTheme.font,
+                        textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                      }}
+                    >
+                      {getThemedText('Gems')}
+                    </p>
                   </div>
-                  <p className="text-md font-semibold text-gray-700">75</p>
+                  <p 
+                    className="text-md font-semibold"
+                    style={{ 
+                      color: currentTheme.textPrimary,
+                      fontFamily: currentTheme.font
+                    }}
+                  >
+                    75
+                  </p>
                 </div>
               </div>
               
               {/* Current Character Class with pixel-style */}
-              <div className="p-3 bg-indigo-50 rounded-sm flex items-center justify-between">
+              <div 
+                className="p-3 flex items-center justify-between"
+                style={{
+                  backgroundColor: currentTheme.bgTertiary,
+                  borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '6px',
+                  border: `1px solid ${currentTheme.borderColor}`
+                }}
+              >
                 <div className="flex items-center">
                   <span role="img" aria-label="Character" className="text-2xl mr-3">🧙‍♀️</span>
                   <div>
-                    <p className="text-xs text-indigo-600">Character Class</p>
-                    <p className="text-sm font-semibold text-indigo-700">Master Developer</p>
+                    <p 
+                      className="text-xs"
+                      style={{ 
+                        color: currentTheme.primaryColor,
+                        fontFamily: currentTheme.font,
+                        textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                      }}
+                    >
+                      {getThemedText('Character Class')}
+                    </p>
+                    <p 
+                      className="text-sm font-semibold"
+                      style={{ 
+                        color: currentTheme.textPrimary,
+                        fontFamily: currentTheme.font,
+                        textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                      }}
+                    >
+                      {getThemedText('Master Developer')}
+                    </p>
                   </div>
                 </div>
-                <span className="text-xs py-1 px-2 bg-indigo-200 text-indigo-800 rounded-sm">
-                  +15% XP
+                <span 
+                  className="text-xs py-1 px-2"
+                  style={{
+                    backgroundColor: currentTheme.primaryColor + '30',
+                    color: currentTheme.primaryColor,
+                    borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '4px',
+                    fontFamily: currentTheme.font,
+                    textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                  }}
+                >
+                  {getThemedText('+15% XP')}
                 </span>
               </div>
             </div>
@@ -185,9 +472,24 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
         {!isCollapsed && (
           <button
             onClick={toggleCollapse}
-            className="absolute top-2 right-2 p-2 rounded-sm border border-gray-200 shadow-sm bg-white hover:bg-gray-50 transition-colors"
+            className="absolute top-2 right-2 p-2 transition-colors"
+            style={{
+              backgroundColor: currentTheme.bgSecondary,
+              border: `1px solid ${currentTheme.borderColor}`,
+              borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '6px',
+              color: currentTheme.textSecondary,
+              boxShadow: currentTheme.features?.hasGlowEffects ? `0 0 8px ${currentTheme.primaryColor}20` : '0 1px 2px rgba(0,0,0,0.1)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = currentTheme.bgTertiary;
+              e.target.style.color = currentTheme.primaryColor;
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = currentTheme.bgSecondary;
+              e.target.style.color = currentTheme.textSecondary;
+            }}
           >
-            <ChevronLeftIcon className="w-5 h-5 text-gray-500" />
+            <ChevronLeftIcon className="w-5 h-5" />
           </button>
         )}
       </div>

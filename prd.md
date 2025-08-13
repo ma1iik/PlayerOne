@@ -69,10 +69,27 @@ PlayerOne is a gamified productivity platform that transforms daily tasks, habit
 ### Productivity System
 
 #### Task Management
-- Tasks: One-time activities with difficulty rating (1-4), due dates, categories
+- Tasks: One-time activities with difficulty rating (1-4), dates, categories
 - Habits: Recurring activities with streak tracking, countable/checkbox options
 - Projects: Multi-step goals with subtask management and progress calculation
 - Categories: Tech, Fitness, Study, Creative, Social (determines reward type)
+
+#### Enhanced Recurring Task System
+- **Habits:**
+  - Daily or Weekly recurrence only
+  - Weekly habits: Select specific day of week (Monday through Sunday)
+- **Tasks:**
+  - One-time: Single occurrence with optional date
+  - Recurring: Choose between:
+    - **Day of Week:** Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
+    - **Day of Month:** 1st through 31st of each month (using native date picker)
+- **Projects:**
+  - One-time activities only (cannot be recurring)
+- **Smart Task Handling for Late/Overdue Tasks:**
+  - **Only for one-time tasks with a date**
+  - User can choose:
+    - **Right Away:** Task appears immediately when overdue (standard behavior)
+    - **On Date:** Task appears on the specific date
 
 #### Advanced Features (Roadmap)
 - Pomodoro timer integration
@@ -143,9 +160,9 @@ character_customization: user_id, hair_style, hair_color, eye_type, eye_color, s
 
 ### Productivity Data
 sql
-tasks: user_id, title, description, due_date, difficulty, status, category
+tasks: user_id, title, description, date, difficulty, status, category
 habits: user_id, title, recurrence, difficulty, countable, target_count, streak
-projects: user_id, title, description, due_date, progress_percentage
+projects: user_id, title, description, date, progress_percentage
 subtasks: project_id, title, completed, order_index
 
 

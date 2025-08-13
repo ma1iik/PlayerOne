@@ -62,7 +62,10 @@ const AddItemModal = ({
       } else {
         // Default new item
         setSelectedType("task");
-        setFormData({ ...DEFAULT_FORM_DATA });
+        setFormData({ 
+          ...DEFAULT_FORM_DATA,
+          recurrence: "one-time" // Ensure default is set
+        });
       }
       
       // Reset errors whenever the modal opens
@@ -122,16 +125,25 @@ const AddItemModal = ({
 
   const handleTypeChange = (type) => {
     setSelectedType(type);
-    // Update recurrence based on type
+    // Update recurrence and reset type-specific fields based on type
     if (type === "habit") {
       setFormData({
         ...formData,
         recurrence: "daily",
+        countable: false, // Reset to default
+        targetCount: 1,
+        currentCount: 0,
+        streak: 0
       });
     } else if (type === "task" || type === "project") {
       setFormData({
         ...formData,
         recurrence: "one-time",
+        // Reset habit-specific fields
+        countable: false,
+        targetCount: 1,
+        currentCount: 0,
+        streak: 0
       });
     }
     
@@ -310,19 +322,21 @@ const AddItemModal = ({
             )}
           </div>
           
-          {/* Recurrence Section */}
-          <RecurrenceSection 
-            formData={formData}
-            setFormData={setFormData}
-            selectedType={selectedType}
-            errors={errors}
-            handleInputChange={handleInputChange}
-          />
+          {/* Recurrence Section - only for habits and tasks */}
+          {selectedType !== "project" && (
+            <RecurrenceSection 
+              formData={formData}
+              setFormData={setFormData}
+              selectedType={selectedType}
+              errors={errors}
+              handleInputChange={handleInputChange}
+            />
+          )}
           
-          {/* Due Date for Tasks and Projects */}
-          {(selectedType === "task" || selectedType === "project") && formData.recurrence === "one-time" && (
+          {/* Date for Tasks and Projects */}
+          {(selectedType === "task" && formData.recurrence === "one-time") || selectedType === "project" ? (
             <div>
-              <FormLabel htmlFor="due">Due Date {selectedType === "project" ? "" : "(optional)"}</FormLabel>
+              <FormLabel htmlFor="due">Date {selectedType === "project" ? "" : "(optional)"}</FormLabel>
               <FormInput
                 name="due"
                 type="date"
@@ -333,16 +347,42 @@ const AddItemModal = ({
               />
               {errors.due && selectedType === "project" && (
                 <p className="mt-1 text-xs text-red-500">
-                  Due date is required for projects.
+                  Date is required for projects.
                 </p>
               )}
+              
+              {/* Show Task behavior for one-time tasks with a date */}
+              {selectedType === "task" && formData.due && (
+                <div className="mt-3">
+                  <FormLabel htmlFor="lateTaskBehavior">Show Task</FormLabel>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { value: "immediate", label: "Right Away", description: "Standard behavior" },
+                      { value: "delayed", label: "On Date", description: "Wait for specific date" }
+                    ].map((option) => (
+                      <ThemedButton
+                        key={option.value}
+                        onClick={() => setFormData({ ...formData, lateTaskBehavior: option.value })}
+                        isActive={formData.lateTaskBehavior === option.value}
+                        className="text-sm"
+                      >
+                        <div className="text-center">
+                          <div className="font-medium">{option.label}</div>
+                          <div className="text-xs opacity-75">{option.description}</div>
+                        </div>
+                      </ThemedButton>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          ) : null}
           
           {/* Countable Toggle and Settings for Habits */}
           {selectedType === "habit" && (
             <CountableSection 
               formData={formData}
+              setFormData={setFormData}
               isEditMode={isEditMode}
               handleInputChange={handleInputChange}
               handleNumberChange={handleNumberChange}
@@ -461,7 +501,7 @@ const AddItemModal = ({
               <ul className="mt-1 list-disc list-inside text-sm">
                 {errors.title && <li>Title is required</li>}
                 {errors.description && <li>Description is too long</li>}
-                {errors.due && selectedType === "project" && <li>Due date is required for projects</li>}
+                {errors.due && selectedType === "project" && <li>Date is required for projects</li>}
                 {errors.difficulty && <li>Invalid difficulty level</li>}
                 {errors.progress && <li>Progress must be between 0-100</li>}
                 {errors.targetCount && <li>Target count must be a positive number</li>}

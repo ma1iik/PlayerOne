@@ -16,11 +16,23 @@ const DifficultySection = ({ formData, handleInputChange, errors }) => {
   // Get difficulty indicator based on level (1-4)
   const getDifficultyIndicator = (level) => {
     const stars = [];
+    
+    // Different colors based on difficulty level - same as TaskItem
+    const getStarColor = (level) => {
+      switch(level) {
+        case 1: return "text-green-400"; // Easy - green
+        case 2: return "text-blue-400";  // Medium - blue
+        case 3: return "text-orange-400"; // Hard - orange
+        case 4: return "text-red-400";   // Epic - red
+        default: return "text-green-400";
+      }
+    };
+    
     for (let i = 0; i < 4; i++) {
       stars.push(
         <span 
           key={i} 
-          className={i < level ? "text-yellow-400" : "text-gray-300 opacity-50"}
+          className={i < level ? getStarColor(level) : "text-gray-300 opacity-50"}
         >
           ★
         </span>
@@ -34,10 +46,6 @@ const DifficultySection = ({ formData, handleInputChange, errors }) => {
       <FormLabel htmlFor="difficulty">Difficulty</FormLabel>
       <div className="grid grid-cols-4 gap-2">
         {[1, 2, 3, 4].map((level) => {
-          // Colors for the difficulty levels
-          const difficultyColors = [null, "#10b981", "#3b82f6", "#f97316", "#ef4444"];
-          const bgColors = [null, "rgba(16, 185, 129, 0.4)", "rgba(59, 130, 246, 0.4)", "rgba(249, 115, 22, 0.4)", "rgba(239, 68, 68, 0.4)"];
-          
           return (
             <ThemedButton
               key={level}
@@ -52,7 +60,6 @@ const DifficultySection = ({ formData, handleInputChange, errors }) => {
                 handleInputChange(event);
               }}
               isActive={formData.difficulty === level}
-              color={isNeonTheme || isCyberpunk ? difficultyColors[level] : bgColors[level]}
             >
               {getDifficultyIndicator(level)}
               <div className="mt-1">
