@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import TaskSection from '../components/TaskSection';
 
-// Icon imports
 const SearchIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -16,12 +15,10 @@ const PlusIcon = () => (
 );
 
 const TaskManager = () => {
-  // State for tabs in each section
   const [habitTab, setHabitTab] = useState('all');
   const [taskTab, setTaskTab] = useState('active');
   const [projectTab, setProjectTab] = useState('all');
   
-  // Sample data
   const habits = [
     { id: 1, title: 'Morning exercise', streak: 12, frequency: 'Daily', completed: 0, target: 1 },
     { id: 2, title: 'Read 20 pages', streak: 5, frequency: 'Daily', completed: 0, target: 1 }
@@ -57,34 +54,27 @@ const TaskManager = () => {
     { id: 2, title: 'Backend Migration', progress: 35, difficulty: 3 }
   ];
   
-  // Handler functions
   const handleAdd = (type) => {
     console.log(`Adding a new ${type.slice(0, -1)}`);
-    // Implement add functionality
   };
   
   const handleEdit = (id) => {
     console.log(`Editing item with id: ${id}`);
-    // Implement edit functionality
   };
   
   const handleToggle = (id) => {
     console.log(`Toggling habit with id: ${id}`);
-    // Implement toggle functionality
   };
   
   const handleComplete = (id) => {
     console.log(`Completing task with id: ${id}`);
-    // Implement complete functionality
   };
   
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      {/* Top Navigation */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo */}
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
                 <div className="h-8 w-8 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 flex items-center justify-center text-white font-semibold">
@@ -94,7 +84,6 @@ const TaskManager = () => {
               </div>
             </div>
             
-            {/* Search */}
             <div className="max-w-lg w-full lg:max-w-xs relative">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -108,7 +97,6 @@ const TaskManager = () => {
               </div>
             </div>
             
-            {/* Right section */}
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg px-4 py-2 flex items-center text-sm font-medium hover:shadow-md transition-shadow">

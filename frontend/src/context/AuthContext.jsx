@@ -10,19 +10,16 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Check authentication status on initial load
   useEffect(() => {
     const checkAuth = async () => {
       setLoading(true);
       try {
         if (authService.isAuthenticated()) {
-          // Fetch user profile if we have a token
           const response = await authService.authFetch("http://localhost:3000/api/profile");
           if (response.ok) {
             const data = await response.json();
             setUser(data.profile);
           } else {
-            // If profile fetch fails, clear auth state
             authService.clearToken();
             setUser(null);
           }
@@ -41,7 +38,6 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  // Login handler
   const login = async (email, password, rememberMe = false) => {
     setLoading(true);
     setError(null);
@@ -57,7 +53,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Register handler
   const register = async (username, email, password, rememberMe = false) => {
     setLoading(true);
     setError(null);
@@ -73,7 +68,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout handler
   const logout = async () => {
     setLoading(true);
     try {
@@ -87,7 +81,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Provide authentication values and functions
   const value = {
     user,
     loading,
@@ -105,10 +98,9 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook for using auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;

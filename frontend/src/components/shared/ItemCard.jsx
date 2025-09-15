@@ -7,11 +7,10 @@ const ItemCard = ({
   item, 
   onClick, 
   actionButton, 
-  mode = "shop", // "shop" or "inventory"
+  mode = "shop",
 }) => {
   const { theme: currentTheme } = useThemeStyles();
   
-  // Add null checks to prevent React Error #31
   if (!currentTheme) {
     return <div>Loading...</div>;
   }
@@ -19,7 +18,6 @@ const ItemCard = ({
   const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
-  // Get themed item card style
   const getItemCardStyle = () => {
     const rarityColor = getRarityColor(item.rarity);
     
@@ -47,11 +45,10 @@ const ItemCard = ({
     }
   };
 
-  // Render bottom part based on mode
   const renderBottomSection = () => {
     if (mode === "shop") {
       return (
-        <div className="mt-3 flex justify-between items-center">
+        <div className="mt-2 flex justify-between items-center">
           <div className="flex items-center">
             <span role="img" aria-label="Currency" className="mr-1">
               {item.currency === 'gems' ? '💎' : '🪙'}
@@ -126,10 +123,10 @@ const ItemCard = ({
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
-      <div className="p-4 flex flex-col h-full">
+      <div className="p-3.5 flex flex-col h-full">
         {/* Item image */}
         <div 
-          className="w-full aspect-square flex items-center justify-center mb-3 relative" 
+          className="w-full aspect-square flex items-center justify-center mb-2.5 relative" 
           style={{ 
             backgroundColor: isNeonTheme || isCyberpunk ? 'rgba(0, 0, 0, 0.3)' : currentTheme.bgTertiary,
             borderRadius: currentTheme.radius
@@ -153,7 +150,7 @@ const ItemCard = ({
           <img 
             src={item.image} 
             alt={item.name}
-            className="w-3/4 h-3/4 object-contain"
+            className="w-2/3 h-2/3 object-contain"
           />
         </div>
         
@@ -168,7 +165,7 @@ const ItemCard = ({
               }}>
             {isNeonTheme ? item.name.toUpperCase() : item.name}
           </h3>
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-2 mt-0.5">
             <span className="text-xs" 
                   style={{ 
                     color: getRarityColor(item.rarity),

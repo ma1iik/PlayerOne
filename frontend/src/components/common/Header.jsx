@@ -13,9 +13,8 @@ const Header = () => {
 
   const profileRef = useRef(null);
   const location = useLocation();
-  const [notificationCount, setNotificationCount] = useState(3); // Example notification count
+  const [notificationCount, setNotificationCount] = useState(3);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
@@ -26,7 +25,6 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Check if a nav link is active
   const isActive = (path) => {
     return location.pathname === path;
   };
@@ -45,7 +43,6 @@ const Header = () => {
     >
       <div className="px-8 mx-auto">
         <div className="flex justify-between items-center h-16">
-          {/* Left: Navigation Links with better active indicators */}
           <nav className="flex items-center gap-6">
             <Link
               to="/home"
@@ -85,7 +82,6 @@ const Header = () => {
             </Link>
           </nav>
           
-          {/* Center: Logo with larger text */}
           <div className="flex items-center flex-shrink-0">
             <div 
               className="h-10 w-10 flex items-center justify-center text-white font-semibold text-lg"
@@ -108,9 +104,7 @@ const Header = () => {
             </span>
           </div>
 
-          {/* Right Side Actions with bigger elements */}
           <div className="flex items-center gap-5">
-            {/* Currency display with larger text */}
             <div className="flex items-center gap-3">
               <div 
                 className="flex items-center gap-2 px-3 py-1.5 text-base"
@@ -140,7 +134,6 @@ const Header = () => {
               </div>
             </div>
             
-            {/* Notifications icon with larger size */}
             <button 
               className="relative p-1.5 transition-colors"
               style={{ 
@@ -162,7 +155,6 @@ const Header = () => {
               )}
             </button>
             
-            {/* Profile icon dropdown with larger icon */}
             <div className="relative" ref={profileRef}>
               <button
                 className="p-1.5 transition-colors"

@@ -7,7 +7,10 @@
     "start": "node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:frontend": "cd frontend && npm run build",
-    "sall": "npm run build:frontend && npm start"
+    "sall": "npm run build:frontend && SALL_MODE=true npm start",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "nodemon src/server.js"
   },
   "keywords": [],
   "author": "",
@@ -35,6 +38,8 @@
     "path": "^0.12.7"
   },
   "devDependencies": {
-    "@shadcn/ui": "^0.0.4"
+    "@shadcn/ui": "^0.0.4",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.10"
   }
 }

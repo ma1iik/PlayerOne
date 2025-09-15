@@ -58,6 +58,24 @@ export const THEMES = {
       // Default theme, no special features
     }
   }),
+
+  ENHANCED_LIGHT: createTheme({
+    id: "enhanced-light",
+    name: "Enhanced Light",
+    primaryColor: "#6d28d9",
+    secondaryColor: "#8b5cf6",
+    bgPrimary: "#f8fafc", // More grey-leaning, less turquoise
+    bgSecondary: "#ffffff", // Keep pure white for cards
+    bgTertiary: "#e5e7eb", // Stronger grey with slight violet tint
+    textPrimary: "#0f172a", // Darker text for better readability
+    textSecondary: "#475569", // Darker secondary text
+    borderColor: "#cbd5e1", // Darker borders for better definition
+    radius: "0.375rem",
+    font: "'Inter', sans-serif",
+    features: {
+      // Enhanced contrast for better accessibility
+    }
+  }),
   
   NEON_VIOLET: createTheme({
     id: "neon-violet",
@@ -167,6 +185,7 @@ export const THEMES = {
 
 // Legacy exports for backwards compatibility
 export const LIGHT = THEMES.LIGHT;
+export const ENHANCED_LIGHT = THEMES.ENHANCED_LIGHT;
 export const NEON_VIOLET = THEMES.NEON_VIOLET;
 export const CYBERPUNK = THEMES.CYBERPUNK;
 export const NIGHT = THEMES.NIGHT;

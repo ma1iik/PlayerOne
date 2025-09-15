@@ -2,9 +2,13 @@ import React, { useState } from "react";
 import { EyeIcon, EyeOffIcon, UserAddIcon } from "@heroicons/react/outline";
 import { motion } from "framer-motion";
 import { useThemeStyles } from "../context/ThemeProvider";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const { theme, styles } = useThemeStyles();
+  const { register, error, loading } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -21,9 +25,27 @@ const Register = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Register attempt:", formData);
+    
+    // Basic validation
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+    
+    if (formData.password.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
+    
+    try {
+      await register(formData.username, formData.email, formData.password, false);
+      navigate('/home');
+    } catch (err) {
+      // Error is handled by AuthContext
+      console.error('Registration failed:', err);
+    }
   };
 
   // Helper functions
@@ -72,6 +94,20 @@ const Register = () => {
               {getThemedText('Join us and start your journey')}
             </p>
           </div>
+
+          {/* Error Display */}
+          {error && (
+            <div 
+              className="mb-4 p-3 rounded-lg border"
+              style={{
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                borderColor: '#ef4444',
+                color: '#ef4444'
+              }}
+            >
+              {error}
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -226,13 +262,14 @@ const Register = () => {
 
             <button
               type="submit"
-              className={`w-full py-3 rounded-lg font-medium transition-colors ${getTextClasses('', theme.features.hasGlowEffects)}`}
+              disabled={loading}
+              className={`w-full py-3 rounded-lg font-medium transition-colors ${getTextClasses('', theme.features.hasGlowEffects)} ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
               style={{
                 ...styles.button.base,
                 ...styles.button.primary[theme.variants?.button || 'default']
               }}
             >
-              {getThemedText('Create Account')}
+              {loading ? getThemedText('Creating Account...') : getThemedText('Create Account')}
             </button>
           </form>
 

@@ -5,7 +5,6 @@ import { useThemeStyles } from "../../context/ThemeProvider";
 const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
   const { theme: currentTheme } = useThemeStyles();
   
-  // Add null checks to prevent React Error #31
   if (!currentTheme) {
     return <div>Loading...</div>;
   }
@@ -14,19 +13,14 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
   const isCyberpunk = currentTheme.id === 'cyberpunk';
   const containerRef = useRef(null);
   
-  // Local state to track completion status for animation purposes
   const [isCompleted, setIsCompleted] = useState(habit.completed || false);
   
-  // Calculate if countable habit is completed
   const isCountableCompleted = habit.countable && 
     habit.targetCount > 0 && 
     (habit.currentCount || 0) >= habit.targetCount;
   
-  // Use either the local state or countable completion status
   const displayAsCompleted = isCompleted || isCountableCompleted;
   
-  // This effect updates the border directly on completion change
-  // by manipulating the DOM element directly, bypassing React's transitions
   useEffect(() => {
     if (containerRef.current) {
       const baseBorder = `1px solid ${currentTheme.borderColor}`;
@@ -39,16 +33,14 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
     }
   }, [displayAsCompleted, currentTheme, isNeonTheme, isCyberpunk]);
   
-  // Get difficulty indicator with stars based on level (1-4)
   const getDifficultyIndicator = (level = 1) => {
     const stars = [];
-    // Different colors based on difficulty level
     const getStarColor = (level) => {
       switch(level) {
-        case 1: return "text-green-400"; // Easy - green
-        case 2: return "text-blue-400";  // Medium - blue
-        case 3: return "text-yellow-400"; // Hard - yellow
-        case 4: return "text-red-400";   // Very hard - red
+        case 1: return "text-green-400";
+        case 2: return "text-blue-400";
+        case 3: return "text-yellow-400";
+        case 4: return "text-red-400";
         default: return "text-green-400";
       }
     };
@@ -66,7 +58,6 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
     return <div className="flex gap-0.5">{stars}</div>;
   };
 
-  // Calculate progress for countable habits only
   const getProgress = () => {
     if (!habit.countable) return '';
     const current = habit.currentCount || 0;
@@ -74,7 +65,6 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
     return `${current}/${target}`;
   };
   
-  // Handle checkbox toggle with animation
   const handleToggle = (e) => {
     e.stopPropagation();
     setIsCompleted(!isCompleted);
@@ -83,7 +73,6 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
     }
   };
   
-  // Handle increment with completion check
   const handleIncrement = (e) => {
     e.stopPropagation();
     if (onUpdateCount) {
@@ -92,7 +81,6 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
     }
   };
   
-  // Handle decrement
   const handleDecrement = (e) => {
     e.stopPropagation();
     if (onUpdateCount) {
@@ -101,18 +89,15 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
     }
   };
 
-  // Get styles without border (we'll handle the border separately)
   const getStyles = () => {
     const baseBorder = `1px solid ${currentTheme.borderColor}`;
-    
     return {
-      backgroundColor: displayAsCompleted ? currentTheme.bgTertiary : currentTheme.bgSecondary,
+      backgroundColor: currentTheme.bgSecondary,
       borderRadius: currentTheme.radius,
-      boxShadow: currentTheme.shadow,
+      border: `1px solid ${currentTheme.borderColor}`,
       borderTop: baseBorder,
       borderRight: baseBorder,
       borderBottom: baseBorder,
-      // borderLeft is handled by the useEffect
     };
   };
 
@@ -122,7 +107,6 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
       className={`group relative transition-all duration-300 hover:translate-y-[-2px] ${displayAsCompleted ? 'opacity-75' : ''}`}
       style={getStyles()}
     >
-      {/* Drag handle indicator */}
       <div 
         className="absolute left-1 top-0 bottom-0 flex items-center justify-center opacity-0 group-hover:opacity-30 transition-opacity cursor-grab active:cursor-grabbing"
         style={{ color: currentTheme.textSecondary, width: '12px' }}
@@ -138,7 +122,6 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
       </div>
 
       <div className="flex items-center">
-        {/* Main content */}
         <div className="flex-1 pl-7 pr-3 py-3">
           <div className="flex items-center">
             <h3 
@@ -151,7 +134,6 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
               {isNeonTheme ? habit.title.toUpperCase() : habit.title}
             </h3>
             
-            {/* Edit button (pencil icon) - updated to match TaskItem and ProjectItem */}
             <div 
               className="ml-2 opacity-0 group-hover:opacity-40 transition-opacity"
             >
@@ -161,11 +143,9 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
                   color: currentTheme.textSecondary
                 }}
                 onMouseOver={(e) => {
-                  // Darken the icon itself on hover (not the background)
                   e.currentTarget.style.opacity = "1";
                 }}
                 onMouseOut={(e) => {
-                  // Reset on mouse out
                   e.currentTarget.style.opacity = "";
                 }}
                 onClick={(e) => {
@@ -177,16 +157,13 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
               </button>
             </div>
             
-            {/* Add flex-1 to push the stars to the right */}
             <div className="flex-1"></div>
             
-            {/* Difficulty stars - positioned at the right */}
             <div className="text-xs mr-2">
               {getDifficultyIndicator(habit.difficulty || 1)}
             </div>
           </div>
           
-          {/* Description - Added to display habit description if available */}
           {habit.description && (
             <p 
               className="text-xs mt-1 mb-1.5 transition-all duration-300" 
@@ -214,7 +191,6 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
                 {isNeonTheme ? habit.recurrence.toUpperCase() : habit.recurrence}
               </span>
               
-              {/* Streak indicator - moved under recurrence */}
               <div 
                 className="flex items-center text-xs px-1.5 py-0.5 font-medium transition-all duration-300" 
                 style={{
@@ -233,7 +209,6 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
               </div>
             </div>
             
-            {/* Counter display - aligned with the same right spacing as the stars */}
             <span 
               className="text-xs mr-2 transition-all duration-300" 
               style={{ 
@@ -246,7 +221,6 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
           </div>
         </div>
         
-        {/* Right side controls */}
         {habit.countable ? (
           <div className="flex flex-col w-12 border-l" style={{ borderColor: currentTheme.borderColor }}>
             <button 

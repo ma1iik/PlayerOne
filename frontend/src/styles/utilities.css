@@ -173,6 +173,16 @@
 	display: none;  /* Chrome, Safari and Opera */
   }
   
+  /* Hide all scrollbars globally */
+  * {
+	scrollbar-width: none;  /* Firefox */
+	-ms-overflow-style: none;  /* IE and Edge */
+  }
+  
+  *::-webkit-scrollbar {
+	display: none;  /* Chrome, Safari and Opera */
+  }
+  
   /* Glass morphism effect */
   .glass {
 	background: rgba(255, 255, 255, 0.05);
@@ -180,4 +190,34 @@
 	-webkit-backdrop-filter: blur(12px);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  }
+
+  /* Shimmer animation for progress bars */
+  @keyframes shimmer {
+	0% {
+	  transform: translateX(-100%);
+	}
+	100% {
+	  transform: translateX(100%);
+	}
+  }
+
+  /* Pulse animation for completion */
+  @keyframes pulse-glow {
+	0%, 100% {
+	  box-shadow: 0 0 5px currentColor;
+	}
+	50% {
+	  box-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
+	}
+  }
+
+  /* Floating animation for cards */
+  @keyframes float {
+	0%, 100% {
+	  transform: translateY(0px);
+	}
+	50% {
+	  transform: translateY(-5px);
+	}
   }

@@ -10,10 +10,6 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import SortableItem from './dnd/SortableItem';
 import { useDrag } from "../context/DragContext";
 
-// Section component for DRY code - with optional tabs
-// In MainContent.jsx, find the Section component and modify the div structure to support scrolling
-
-// Section component for DRY code - with optional tabs
 const Section = ({ 
   title, 
   icon, 
@@ -34,7 +30,6 @@ const Section = ({
   }) => {
   const { theme: currentTheme } = useThemeStyles();
   
-  // Add null checks to prevent React Error #31
   if (!currentTheme) {
     return <div>Loading...</div>;
   }
@@ -45,13 +40,13 @@ const Section = ({
   
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Header */}
       <div className="flex items-center justify-between p-4 border-b" style={{
         backgroundColor: currentTheme.bgSecondary,
         borderColor: currentTheme.borderColor,
         borderTopLeftRadius: currentTheme.radius,
         borderTopRightRadius: currentTheme.radius,
-        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+        minHeight: !showTabs ? '64px' : 'auto'
       }}>
         <div className="flex items-center gap-2">
           {icon}
@@ -61,13 +56,12 @@ const Section = ({
           <span className="text-xs font-medium px-2 py-0.5" style={{
             backgroundColor: `${currentTheme.primaryColor}15`,
             color: currentTheme.primaryColor,
-            borderRadius: `calc(${currentTheme.radius} / 2)` // Make it less round, more square
+            borderRadius: `calc(${currentTheme.radius} / 2)`
           }}>
             {count}
           </span>
         </div>
         
-        {/* Tabs - only shown if showTabs is true */}
         {showTabs && tabs && (
           <div className="flex bg-gray-100 rounded-lg p-1" style={{
             backgroundColor: currentTheme.bgTertiary,
@@ -92,7 +86,6 @@ const Section = ({
         )}
       </div>
       
-      {/* Content container with fixed height and scrollable content */}
       <div className="flex-1 flex flex-col overflow-hidden" style={{
         backgroundColor: currentTheme.bgPrimary,
         borderBottomLeftRadius: currentTheme.radius,
@@ -102,7 +95,6 @@ const Section = ({
         borderRight: `1px solid ${currentTheme.borderColor}`,
         borderBottom: `1px solid ${currentTheme.borderColor}`
       }}>
-        {/* Add button - fixed at the top */}
         <div className="p-4 pb-2">
           <button
             onClick={onAdd}
@@ -114,39 +106,30 @@ const Section = ({
               borderRadius: currentTheme.radius
             }}
             onMouseOver={(e) => {
-              // Slightly darken background and border on hover, keeping same color family
               if ((currentTheme.id && currentTheme.id.includes('neon')) || currentTheme.id === 'cyberpunk') {
-                // For neon/cyberpunk themes - just slightly increase opacity
                 e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
                 e.currentTarget.style.borderColor = `${currentTheme.borderColor}`;
-                // Just slightly increase text brightness
                 e.currentTarget.style.color = currentTheme.textSecondary;
                 e.currentTarget.style.opacity = "0.9";
               } else {
-                // For regular themes - make background just slightly darker
                 const bgColor = currentTheme.bgTertiary;
                 if (bgColor.startsWith('#')) {
-                  // Subtle darkening - just reduce brightness by about 5-10%
                   e.currentTarget.style.backgroundColor = bgColor === '#f3f4f6' ? '#ebedf0' : 
                                                          bgColor === '#374151' ? '#333a48' :
                                                          bgColor === '#1e1e35' ? '#1c1c31' : 
-                                                         '#e9eaec'; // fallback
+                                                         '#e9eaec';
                 } else {
-                  // For non-hex colors, use opacity trick
                   e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.03)';
                 }
                 
-                // Slightly darken border
                 e.currentTarget.style.borderColor = currentTheme.borderColor === '#e5e7eb' ? '#dfe3ea' :
                                                    currentTheme.borderColor === '#374151' ? '#3d4759' :
                                                    currentTheme.borderColor; 
               }
-              // Make text just slightly darker, not dramatically different
               e.currentTarget.style.color = currentTheme.textSecondary;
               e.currentTarget.style.opacity = "0.85";
             }}
             onMouseOut={(e) => {
-              // Reset on mouse out
               e.currentTarget.style.backgroundColor = currentTheme.bgTertiary;
               e.currentTarget.style.color = currentTheme.textSecondary;
               e.currentTarget.style.borderColor = currentTheme.borderColor;
@@ -158,8 +141,7 @@ const Section = ({
           </button>
         </div>
         
-        {/* Scrollable item list area with fixed height */}
-        <div className="flex-1 px-4 overflow-y-auto custom-scrollbar">
+        <div className="flex-1 px-4 overflow-hidden">
           {items.length === 0 ? (
             <div className="flex items-center justify-center text-center h-full" style={{
               color: currentTheme.textSecondary,
@@ -195,7 +177,6 @@ const Section = ({
           )}
         </div>
         
-        {/* Footer - fixed at the bottom */}
         <div className="px-4 py-3 mt-auto border-t" style={{ borderColor: currentTheme.borderColor }}>
           <p className="text-xs text-center" style={{ color: currentTheme.textSecondary }}>
             {footerText}
@@ -223,7 +204,6 @@ const MainContent = ({
 }) => {
   const { theme: currentTheme } = useThemeStyles();
   
-  // Add null checks to prevent React Error #31
   if (!currentTheme) {
     return <div>Loading...</div>;
   }
@@ -232,12 +212,10 @@ const MainContent = ({
 
   const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
 
-  // Tab states for each section - Keep habits tab functionality but don't show it
   const [habitTab, setHabitTab] = useState('all');
   const [taskTab, setTaskTab] = useState('all');
   const [projectTab, setProjectTab] = useState('all');
 
-  // Handle completing a task
   const handleCompleteTask = (id) => {
     setTasks(
       tasks.map((t) =>
@@ -246,7 +224,6 @@ const MainContent = ({
     );
   };
 
-  // Handle toggling a habit completion
   const handleToggleHabit = (id) => {
     setHabits(
       habits.map((h) =>
@@ -255,7 +232,6 @@ const MainContent = ({
     );
   };
 
-  // Handle updating a countable habit
   const handleUpdateHabitCount = (id, newCount) => {
     setHabits(
       habits.map((h) =>
@@ -264,13 +240,11 @@ const MainContent = ({
     );
   };
 
-  // Handle editing an item
   const handleEditItem = (item, type) => {
     setEditingItem({ item, type });
     setShowAddModal(true);
   };
 
-  // Handle adding a new item based on type
   const handleAddItem = (type) => {
     setEditingItem({ type, item: null });
     setShowAddModal(true);
@@ -299,13 +273,10 @@ const MainContent = ({
         return;
     }
     
-    // Log the relevant item arrays before update
     console.log(`${itemType} array before update:`, currentItems);
     
-    // Call the drag handler
     handleDragEnd(event, currentItems, setItemsFunction);
     
-    // For tasks specifically - add extra validation
     if (itemType === 'task') {
       console.log('Verifying task IDs are correct:');
       currentItems.forEach(task => {
@@ -318,11 +289,9 @@ const MainContent = ({
     }
   }
 
-  // Filter items based on search query and active tab
   const filteredHabits = habits.filter(habit => 
     searchQuery ? habit.title.toLowerCase().includes(searchQuery.toLowerCase()) : true
   ).sort((a, b) => {
-    // Sort by completion status - completed habits go to the bottom
     const aCompleted = a.completed || (a.countable && a.targetCount > 0 && (a.currentCount || 0) >= a.targetCount);
     const bCompleted = b.completed || (b.countable && b.targetCount > 0 && (b.currentCount || 0) >= b.targetCount);
     
@@ -341,11 +310,10 @@ const MainContent = ({
         return task.due;
       case 'completed':
         return task.status === "Completed";
-      default: // 'all'
+      default:
         return true;
     }
   }).sort((a, b) => {
-    // First sort by completion status
     const aCompleted = a.status === "Completed";
     const bCompleted = b.status === "Completed";
     
@@ -353,12 +321,10 @@ const MainContent = ({
       return aCompleted ? 1 : -1;
     }
   
-    // In scheduled view, sort by due date
     if (taskTab === 'scheduled' && a.due && b.due) {
       return new Date(a.due) - new Date(b.due);
     }
     
-    // Otherwise maintain current order (for drag and drop)
     return 0;
   });
 
@@ -372,7 +338,6 @@ const MainContent = ({
     return true;
   });
 
-  // Icons for sections
   const habitIcon = (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" style={{ color: currentTheme.textSecondary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -393,10 +358,8 @@ const MainContent = ({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden" style={{ backgroundColor: currentTheme.bgPrimary }}>
-      {/* Header - Modified to remove background */}
       <div className="z-10 px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
-          {/* Toggle button (when panel is collapsed) */}
           <div className="flex items-center">
             {isCollapsed && (
               <button
@@ -415,7 +378,6 @@ const MainContent = ({
             )}
           </div>
 
-          {/* Search bar */}
           <div className="flex justify-center flex-1">
             <div className="relative w-full max-w-2xl">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -453,7 +415,6 @@ const MainContent = ({
             </div>
           </div>
 
-          {/* Add item button */}
           <button
             onClick={() => handleAddItem("task")}
             className="ml-4 flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all"
@@ -470,10 +431,8 @@ const MainContent = ({
         </div>
       </div>
 
-      {/* Content with grid layout - this container is scrollable */}
       <div className="flex-1 overflow-hidden pt-4 pb-6 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full">
-          {/* Habits section - No tabs */}
           <Section
             title="Habits"
             icon={habitIcon}
@@ -500,12 +459,11 @@ const MainContent = ({
                 onUpdateCount={handleUpdateHabitCount}
               />
             )}
-            showTabs={false} // This is the key change - hide tabs for habits
+            showTabs={false}
             onDragEnd={handleItemDragEnd}
             itemType="habit"
           />
 
-          {/* Tasks section */}
           <Section
             title="Tasks"
             icon={taskIcon}
@@ -535,7 +493,6 @@ const MainContent = ({
             itemType="task"
           />
 
-          {/* Projects section */}
           <Section
             title="Projects"
             icon={projectIcon}

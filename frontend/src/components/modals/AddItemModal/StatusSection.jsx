@@ -13,30 +13,49 @@ const StatusSection = ({ formData, setFormData }) => {
   const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
-  // Utility function for status colors
-  const getStatusColor = (status, opacity = 1) => {
+  // Utility function for status colors with better contrast
+  const getStatusColor = (status) => {
     const colors = {
-      "Pending": `rgba(245, 158, 11, ${opacity})`, // amber
-      "In Progress": `rgba(59, 130, 246, ${opacity})`, // blue
-      "Completed": `rgba(16, 185, 129, ${opacity})` // green
+      "Pending": "#f59e0b", // amber-500 - better contrast
+      "In Progress": "#3b82f6", // blue-500 - better contrast  
+      "Completed": "#10b981" // green-500 - better contrast
     };
-    return colors[status] || `rgba(107, 114, 128, ${opacity})`; // gray as fallback
+    return colors[status] || "#6b7280"; // gray-500 as fallback
   };
 
   return (
     <div>
       <FormLabel htmlFor="status">Status</FormLabel>
       <div className="grid grid-cols-3 gap-2">
-        {["Pending", "In Progress", "Completed"].map((status) => (
-          <ThemedButton
-            key={status}
-            onClick={() => setFormData({ ...formData, status: status })}
-            isActive={formData.status === status}
-            color={isNeonTheme || isCyberpunk ? getStatusColor(status, 1) : getStatusColor(status, 0.4)}
-          >
-            {isNeonTheme ? status.toUpperCase() : status}
-          </ThemedButton>
-        ))}
+        {["Pending", "In Progress", "Completed"].map((status) => {
+          const isActive = formData.status === status;
+          const statusColor = getStatusColor(status);
+          
+          return (
+            <button
+              key={status}
+              onClick={() => setFormData({ ...formData, status: status })}
+              className="px-3 py-2 text-sm font-medium transition-all duration-200 rounded-lg"
+              style={{
+                backgroundColor: isActive 
+                  ? statusColor 
+                  : currentTheme.bgTertiary,
+                color: isActive 
+                  ? '#ffffff' 
+                  : currentTheme.textSecondary,
+                border: isActive 
+                  ? 'none' 
+                  : `1px solid ${currentTheme.borderColor}`,
+                borderRadius: currentTheme.radius,
+                boxShadow: isActive 
+                  ? `0 2px 4px ${statusColor}40` 
+                  : 'none'
+              }}
+            >
+              {isNeonTheme ? status.toUpperCase() : status}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

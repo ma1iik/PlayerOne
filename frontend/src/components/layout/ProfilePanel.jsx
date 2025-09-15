@@ -6,7 +6,6 @@ import PixelCharacter from "../PixelCharacter";
 const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
   const { theme: currentTheme, styles } = useThemeStyles();
 
-  // Add null checks to prevent React Error #31
   if (!currentTheme) {
     return <div>Loading...</div>;
   }
@@ -18,9 +17,7 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
   const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
   
-  // Assuming the user is online and has checked in for the day
   const hasCheckedIn = true; 
-  // Placeholder data for daily stats
   const dailyStats = {
     tasksCompleted: 6,
     totalTasks: 10,
@@ -30,9 +27,8 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
 
   return (
     <div className={`relative h-full transition-all duration-300 ease-in-out ${
-      isCollapsed ? "w-0" : "w-104" // Increased width from 72 to 96
+      isCollapsed ? "w-0" : "w-104"
     }`}>
-      {/* Inner "sliding door" for the panel content */}
       <div
         className={`absolute inset-0 border-r overflow-hidden shadow-sm
           transition-transform duration-300 ease-in-out
@@ -45,7 +41,6 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
       >
         <div className="p-6 h-full flex flex-col">
           <div className="flex flex-col items-center">
-            {/* Avatar with pixel-style border */}
             <div className="mb-4 relative">
               <img
                 src={profile.avatar || "https://via.placeholder.com/150?text=Avatar"}
@@ -57,7 +52,6 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                   boxShadow: currentTheme.features?.hasGlowEffects ? `0 0 15px ${currentTheme.primaryColor}40` : '0 2px 4px rgba(0,0,0,0.1)'
                 }}
               />
-              {/* Pixel-styled level badge */}
               <div 
                 className="absolute -bottom-2 -right-2 text-white text-xs font-bold px-2 py-1 shadow-sm"
                 style={{
@@ -71,7 +65,6 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
               </div>
             </div>
             
-            {/* Name and Role */}
             <h2 
               className="text-xl font-semibold mb-1"
               style={{ 
@@ -93,15 +86,14 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
               {getThemedText(profile.role)}
             </p>
 
-            {/* Daily Check-in Button with pixel-style */}
             <div className="w-full mb-6">
               <button 
                 className={`w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-all`}
                 style={{
-                  backgroundColor: hasCheckedIn ? currentTheme.bgTertiary : `linear-gradient(to right, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
-                  background: hasCheckedIn ? currentTheme.bgTertiary : `linear-gradient(to right, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
+                  backgroundColor: hasCheckedIn ? `${currentTheme.bgSecondary}E6` : `linear-gradient(to right, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
+                  background: hasCheckedIn ? `linear-gradient(135deg, ${currentTheme.bgSecondary}E6, rgba(16, 185, 129, 0.1))` : `linear-gradient(to right, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
                   color: hasCheckedIn ? currentTheme.textSecondary : '#ffffff',
-                  border: hasCheckedIn ? `1px solid ${currentTheme.borderColor}` : 'none',
+                  border: hasCheckedIn ? `1px solid rgba(16, 185, 129, 0.3)` : 'none',
                   borderRadius: currentTheme.features?.hasSharpCorners ? '2px' : '6px',
                   fontFamily: currentTheme.font,
                   textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none',
@@ -111,7 +103,7 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
               >
                 {hasCheckedIn ? (
                   <>
-                    <CheckIcon className="w-5 h-5" />
+                    <CheckIcon className="w-5 h-5" style={{ color: '#10b981' }} />
                     {getThemedText('Daily Check-in Completed!')}
                   </>
                 ) : (
@@ -120,7 +112,6 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
               </button>
             </div>
 
-            {/* Stats section with pixel-style cards */}
             <div className="w-full space-y-5">
               
               <div 
@@ -208,7 +199,6 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                 </div>
               </div>
 
-              {/* Level and XP with pixel-style progress bar */}
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span 
@@ -260,7 +250,6 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                 </div>
               </div>
 
-              {/* Stats Grid with pixel-style cards */}
               <div className="grid grid-cols-3 gap-3">
                 <div 
                   className="p-3 col-span-1 flex flex-col items-center"
@@ -351,7 +340,6 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                 </div>
               </div>
               
-              {/* Currency display with pixel-style */}
               <div className="grid grid-cols-2 gap-4">
                 <div 
                   className="p-3 flex items-center justify-between"
@@ -417,7 +405,6 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                 </div>
               </div>
               
-              {/* Current Character Class with pixel-style */}
               <div 
                 className="p-3 flex items-center justify-between"
                 style={{
@@ -468,7 +455,6 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
           </div>
         </div>
 
-        {/* Pixel-styled toggle button */}
         {!isCollapsed && (
           <button
             onClick={toggleCollapse}

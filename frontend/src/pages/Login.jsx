@@ -2,10 +2,15 @@ import React, { useState } from "react";
 import { EyeIcon, EyeOffIcon, LockClosedIcon, UserIcon } from "@heroicons/react/outline";
 import { motion } from "framer-motion";
 import { useThemeStyles } from "../context/ThemeProvider";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const { theme, styles } = useThemeStyles();
+  const { login, loading, error } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -18,9 +23,19 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login attempt:", formData);
+    setIsSubmitting(true);
+    
+    try {
+      await login(formData.email, formData.password, false);
+      navigate("/home");
+    } catch (err) {
+      console.error("Login failed:", err);
+      // Error is handled by AuthContext
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Helper functions
@@ -70,6 +85,20 @@ const Login = () => {
             </p>
           </div>
 
+          {/* Error Display */}
+          {error && (
+            <div 
+              className="mb-4 p-3 rounded-lg text-sm"
+              style={{ 
+                backgroundColor: '#fee2e2',
+                color: '#dc2626',
+                border: '1px solid #fecaca'
+              }}
+            >
+              {error}
+            </div>
+          )}
+
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
@@ -93,6 +122,7 @@ const Login = () => {
                 }}
                 placeholder={getThemedText('Enter your email')}
                 required
+                disabled={isSubmitting}
               />
             </div>
 
@@ -118,11 +148,13 @@ const Login = () => {
                   }}
                   placeholder={getThemedText('Enter your password')}
                   required
+                  disabled={isSubmitting}
                 />
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={isSubmitting}
                 >
                   {showPassword ? (
                     <EyeOffIcon className="h-5 w-5" style={{ color: theme.textSecondary }} />
@@ -139,6 +171,7 @@ const Login = () => {
                   type="checkbox"
                   className="rounded"
                   style={{ accentColor: theme.primaryColor }}
+                  disabled={isSubmitting}
                 />
                 <span className="ml-2 text-sm" style={{ color: theme.textSecondary }}>
                   {getThemedText('Remember me')}
@@ -155,13 +188,16 @@ const Login = () => {
 
             <button
               type="submit"
+              disabled={isSubmitting || loading}
               className={`w-full py-3 rounded-lg font-medium transition-colors ${getTextClasses('', theme.features.hasGlowEffects)}`}
               style={{
                 ...styles.button.base,
-                ...styles.button.primary[theme.variants?.button || 'default']
+                ...styles.button.primary[theme.variants?.button || 'default'],
+                opacity: (isSubmitting || loading) ? 0.6 : 1,
+                cursor: (isSubmitting || loading) ? 'not-allowed' : 'pointer'
               }}
             >
-              {getThemedText('Sign In')}
+              {isSubmitting || loading ? getThemedText('Signing In...') : getThemedText('Sign In')}
             </button>
           </form>
 

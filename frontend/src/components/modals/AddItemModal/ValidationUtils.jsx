@@ -16,7 +16,7 @@ export const DEFAULT_FORM_DATA = {
 	// Enhanced recurrence fields
 	recurrenceType: "weekly", // "weekly" or "monthly" for tasks
 	lateTaskBehavior: "immediate", // "immediate" or "delayed"
-	subtasks: [], // Added subtasks array
+	subtasks: [], // Added subtasks array with enhanced structure
 };
 	
   // Input validation functions

@@ -173,12 +173,6 @@ const AddItemModal = ({
       if (!validateInput(name, processedValue)) {
         setErrors({ ...errors, [name]: true });
       }
-    } else if (name === "streak") {
-      processedValue = Math.max(0, parseInt(value) || 0);
-      // Validate the streak value
-      if (!validateInput(name, processedValue)) {
-        setErrors({ ...errors, [name]: true });
-      }
     } else if (name === "countable") {
       processedValue = value === "true";
     } else if (typeof value === 'string') {
@@ -448,20 +442,17 @@ const AddItemModal = ({
             <div>
               <FormLabel htmlFor="streak">Current Streak</FormLabel>
               <div className="flex items-center">
-                <input
-                  id="streak"
-                  name="streak"
-                  type="number"
-                  min="0"
-                  className={`w-20 py-1.5 px-2 border text-center ${errors.streak ? 'border-red-500' : ''}`}
+                <div 
+                  className="w-20 py-1.5 px-2 border text-center bg-gray-100"
                   style={{ 
-                    backgroundColor: currentTheme.inputBg,
-                    color: currentTheme.textPrimary,
-                    borderColor: errors.streak ? '#ef4444' : currentTheme.borderColor
+                    backgroundColor: currentTheme.bgTertiary,
+                    color: currentTheme.textSecondary,
+                    borderColor: currentTheme.borderColor,
+                    borderRadius: currentTheme.radius
                   }}
-                  value={formData.streak || 0}
-                  onChange={handleInputChange}
-                />
+                >
+                  {formData.streak || 0}
+                </div>
                 <div 
                   className="ml-2 flex items-center gap-1 px-2 py-1 rounded"
                   style={{
@@ -475,14 +466,12 @@ const AddItemModal = ({
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
                   </svg>
-                  <span className="text-xs font-medium">Streak</span>
+                  <span className="text-xs font-medium">Streak (Read-only)</span>
                 </div>
               </div>
-              {errors.streak && (
-                <p className="mt-1 text-xs text-red-500">
-                  Streak cannot be negative.
-                </p>
-              )}
+              <p className="mt-1 text-xs text-gray-500">
+                Streak is calculated automatically based on your completion history.
+              </p>
             </div>
           )}
           
@@ -506,7 +495,6 @@ const AddItemModal = ({
                 {errors.progress && <li>Progress must be between 0-100</li>}
                 {errors.targetCount && <li>Target count must be a positive number</li>}
                 {errors.currentCount && <li>Current count cannot be negative</li>}
-                {errors.streak && <li>Streak cannot be negative</li>}
               </ul>
             </div>
           )}

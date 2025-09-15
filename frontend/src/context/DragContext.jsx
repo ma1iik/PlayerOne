@@ -13,10 +13,8 @@ import {
   verticalListSortingStrategy 
 } from '@dnd-kit/sortable';
 
-// Create context
 const DragContext = createContext();
 
-// Custom hook for using the drag context
 export const useDrag = () => {
   const context = useContext(DragContext);
   if (!context) {
@@ -26,23 +24,21 @@ export const useDrag = () => {
 };
 
 export const DragProvider = ({ children }) => {
-  // Set up sensors for both mouse and touch interactions
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
-      distance: 10, // Minimum drag distance before activation
+      distance: 10,
     },
   });
   
   const touchSensor = useSensor(TouchSensor, {
     activationConstraint: {
-      delay: 250, // Delay before touch activation
-      tolerance: 5, // Tolerance for movement during delay
+      delay: 250,
+      tolerance: 5,
     },
   });
   
   const sensors = useSensors(mouseSensor, touchSensor);
 
-  // Handle drag end events across different item types
   const handleDragEnd = (result, itemsArray, setItemsFunction) => {
 	const { active, over } = result;
 	
@@ -51,7 +47,6 @@ export const DragProvider = ({ children }) => {
 		const oldIndex = items.findIndex(item => item.id === active.id);
 		const newIndex = items.findIndex(item => item.id === over.id);
 		
-		// Make sure indexes are valid
 		if (oldIndex === -1 || newIndex === -1) {
 		  console.error("Invalid indexes detected", { active, over, oldIndex, newIndex });
 		  return items;
@@ -62,7 +57,6 @@ export const DragProvider = ({ children }) => {
 	}
   };
 
-  // Context value
   const value = {
     sensors,
     handleDragEnd,
