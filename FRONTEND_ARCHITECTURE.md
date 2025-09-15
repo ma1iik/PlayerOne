@@ -153,19 +153,21 @@ graph TD
 
 ```mermaid
 graph TB
-    A[Home] --> B[MainContent]
-    A --> C[ProfilePanel]
-    
-    D[Inventory] --> E[ItemGrid]
-    D --> F[CharacterEquipment]
-    D --> G[FilterPanel]
-    
-    H[Shop] --> I[ItemList]
-    H --> J[CategoryBar]
-    H --> K[CartModal]
-    
-    L[Settings] --> M[ThemeSettings]
-    L --> N[UserSettings]
+    subgraph "Page Components"
+        A[Home] --> B[MainContent]
+        A --> C[ProfilePanel]
+        
+        D[Inventory] --> E[ItemGrid]
+        D --> F[CharacterEquipment]
+        D --> G[FilterPanel]
+        
+        H[Shop] --> I[ItemList]
+        H --> J[CategoryBar]
+        H --> K[CartModal]
+        
+        L[Settings] --> M[ThemeSettings]
+        L --> N[UserSettings]
+    end
 ```
 
 ### Component Hierarchy
@@ -271,49 +273,53 @@ graph TD
 
 ```mermaid
 graph TB
-    A[Inventory Page] --> B[Character Equipment]
-    A --> C[Item Grid]
-    A --> D[Filter Panel]
-    
-    B --> E[Equipment Slots]
-    E --> F[Helmet]
-    E --> G[Armor]
-    E --> H[Weapon]
-    E --> I[Accessories]
-    
-    C --> J[Item Categories]
-    J --> K[Weapons]
-    J --> L[Armor]
-    J --> M[Consumables]
-    J --> N[Accessories]
-    
-    D --> O[Rarity Filter]
-    D --> P[Type Filter]
-    D --> Q[Sort Options]
+    subgraph "Inventory Architecture"
+        A[Inventory Page] --> B[Character Equipment]
+        A --> C[Item Grid]
+        A --> D[Filter Panel]
+        
+        B --> E[Equipment Slots]
+        E --> F[Helmet]
+        E --> G[Armor]
+        E --> H[Weapon]
+        E --> I[Accessories]
+        
+        C --> J[Item Categories]
+        J --> K[Weapons]
+        J --> L[Armor]
+        J --> M[Consumables]
+        J --> N[Accessories]
+        
+        D --> O[Rarity Filter]
+        D --> P[Type Filter]
+        D --> Q[Sort Options]
+    end
 ```
 
 ### 4. Shop System
 
 ```mermaid
 graph TB
-    A[Shop Page] --> B[Category Bar]
-    A --> C[Item List]
-    A --> D[Cart Modal]
-    
-    B --> E[Weapons]
-    B --> F[Armor]
-    B --> G[Consumables]
-    B --> H[Accessories]
-    
-    C --> I[Item Cards]
-    I --> J[Item Image]
-    I --> K[Item Info]
-    I --> L[Price]
-    I --> M[Add to Cart]
-    
-    D --> N[Cart Items]
-    D --> O[Total Price]
-    D --> P[Checkout]
+    subgraph "Shop Architecture"
+        A[Shop Page] --> B[Category Bar]
+        A --> C[Item List]
+        A --> D[Cart Modal]
+        
+        B --> E[Weapons]
+        B --> F[Armor]
+        B --> G[Consumables]
+        B --> H[Accessories]
+        
+        C --> I[Item Cards]
+        I --> J[Item Image]
+        I --> K[Item Info]
+        I --> L[Price]
+        I --> M[Add to Cart]
+        
+        D --> N[Cart Items]
+        D --> O[Total Price]
+        D --> P[Checkout]
+    end
 ```
 
 ## Modal System
@@ -377,28 +383,30 @@ graph TD
 
 ```mermaid
 graph TB
-    A[ThemeProvider] --> B[Theme Config]
-    B --> C[Color Palette]
-    B --> D[Typography]
-    B --> E[Spacing]
-    B --> F[Effects]
-    
-    C --> G[Primary Colors]
-    C --> H[Secondary Colors]
-    C --> I[Background Colors]
-    C --> J[Text Colors]
-    
-    D --> K[Font Families]
-    D --> L[Font Sizes]
-    D --> M[Font Weights]
-    
-    E --> N[Border Radius]
-    E --> O[Padding]
-    E --> P[Margins]
-    
-    F --> Q[Glow Effects]
-    F --> R[Shadows]
-    F --> S[Animations]
+    subgraph "Theme System"
+        A[ThemeProvider] --> B[Theme Config]
+        B --> C[Color Palette]
+        B --> D[Typography]
+        B --> E[Spacing]
+        B --> F[Effects]
+        
+        C --> G[Primary Colors]
+        C --> H[Secondary Colors]
+        C --> I[Background Colors]
+        C --> J[Text Colors]
+        
+        D --> K[Font Families]
+        D --> L[Font Sizes]
+        D --> M[Font Weights]
+        
+        E --> N[Border Radius]
+        E --> O[Padding]
+        E --> P[Margins]
+        
+        F --> Q[Glow Effects]
+        F --> R[Shadows]
+        F --> S[Animations]
+    end
 ```
 
 ### Available Themes
@@ -477,17 +485,19 @@ sequenceDiagram
 
 ```mermaid
 graph TB
-    A[AuthService] --> B[Login/Register]
-    A --> C[Token Management]
-    A --> D[Profile Management]
-    
-    E[ApiService] --> F[Tasks API]
-    E --> G[Profile API]
-    E --> H[Items API]
-    
-    I[Data Layer] --> J[Mock Data]
-    I --> K[Local Storage]
-    I --> L[Session Storage]
+    subgraph "Service Layer"
+        A[AuthService] --> B[Login/Register]
+        A --> C[Token Management]
+        A --> D[Profile Management]
+        
+        E[ApiService] --> F[Tasks API]
+        E --> G[Profile API]
+        E --> H[Items API]
+        
+        I[Data Layer] --> J[Mock Data]
+        I --> K[Local Storage]
+        I --> L[Session Storage]
+    end
 ```
 
 ### API Endpoints
