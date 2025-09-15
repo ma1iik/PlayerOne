@@ -13,7 +13,7 @@ PlayerOne is a gamified productivity application built with React, featuring a c
 - **Drag & Drop**: @dnd-kit (core, sortable, utilities)
 - **Icons**: Heroicons React 1.0.6
 - **State Management**: React Context API
-
+ 
 ## Project Structure
 
 ```
@@ -46,34 +46,32 @@ frontend/
 
 ```mermaid
 graph TB
-    subgraph "Frontend Architecture"
-        A[App.jsx] --> B[ThemeProvider]
-        A --> C[AuthProvider]
-        A --> D[DragProvider]
-        A --> E[AppRoutes]
-        
-        B --> F[Theme System]
-        C --> G[Authentication]
-        D --> H[Drag & Drop]
-        E --> I[Page Components]
-        
-        I --> J[Home]
-        I --> K[Inventory]
-        I --> L[Shop]
-        I --> M[Login/Register]
-        I --> N[Settings]
-        
-        J --> O[MainContent]
-        O --> P[HabitItem]
-        O --> Q[TaskItem]
-        O --> R[ProjectItem]
-        
-        K --> S[ItemGrid]
-        K --> T[CharacterEquipment]
-        
-        L --> U[ItemList]
-        L --> V[CartModal]
-    end
+    A[App.jsx] --> B[ThemeProvider]
+    A --> C[AuthProvider]
+    A --> D[DragProvider]
+    A --> E[AppRoutes]
+    
+    B --> F[Theme System]
+    C --> G[Authentication]
+    D --> H[Drag and Drop]
+    E --> I[Page Components]
+    
+    I --> J[Home]
+    I --> K[Inventory]
+    I --> L[Shop]
+    I --> M[Login/Register]
+    I --> N[Settings]
+    
+    J --> O[MainContent]
+    O --> P[HabitItem]
+    O --> Q[TaskItem]
+    O --> R[ProjectItem]
+    
+    K --> S[ItemGrid]
+    K --> T[CharacterEquipment]
+    
+    L --> U[ItemList]
+    L --> V[CartModal]
 ```
 
 ## Core Context Providers
@@ -155,21 +153,19 @@ graph TD
 
 ```mermaid
 graph TB
-    subgraph "Page Components"
-        A[Home] --> B[MainContent]
-        A --> C[ProfilePanel]
-        
-        D[Inventory] --> E[ItemGrid]
-        D --> F[CharacterEquipment]
-        D --> G[FilterPanel]
-        
-        H[Shop] --> I[ItemList]
-        H --> J[CategoryBar]
-        H --> K[CartModal]
-        
-        L[Settings] --> M[ThemeSettings]
-        L --> N[UserSettings]
-    end
+    A[Home] --> B[MainContent]
+    A --> C[ProfilePanel]
+    
+    D[Inventory] --> E[ItemGrid]
+    D --> F[CharacterEquipment]
+    D --> G[FilterPanel]
+    
+    H[Shop] --> I[ItemList]
+    H --> J[CategoryBar]
+    H --> K[CartModal]
+    
+    L[Settings] --> M[ThemeSettings]
+    L --> N[UserSettings]
 ```
 
 ### Component Hierarchy
@@ -275,53 +271,49 @@ graph TD
 
 ```mermaid
 graph TB
-    subgraph "Inventory Architecture"
-        A[Inventory Page] --> B[Character Equipment]
-        A --> C[Item Grid]
-        A --> D[Filter Panel]
-        
-        B --> E[Equipment Slots]
-        E --> F[Helmet]
-        E --> G[Armor]
-        E --> H[Weapon]
-        E --> I[Accessories]
-        
-        C --> J[Item Categories]
-        J --> K[Weapons]
-        J --> L[Armor]
-        J --> M[Consumables]
-        J --> N[Accessories]
-        
-        D --> O[Rarity Filter]
-        D --> P[Type Filter]
-        D --> Q[Sort Options]
-    end
+    A[Inventory Page] --> B[Character Equipment]
+    A --> C[Item Grid]
+    A --> D[Filter Panel]
+    
+    B --> E[Equipment Slots]
+    E --> F[Helmet]
+    E --> G[Armor]
+    E --> H[Weapon]
+    E --> I[Accessories]
+    
+    C --> J[Item Categories]
+    J --> K[Weapons]
+    J --> L[Armor]
+    J --> M[Consumables]
+    J --> N[Accessories]
+    
+    D --> O[Rarity Filter]
+    D --> P[Type Filter]
+    D --> Q[Sort Options]
 ```
 
 ### 4. Shop System
 
 ```mermaid
 graph TB
-    subgraph "Shop Architecture"
-        A[Shop Page] --> B[Category Bar]
-        A --> C[Item List]
-        A --> D[Cart Modal]
-        
-        B --> E[Weapons]
-        B --> F[Armor]
-        B --> G[Consumables]
-        B --> H[Accessories]
-        
-        C --> I[Item Cards]
-        I --> J[Item Image]
-        I --> K[Item Info]
-        I --> L[Price]
-        I --> M[Add to Cart]
-        
-        D --> N[Cart Items]
-        D --> O[Total Price]
-        D --> P[Checkout]
-    end
+    A[Shop Page] --> B[Category Bar]
+    A --> C[Item List]
+    A --> D[Cart Modal]
+    
+    B --> E[Weapons]
+    B --> F[Armor]
+    B --> G[Consumables]
+    B --> H[Accessories]
+    
+    C --> I[Item Cards]
+    I --> J[Item Image]
+    I --> K[Item Info]
+    I --> L[Price]
+    I --> M[Add to Cart]
+    
+    D --> N[Cart Items]
+    D --> O[Total Price]
+    D --> P[Checkout]
 ```
 
 ## Modal System
@@ -385,30 +377,28 @@ graph TD
 
 ```mermaid
 graph TB
-    subgraph "Theme System"
-        A[ThemeProvider] --> B[Theme Config]
-        B --> C[Color Palette]
-        B --> D[Typography]
-        B --> E[Spacing]
-        B --> F[Effects]
-        
-        C --> G[Primary Colors]
-        C --> H[Secondary Colors]
-        C --> I[Background Colors]
-        C --> J[Text Colors]
-        
-        D --> K[Font Families]
-        D --> L[Font Sizes]
-        D --> M[Font Weights]
-        
-        E --> N[Border Radius]
-        E --> O[Padding]
-        E --> P[Margins]
-        
-        F --> Q[Glow Effects]
-        F --> R[Shadows]
-        F --> S[Animations]
-    end
+    A[ThemeProvider] --> B[Theme Config]
+    B --> C[Color Palette]
+    B --> D[Typography]
+    B --> E[Spacing]
+    B --> F[Effects]
+    
+    C --> G[Primary Colors]
+    C --> H[Secondary Colors]
+    C --> I[Background Colors]
+    C --> J[Text Colors]
+    
+    D --> K[Font Families]
+    D --> L[Font Sizes]
+    D --> M[Font Weights]
+    
+    E --> N[Border Radius]
+    E --> O[Padding]
+    E --> P[Margins]
+    
+    F --> Q[Glow Effects]
+    F --> R[Shadows]
+    F --> S[Animations]
 ```
 
 ### Available Themes
@@ -487,19 +477,17 @@ sequenceDiagram
 
 ```mermaid
 graph TB
-    subgraph "Service Layer"
-        A[AuthService] --> B[Login/Register]
-        A --> C[Token Management]
-        A --> D[Profile Management]
-        
-        E[ApiService] --> F[Tasks API]
-        E --> G[Profile API]
-        E --> H[Items API]
-        
-        I[Data Layer] --> J[Mock Data]
-        I --> K[Local Storage]
-        I --> L[Session Storage]
-    end
+    A[AuthService] --> B[Login/Register]
+    A --> C[Token Management]
+    A --> D[Profile Management]
+    
+    E[ApiService] --> F[Tasks API]
+    E --> G[Profile API]
+    E --> H[Items API]
+    
+    I[Data Layer] --> J[Mock Data]
+    I --> K[Local Storage]
+    I --> L[Session Storage]
 ```
 
 ### API Endpoints
