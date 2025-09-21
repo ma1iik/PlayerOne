@@ -1,14 +1,14 @@
 const express = require('express');
-const session = require('express-session');
-const passport = require('./auth/passport');
-const authRoutes = require('./routes/auth');
-const profileRoutes = require('./routes/profile');
-const taskRoutes = require('./routes/tasks');
-const db = require('./models/db');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+
+// Supabase routes
+const supabaseAuthRoutes = require('./routes/supabaseAuth');
+const supabaseTaskRoutes = require('./routes/supabaseTasks');
+const supabaseHabitRoutes = require('./routes/supabaseHabits');
+const supabaseProjectRoutes = require('./routes/supabaseProjects');
 
 dotenv.config();
 const app = express();
@@ -21,24 +21,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(cookieParser());
 
-app.use(
-    session({
-        secret: process.env.APP_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            secure: process.env.NODE_ENV === 'production',
-            httpOnly: true,
-            sameSite: 'strict',
-        },
-    })
-);
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use('/api/auth', authRoutes);
-app.use('/api/profile', profileRoutes);
-app.use('/api/tasks', taskRoutes);
+// Supabase API routes
+app.use('/api/auth', supabaseAuthRoutes);
+app.use('/api/tasks', supabaseTaskRoutes);
+app.use('/api/habits', supabaseHabitRoutes);
+app.use('/api/projects', supabaseProjectRoutes);
 
 // Serve static files in production or when using sall command
 if (!isDevelopment || isSallMode) {

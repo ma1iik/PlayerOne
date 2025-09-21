@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import authService from "../services/authService";
+import { supabase } from "../config/supabase";
 
 export const AuthContext = createContext();
 
@@ -11,40 +11,57 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuth = async () => {
+    // Get initial session
+    const getInitialSession = async () => {
       setLoading(true);
       try {
-        if (authService.isAuthenticated()) {
-          const response = await authService.authFetch("http://localhost:3000/api/profile");
-          if (response.ok) {
-            const data = await response.json();
-            setUser(data.profile);
-          } else {
-            authService.clearToken();
-            setUser(null);
-          }
-        } else {
-          setUser(null);
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Session error:", error);
+          setError(error.message);
+        } else if (session) {
+          setUser(session.user);
         }
       } catch (err) {
         console.error("Auth check error:", err);
         setError(err.message);
-        setUser(null);
       } finally {
         setLoading(false);
       }
     };
 
-    checkAuth();
+    getInitialSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session) {
+          setUser(session.user);
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (email, password, rememberMe = false) => {
     setLoading(true);
     setError(null);
     try {
-      const userData = await authService.login(email, password, rememberMe);
-      setUser(userData);
-      return userData;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      setUser(data.user);
+      return data.user;
     } catch (err) {
       setError(err.message);
       throw err;
@@ -57,9 +74,23 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const userData = await authService.register(username, email, password, rememberMe);
-      setUser(userData);
-      return userData;
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username,
+            display_name: username
+          }
+        }
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      setUser(data.user);
+      return data.user;
     } catch (err) {
       setError(err.message);
       throw err;
@@ -71,7 +102,10 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     setLoading(true);
     try {
-      await authService.logout();
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        throw new Error(error.message);
+      }
       setUser(null);
       navigate("/");
     } catch (err) {
