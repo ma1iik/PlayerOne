@@ -57,7 +57,14 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (error) {
-        throw new Error(error.message);
+        // Handle specific error cases with better messages
+        if (error.message.includes('Email not confirmed')) {
+          throw new Error('Please check your email and click the confirmation link before logging in.');
+        } else if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Invalid email or password. Please check your credentials.');
+        } else {
+          throw new Error(error.message);
+        }
       }
 
       setUser(data.user);
@@ -115,6 +122,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const resendConfirmation = async (email) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return { success: true, message: 'Confirmation email sent! Please check your inbox.' };
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -123,6 +152,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    resendConfirmation,
   };
 
   return (

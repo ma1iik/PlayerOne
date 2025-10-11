@@ -1,25 +1,17 @@
-// src/pages/Shop.jsx - Updated styling only
+// src/pages/Shop.jsx
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
-  SearchIcon, 
-  FilterIcon, 
-  ShoppingCartIcon,
-  SortAscendingIcon,
-  SortDescendingIcon,
-  ViewGridIcon,
-  ViewListIcon
+  ShoppingCartIcon
 } from "@heroicons/react/outline";
 import { useThemeStyles } from "../context/ThemeProvider";
 import CategoryBar from "../components/shop/CategoryBar";
 import ItemDetail from "../components/shop/ItemDetail";
 import CartModal from "../components/shop/CartModal";
-import FilterPanel from "../components/ui/FilterPanel";
 import ItemGrid from "../components/shared/ItemGrid";
 import ItemList from "../components/shared/ItemList";
 import { sampleShopItems } from "../data/shopData";
 import { 
-  filterOptions, 
   shopCategories, 
   filterItems, 
   sortItems 
@@ -36,24 +28,32 @@ const Shop = () => {
   const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   const isCyberpunk = currentTheme.id === 'cyberpunk';
 
-  // State for shop items, filters, sorting, categories, and view mode
+  // State for shop items, categories, and cart
   const [items, setItems] = useState([]);
   const [viewMode, setViewMode] = useState("grid");
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
-  const [showFilters, setShowFilters] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [cart, setCart] = useState([]);
-  const [showCart, setShowCart] = useState(false);
-  const [sortOption, setSortOption] = useState({ field: "name", direction: "asc" });
-  const [activeFilters, setActiveFilters] = useState({
-    minPrice: 0,
-    maxPrice: 1000,
+  // New filter/search state to enable sidebar filtering UI
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({
     type: "",
     rarity: "",
+    minPrice: 0,
+    maxPrice: 1000,
     featured: false,
     category: "all"
   });
+  const [cart, setCart] = useState([]);
+  const [showCart, setShowCart] = useState(false);
+
+  // Shop category navigation
+  const [activeShopType, setActiveShopType] = useState("market");
+  const shopTypes = [
+    { id: "market", label: "Market", description: "Shop art will be here" },
+    { id: "quests", label: "Quests", description: "Mission rewards and quest items" },
+    { id: "customizations", label: "Customizations", description: "Character and UI customizations" },
+    { id: "seasonal", label: "Seasonal Shop", description: "Limited time seasonal items" },
+    { id: "time-travelers", label: "Time Travelers", description: "Exclusive time-limited items" }
+  ];
 
   // Initialize with sample shop items
   useEffect(() => {
@@ -102,62 +102,33 @@ const Shop = () => {
     return cart.reduce((total, item) => total + item.quantity, 0);
   };
 
-  // Update category filter when changing category
-  useEffect(() => {
-    setActiveFilters({
-      ...activeFilters,
-      category: activeCategory
+  // Apply common filtering utility with search and category
+  const filteredItems = filterItems(items, filters, searchQuery, "shop");
+
+  // Group items by category for display with headings
+  const groupItemsByCategory = (items) => {
+    const grouped = {};
+    items.forEach(item => {
+      if (!grouped[item.category]) {
+        grouped[item.category] = [];
+      }
+      grouped[item.category].push(item);
     });
-  }, [activeCategory]);
-
-  // Apply filters and sorting
-  const filteredItems = sortItems(
-    filterItems(items, activeFilters, searchQuery, "shop"),
-    sortOption
-  );
-
-  // Handle sort changes
-  const handleSort = (field) => {
-    if (sortOption.field === field) {
-      // Toggle direction if same field
-      setSortOption({
-        field,
-        direction: sortOption.direction === 'asc' ? 'desc' : 'asc'
-      });
-    } else {
-      // New field, default to asc
-      setSortOption({
-        field,
-        direction: 'asc'
-      });
-    }
+    return grouped;
   };
 
-  // Handle filter changes
-  const handleFilterChange = (filterType, value) => {
-    setActiveFilters({
-      ...activeFilters,
-      [filterType]: value
-    });
-
-    // Update category if category filter changed
-    if (filterType === 'category') {
-      setActiveCategory(value);
-    }
+  const groupedItems = groupItemsByCategory(filteredItems);
+  const categoryNames = {
+    'weapons': 'Weapons',
+    'armor': 'Armor', 
+    'potions': 'Potions',
+    'scrolls': 'Scrolls',
+    'materials': 'Materials',
+    'special': 'Special Items'
   };
 
-  // Reset filters
-  const resetFilters = () => {
-    setActiveFilters({
-      minPrice: 0,
-      maxPrice: 1000,
-      type: "",
-      rarity: "",
-      featured: false,
-      category: "all"
-    });
-    setSearchQuery("");
-    setActiveCategory("all");
+  const updateFilter = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
   };
 
   return (
@@ -174,242 +145,228 @@ const Shop = () => {
               repeating-linear-gradient(0deg, rgba(14, 165, 233, 0.05) 0px, rgba(14, 165, 233, 0.05) 1px, transparent 1px, transparent 10px)` : 
              'none'
          }}>
-      <div className="w-full max-w-7xl mx-auto">
-        {/* Header - Updated styling */}
-        <div className="p-4 flex items-center justify-between mb-2" 
-          style={{ 
-            backgroundColor: currentTheme.bgSecondary, 
-            borderBottom: `1px solid ${currentTheme.borderColor}`,
-            borderRadius: `${currentTheme.radius} ${currentTheme.radius} 0 0`,
-            boxShadow: isNeonTheme || isCyberpunk ? `0 0 15px ${currentTheme.shadowColor}` : 'none',
-            position: 'relative',
-            zIndex: 10
-          }}>
-          <div className="flex items-center gap-2">
-            <ShoppingCartIcon className="w-6 h-6" style={{ color: currentTheme.primaryColor }} />
-            <h2 className={`text-xl font-semibold ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                style={{ 
-                  color: currentTheme.textPrimary,
-                  fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                              isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                              currentTheme.font
-                }}>
-              {isNeonTheme ? '[ SHOP ]' : isCyberpunk ? 'SHOP' : 'Shop'}
-            </h2>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* Currency display - Updated styling */}
-            <div className="flex items-center gap-1 px-3 py-1 rounded"
-                 style={{ 
-                   backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary,
-                   border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.borderColor}` : 'none',
-                   borderRadius: currentTheme.radius
-                 }}>
-              <span role="img" aria-label="Coin" title="Coins">🪙</span>
-              <span style={{ color: currentTheme.textPrimary }}>1,250</span>
-            </div>
-            <div className="flex items-center gap-1 px-3 py-1 rounded"
-                 style={{ 
-                   backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary,
-                   border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.borderColor}` : 'none',
-                   borderRadius: currentTheme.radius
-                 }}>
-              <span role="img" aria-label="Gem" title="Gems">💎</span>
-              <span style={{ color: currentTheme.textPrimary }}>75</span>
-            </div>
+      <div className="w-full">
 
-            {/* Search bar - Updated styling */}
-            <div className="relative">
-              <input
-                type="text"
-                placeholder={isNeonTheme ? "[ SEARCH ]" : isCyberpunk ? "SEARCH" : "Search items..."}
-                className={`pl-9 pr-4 py-2 w-48 border focus:outline-none ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                style={{ 
-                  backgroundColor: currentTheme.inputBg,
-                  color: currentTheme.textPrimary,
-                  borderColor: currentTheme.inputBorder,
-                  borderRadius: currentTheme.radius,
-                  fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                              isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                              currentTheme.font
-                }}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <SearchIcon className="w-4 h-4 absolute left-3 top-3" style={{ color: currentTheme.textSecondary }} />
+        {/* Shop Header: navigation on the left, cart on right */}
+        <div
+          className="mb-6 flex items-stretch"
+          style={{
+            backgroundColor: currentTheme.bgSecondary,
+            border: `1px solid ${currentTheme.borderColor}`,
+            borderRadius: '3px !important'
+          }}
+        >
+          {/* Left: Shop type selector - now taking full height */}
+          <div className="flex items-stretch pl-4">
+            <div className="flex items-stretch gap-0 w-full">
+              {shopTypes.map((shopType) => {
+                const isActive = activeShopType === shopType.id;
+                return (
+                  <button
+                    key={shopType.id}
+                    onClick={() => setActiveShopType(shopType.id)}
+                    className="px-4 py-4 text-sm font-bold flex items-center justify-center relative"
+                    style={{
+                      background: 'transparent',
+                      color: isActive ? currentTheme.primaryColor : currentTheme.textSecondary,
+                      fontFamily: currentTheme.font,
+                      height: '100%'
+                    }}
+                  >
+                    {shopType.label}
+                    {isActive && (
+                      <div 
+                        className="absolute bottom-0 left-0 right-0 h-0.5"
+                        style={{ backgroundColor: currentTheme.primaryColor }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </div>
-            
-            {/* View mode toggle - Updated styling */}
-            <div className="flex border rounded"
-                 style={{ 
-                   backgroundColor: currentTheme.bgTertiary,
-                   borderColor: currentTheme.borderColor,
-                   borderRadius: currentTheme.radius
-                 }}>
-              <button
-                onClick={() => setViewMode("grid")}
-                className="p-2 transition-colors"
-                style={{ 
-                  backgroundColor: viewMode === "grid" ? currentTheme.primaryColor : 'transparent',
-                  color: viewMode === "grid" ? '#ffffff' : currentTheme.textSecondary,
-                  borderTopLeftRadius: currentTheme.radius,
-                  borderBottomLeftRadius: currentTheme.radius
-                }}
-              >
-                <ViewGridIcon className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className="p-2 transition-colors"
-                style={{ 
-                  backgroundColor: viewMode === "list" ? currentTheme.primaryColor : 'transparent',
-                  color: viewMode === "list" ? '#ffffff' : currentTheme.textSecondary,
-                  borderTopRightRadius: currentTheme.radius,
-                  borderBottomRightRadius: currentTheme.radius
-                }}
-              >
-                <ViewListIcon className="w-5 h-5" />
-              </button>
-            </div>
-            
-            {/* Filter toggle button - Updated styling */}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isNeonTheme ? 'sl-glow-text' : ''}`}
-              style={{ 
-                backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : 
-                  showFilters ? currentTheme.primaryColor : `${currentTheme.primaryColor}20`,
-                color: showFilters ? (isNeonTheme || isCyberpunk ? currentTheme.primaryColor : '#ffffff') : currentTheme.primaryColor,
-                borderRadius: currentTheme.radius,
-                border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.primaryColor}` : 'none'
-              }}
-            >
-              <FilterIcon className="w-5 h-5" />
-              {isNeonTheme ? '[ FILTERS ]' : isCyberpunk ? 'FILTERS' : 'Filters'}
-            </button>
-            
-            {/* Shopping cart button - Updated styling */}
-            <button
-              onClick={() => setShowCart(true)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isNeonTheme ? 'sl-glow-text' : ''}`}
-              style={{ 
-                backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.secondaryColor,
-                color: isNeonTheme || isCyberpunk ? currentTheme.secondaryColor : '#ffffff',
-                borderRadius: currentTheme.radius,
-                border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.secondaryColor}` : 'none'
-              }}
-            >
-              <ShoppingCartIcon className="w-5 h-5" />
-              <span>
-                {isNeonTheme ? `[ ${getCartItemCount()} ]` : 
-                 isCyberpunk ? getCartItemCount() : 
-                 getCartItemCount()}
-              </span>
-            </button>
           </div>
+
+          {/* Right: Cart button */}
+          <button
+            onClick={() => setShowCart(true)}
+            className="ml-auto flex items-center justify-center gap-2 px-4 py-4 h-full transition-all duration-200 hover:bg-opacity-10"
+            style={{
+              backgroundColor: 'transparent',
+              color: currentTheme.primaryColor,
+              borderRadius: currentTheme.radius
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = `${currentTheme.primaryColor}15`;
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+            }}
+          >
+            <ShoppingCartIcon className="w-5 h-5" />
+            <span className="text-sm font-bold">{getCartItemCount()}</span>
+          </button>
         </div>
 
-        {/* Filters panel - Updated styling will be handled by the component */}
-        <FilterPanel 
-          showFilters={showFilters}
-          activeFilters={activeFilters}
-          handleFilterChange={handleFilterChange}
-          sortOption={sortOption}
-          handleSort={handleSort}
-          resetFilters={resetFilters}
-          filterOptions={filterOptions}
-          mode="shop"
-        />
-        
-        {/* Categories - Updated styling will be handled by the component */}
-        <CategoryBar 
-          categories={shopCategories}
-          activeCategory={activeCategory}
-          setActiveCategory={setActiveCategory}
-        />
-        
-        {/* Main Content - Updated styling */}
-        <div className="p-4 mt-2" style={{ 
-          backgroundColor: currentTheme.bgSecondary,
-          borderRadius: currentTheme.radius,
-          border: `1px solid ${currentTheme.borderColor}`
-        }}>
-          {/* Item count and results info - Updated styling */}
-          <div className="mb-4" style={{ color: currentTheme.textSecondary }}>
-            <span className={isNeonTheme ? 'sl-glow-text' : ''}
-                  style={{ 
-                    fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                                isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                                currentTheme.font
-                  }}>
-              {isNeonTheme 
-                ? `[ ${filteredItems.length} ITEMS AVAILABLE ]` 
-                : isCyberpunk 
-                ? `${filteredItems.length} ITEMS AVAILABLE` 
-                : `${filteredItems.length} items available`}
-            </span>
-          </div>
-          
-          {/* Grid View - Component handles individual item styling */}
-          <ItemGrid 
-            items={filteredItems}
-            viewMode={viewMode}
-            onSelectItem={setSelectedItem}
-            addToCart={addToCart}
-            mode="shop"
-          />
-          
-          {/* List View - Component handles individual item styling */}
-          <ItemList 
-            items={filteredItems}
-            viewMode={viewMode}
-            onSelectItem={setSelectedItem}
-            addToCart={addToCart}
-            mode="shop"
-          />
-          
-          {/* Empty state - Updated styling */}
-          {filteredItems.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-12"
-                 style={{ 
-                   backgroundColor: isNeonTheme || isCyberpunk 
-                     ? 'rgba(255, 255, 255, 0.05)' 
-                     : currentTheme.bgTertiary,
-                   borderRadius: currentTheme.radius,
-                   border: `1px solid ${currentTheme.borderColor}`
+        {/* Main Layout: Filters on left, Banner + Items on right */}
+        <div className="flex gap-6">
+          {/* Left Sidebar - Search + Filters (checkbox style) */}
+          <div className="w-64 flex-shrink-0">
+            <div className="p-4 rounded-lg"
+                 style={{
+                   backgroundColor: currentTheme.bgSecondary,
+                   border: `1px solid ${currentTheme.borderColor}`,
+                   borderRadius: currentTheme.radius
                  }}>
-              <ShoppingCartIcon className="w-12 h-12 mb-4" style={{ color: currentTheme.textSecondary }} />
-              <p className={`text-lg mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                 style={{ 
-                   color: currentTheme.textPrimary,
-                   fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                               isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                               currentTheme.font
-                 }}>
-                {isNeonTheme ? '[ NO ITEMS FOUND ]' : isCyberpunk ? 'NO ITEMS FOUND' : 'No items found'}
-              </p>
-              <p style={{ color: currentTheme.textSecondary }}>
-                {isNeonTheme ? '[ TRY ADJUSTING YOUR FILTERS ]' 
-                 : isCyberpunk ? 'TRY ADJUSTING YOUR FILTERS' 
-                 : 'Try adjusting your filters or search query'}
-              </p>
-              <button
-                onClick={resetFilters}
-                className={`mt-4 px-4 py-2 rounded ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                style={{ 
-                  backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.primaryColor,
-                  color: isNeonTheme || isCyberpunk ? currentTheme.primaryColor : '#ffffff',
-                  border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.primaryColor}` : 'none',
-                  borderRadius: currentTheme.radius,
-                  fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                              isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                              currentTheme.font
-                }}
-              >
-                {isNeonTheme ? '[ RESET FILTERS ]' : isCyberpunk ? 'RESET FILTERS' : 'Reset Filters'}
-              </button>
+              {/* Search */}
+              <div className="mb-4">
+                <input
+                  type="text"
+                  placeholder="Search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-3 py-2 text-sm"
+                  style={{
+                    backgroundColor: currentTheme.inputBg,
+                    color: currentTheme.textPrimary,
+                    border: `1px solid ${currentTheme.inputBorder || currentTheme.borderColor}`,
+                    borderRadius: currentTheme.radius,
+                    fontFamily: currentTheme.font
+                  }}
+                />
+              </div>
+
+              {/* Filters heading */}
+              <h4 className="text-sm font-semibold mb-3" style={{ color: currentTheme.textPrimary, fontFamily: currentTheme.font }}>
+                Filters
+              </h4>
+
+              {/* Category checkboxes (single-select for now) */}
+              <div className="space-y-3">
+                {shopCategories.map((category) => {
+                  const checked = filters.category === category.id;
+                  return (
+                    <label key={category.id} className="flex items-start gap-3 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => updateFilter('category', checked ? 'all' : category.id)}
+                        className="mt-0.5 h-4 w-4"
+                        style={{
+                          accentColor: currentTheme.primaryColor,
+                          cursor: 'pointer'
+                        }}
+                      />
+                      <span className="text-sm" style={{ color: currentTheme.textSecondary, fontFamily: currentTheme.font }}>
+                        {category.name}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
-          )}
+          </div>
+
+          {/* Right Content Area - Banner + Items */}
+          <div className="flex-1">
+            {/* Banner */}
+            <div className="mb-6">
+              <div className="relative h-60 overflow-hidden"
+                   style={{
+                     background: `linear-gradient(135deg, ${currentTheme.primaryColor}20, ${currentTheme.secondaryColor}20)`,
+                     border: `1px solid ${currentTheme.borderColor}`,
+                     borderRadius: '3px'
+                   }}>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">🎮</div>
+                    <h3 className="text-2xl font-bold mb-2" style={{ color: currentTheme.textPrimary, fontFamily: currentTheme.font }}>
+                      {shopTypes.find(s => s.id === activeShopType)?.label} Shop
+                    </h3>
+                    <p className="text-lg" style={{ color: currentTheme.textSecondary, fontFamily: currentTheme.font }}>
+                      {shopTypes.find(s => s.id === activeShopType)?.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Items Section - EXACTLY same width as banner */}
+            <div className="p-4" style={{ 
+              backgroundColor: currentTheme.bgSecondary,
+              borderRadius: currentTheme.radius,
+              border: `1px solid ${currentTheme.borderColor}`
+            }}>
+              {/* Item count and results info - Updated styling */}
+              <div className="mb-4" style={{ color: currentTheme.textSecondary }}>
+                <span className={isNeonTheme ? 'sl-glow-text' : ''}
+                      style={{ 
+                        fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
+                                    isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
+                                    currentTheme.font
+                      }}>
+                  {isNeonTheme 
+                    ? `[ ${filteredItems.length} ITEMS AVAILABLE ]` 
+                    : isCyberpunk 
+                    ? `${filteredItems.length} ITEMS AVAILABLE` 
+                    : `${filteredItems.length} items available`}
+                </span>
+              </div>
+              
+              {/* Items grouped by category with headings */}
+              {Object.keys(groupedItems).length > 0 ? (
+                Object.keys(groupedItems).map(categoryId => (
+                  <div key={categoryId} className="mb-6">
+                    <h3 className="text-lg font-bold mb-3" style={{ 
+                      color: currentTheme.textPrimary,
+                      fontFamily: currentTheme.font 
+                    }}>
+                      {categoryNames[categoryId] || categoryId}
+                    </h3>
+                    {viewMode === 'grid' ? (
+                      <ItemGrid 
+                        items={groupedItems[categoryId]}
+                        viewMode={viewMode}
+                        onSelectItem={setSelectedItem}
+                        addToCart={addToCart}
+                        mode="shop"
+                      />
+                    ) : (
+                      <ItemList 
+                        items={groupedItems[categoryId]}
+                        viewMode={viewMode}
+                        onSelectItem={setSelectedItem}
+                        addToCart={addToCart}
+                        mode="shop"
+                      />
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12"
+                     style={{ 
+                       backgroundColor: isNeonTheme || isCyberpunk 
+                         ? 'rgba(255, 255, 255, 0.05)' 
+                         : currentTheme.bgTertiary,
+                       borderRadius: currentTheme.radius,
+                       border: `1px solid ${currentTheme.borderColor}`
+                     }}>
+                  <ShoppingCartIcon className="w-12 h-12 mb-4" style={{ color: currentTheme.textSecondary }} />
+                  <p className={`text-lg mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                     style={{ 
+                       color: currentTheme.textPrimary,
+                       fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
+                                   isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
+                                   currentTheme.font
+                     }}>
+                    {isNeonTheme ? '[ NO ITEMS FOUND ]' : isCyberpunk ? 'NO ITEMS FOUND' : 'No items found'}
+                  </p>
+                  <p className="text-sm" style={{ color: currentTheme.textSecondary, fontFamily: currentTheme.font }}>
+                    Try adjusting your filters or search terms
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
       
@@ -424,6 +381,8 @@ const Shop = () => {
         />
       )}
       
+      {/* Floating Cart Button removed; cart now in header */}
+
       {/* Shopping Cart Modal */}
       <CartModal
         showCart={showCart}

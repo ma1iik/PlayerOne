@@ -11,6 +11,7 @@ const themes = {
   cyberpunk: THEMES.CYBERPUNK,
   night: THEMES.NIGHT,
   rose: THEMES.ROSE,
+  'dark-fantasy': THEMES.DARK_FANTASY,
 };
 
 const ThemeContext = createContext();

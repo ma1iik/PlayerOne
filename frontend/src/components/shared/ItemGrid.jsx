@@ -48,7 +48,7 @@ const ItemGrid = ({
 
   return (
     <motion.div 
-      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4" 
+      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3" 
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -70,7 +70,11 @@ const ItemGrid = ({
                     e.stopPropagation();
                     addToCart(item, 1);
                   }}
-                  className="text-xs p-1 rounded"
+                  className="text-xs p-1 rounded hover:bg-opacity-20"
+                  style={{ 
+                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                    borderRadius: '4px'
+                  }}
                 >
                   <PlusIcon className="w-4 h-4" />
                 </button>

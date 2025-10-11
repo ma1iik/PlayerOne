@@ -46,7 +46,7 @@ const Header = () => {
           <nav className="flex items-center gap-6">
             <Link
               to="/home"
-              className="text-base font-medium py-3 border-b-2 transition-colors"
+              className="text-base font-bold py-3 border-b-2 transition-colors"
               style={{
                 borderColor: isActive('/home') ? currentTheme.primaryColor : 'transparent',
                 color: isActive('/home') ? currentTheme.primaryColor : currentTheme.textPrimary,
@@ -58,7 +58,7 @@ const Header = () => {
             </Link>
             <Link
               to="/inventory"
-              className="text-base font-medium py-3 border-b-2 transition-colors"
+              className="text-base font-bold py-3 border-b-2 transition-colors"
               style={{
                 borderColor: isActive('/inventory') ? currentTheme.primaryColor : 'transparent',
                 color: isActive('/inventory') ? currentTheme.primaryColor : currentTheme.textPrimary,
@@ -70,7 +70,7 @@ const Header = () => {
             </Link>
             <Link
               to="/shop"
-              className="text-base font-medium py-3 border-b-2 transition-colors"
+              className="text-base font-bold py-3 border-b-2 transition-colors"
               style={{
                 borderColor: isActive('/shop') ? currentTheme.primaryColor : 'transparent',
                 color: isActive('/shop') ? currentTheme.primaryColor : currentTheme.textPrimary,

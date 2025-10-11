@@ -47,29 +47,10 @@ const ItemCard = ({
 
   const renderBottomSection = () => {
     if (mode === "shop") {
-      return (
-        <div className="mt-2 flex justify-between items-center">
-          <div className="flex items-center">
-            <span role="img" aria-label="Currency" className="mr-1">
-              {item.currency === 'gems' ? '💎' : '🪙'}
-            </span>
-            <span className="font-semibold" style={{ color: currentTheme.textPrimary }}>
-              {item.discounted ? (
-                <span>
-                  <span className="line-through text-xs mr-1 opacity-70">{item.originalPrice}</span>
-                  {item.price}
-                </span>
-              ) : (
-                item.price
-              )}
-            </span>
-          </div>
-          {actionButton}
-        </div>
-      );
+      return null;
     } else {
       return (
-        <div className="mt-2 flex justify-between items-center h-6">
+        <div className="mt-1.5 flex justify-between items-center h-5">
           {item.equipped && (
             <span className="text-xs py-1 px-2 rounded" 
                   style={{ 
@@ -114,7 +95,7 @@ const ItemCard = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
-      className={`h-full cursor-pointer transition-all duration-200 ${getScanLineClass(item, isNeonTheme)}`}
+      className={`group h-full cursor-pointer transition-all duration-100 ${getScanLineClass(item, isNeonTheme)}`}
       style={{
         ...getItemCardStyle(),
         ...getScanLineStyle(item, isNeonTheme)
@@ -123,10 +104,10 @@ const ItemCard = ({
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
-      <div className="p-3.5 flex flex-col h-full">
+      <div className="p-2.5 flex flex-col h-full">
         {/* Item image */}
         <div 
-          className="w-full aspect-square flex items-center justify-center mb-2.5 relative" 
+          className="w-full aspect-square flex items-center justify-center mb-2 relative" 
           style={{ 
             backgroundColor: isNeonTheme || isCyberpunk ? 'rgba(0, 0, 0, 0.3)' : currentTheme.bgTertiary,
             borderRadius: currentTheme.radius
@@ -134,7 +115,7 @@ const ItemCard = ({
         >
           {/* Shop-specific: Featured badge */}
           {mode === "shop" && item.featured && (
-            <div className="absolute top-2 right-2">
+            <div className="absolute top-2 left-2">
               <span className="inline-block text-xs px-2 py-0.5 rounded"
                     style={{ 
                       backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.secondaryColor,
@@ -147,6 +128,13 @@ const ItemCard = ({
             </div>
           )}
           
+          {/* Shop-specific: Add to cart button */}
+          {mode === "shop" && actionButton && (
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              {actionButton}
+            </div>
+          )}
+          
           <img 
             src={item.image} 
             alt={item.name}
@@ -156,16 +144,35 @@ const ItemCard = ({
         
         {/* Item information */}
         <div className="flex-1 min-w-0">
-          <h3 className={`font-medium truncate ${isNeonTheme ? 'sl-glow-text' : ''}`}
-              style={{ 
-                color: currentTheme.textPrimary,
-                fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
-                            isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
-                            currentTheme.font
-              }}>
-            {isNeonTheme ? item.name.toUpperCase() : item.name}
-          </h3>
-          <div className="flex items-center gap-2 mt-0.5">
+          <div className="flex items-center justify-between">
+            <h3 className={`text-sm font-medium truncate ${isNeonTheme ? 'sl-glow-text' : ''}`}
+                style={{ 
+                  color: currentTheme.textPrimary,
+                  fontFamily: isNeonTheme ? "'Orbitron', 'Rajdhani', sans-serif" : 
+                              isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
+                              currentTheme.font
+                }}>
+              {isNeonTheme ? item.name.toUpperCase() : item.name}
+            </h3>
+            {mode === "shop" && (
+              <div className="flex items-center ml-2">
+                <span role="img" aria-label="Currency" className="mr-1 text-xs">
+                  {item.currency === 'gems' ? '💎' : '🪙'}
+                </span>
+                <span className="text-sm font-semibold" style={{ color: currentTheme.textPrimary }}>
+                  {item.discounted ? (
+                    <span>
+                      <span className="line-through text-xs mr-1 opacity-70">{item.originalPrice}</span>
+                      {item.price}
+                    </span>
+                  ) : (
+                    item.price
+                  )}
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-1 mt-0.5">
             <span className="text-xs" 
                   style={{ 
                     color: getRarityColor(item.rarity),

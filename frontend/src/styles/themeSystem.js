@@ -52,7 +52,7 @@ export const THEMES = {
     textPrimary: "#1f2937",
     textSecondary: "#6b7280",
     borderColor: "#e5e7eb",
-    radius: "0.375rem",
+    radius: "0.1875rem",
     font: "'Inter', sans-serif",
     features: {
       // Default theme, no special features
@@ -64,13 +64,13 @@ export const THEMES = {
     name: "Enhanced Light",
     primaryColor: "#6d28d9",
     secondaryColor: "#8b5cf6",
-    bgPrimary: "#f8fafc", // More grey-leaning, less turquoise
+    bgPrimary: "#f8fafc", // Slightly less grey
     bgSecondary: "#ffffff", // Keep pure white for cards
-    bgTertiary: "#e5e7eb", // Stronger grey with slight violet tint
+    bgTertiary: "#f1f5f9", // Lighter grey, less strong
     textPrimary: "#0f172a", // Darker text for better readability
-    textSecondary: "#475569", // Darker secondary text
-    borderColor: "#cbd5e1", // Darker borders for better definition
-    radius: "0.375rem",
+    textSecondary: "#64748b", // Lighter grey for secondary text
+    borderColor: "#e2e8f0", // Lighter grey borders
+    radius: "0.1875rem",
     font: "'Inter', sans-serif",
     features: {
       // Enhanced contrast for better accessibility
@@ -136,22 +136,21 @@ export const THEMES = {
   NIGHT: createTheme({
     id: "night",
     name: "Midnight",
-    primaryColor: "#8b5cf6", // Rich purple
-    secondaryColor: "#06b6d4", // Cyan accent
-    bgPrimary: "#0f0f23", // Deep midnight blue
-    bgSecondary: "#1a1a2e", // Dark navy
-    bgTertiary: "#16213e", // Slate blue
-    textPrimary: "#f1f5f9", // Crisp white
-    textSecondary: "#94a3b8", // Cool gray
-    borderColor: "#475569", // Subtle blue-gray
-    radius: "0.5rem",
-    font: "'JetBrains Mono', 'Fira Code', monospace",
+    primaryColor: "#6d28d9", // Same purple as light theme
+    secondaryColor: "#8b5cf6", // Same secondary as light theme
+    bgPrimary: "#111827", // Dark background
+    bgSecondary: "#1f2937", // Dark cards
+    bgTertiary: "#374151", // Dark tertiary
+    textPrimary: "#f9fafb", // Light text
+    textSecondary: "#9ca3af", // Muted light text
+    borderColor: "#374151", // Dark borders
+    radius: "0.1875rem", // Same radius as light theme
+    font: "'Inter', sans-serif", // Same font as light theme
     features: {
-      hasGlassEffect: true,
-      useMonospaceFont: true,
+      // Clean dark theme, no special effects
     },
     variants: {
-      card: 'glass',
+      card: 'default',
       button: 'default',
       input: 'default',
       text: 'default',
@@ -180,6 +179,33 @@ export const THEMES = {
       input: 'default',
       text: 'default',
     }
+  }),
+
+  DARK_FANTASY: createTheme({
+    id: "dark-fantasy",
+    name: "Dark Fantasy",
+    primaryColor: "#8b1538", // Deep blood red
+    secondaryColor: "#4a4a4a", // Charcoal gray
+    bgPrimary: "#0a0a0a", // Almost black
+    bgSecondary: "#141414", // Very dark gray
+    bgTertiary: "#1f1f1f", // Dark charcoal
+    textPrimary: "#d4c5b9", // Aged parchment
+    textSecondary: "#8a7968", // Muted brown
+    borderColor: "#2d2d2d", // Dark border
+    radius: "0.1875rem", // Slightly rounded
+    font: "'Cinzel', 'Times New Roman', serif", // Gothic serif font
+    features: {
+      hasGlowEffects: true,
+      hasGlassEffect: true,
+      hasBorderAnimations: true,
+      hasGridBackground: true,
+    },
+    variants: {
+      card: 'gothic',
+      button: 'gothic',
+      input: 'gothic',
+      text: 'gothic',
+    }
   })
 };
 
@@ -190,6 +216,7 @@ export const NEON_VIOLET = THEMES.NEON_VIOLET;
 export const CYBERPUNK = THEMES.CYBERPUNK;
 export const NIGHT = THEMES.NIGHT;
 export const ROSE = THEMES.ROSE;
+export const DARK_FANTASY = THEMES.DARK_FANTASY;
 
 // Style Generators based on features, not theme names
 export const generateStyles = (theme) => {
@@ -226,6 +253,46 @@ export const generateStyles = (theme) => {
         border: '1px solid rgba(255, 255, 255, 0.1)',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
       },
+      pixel: {
+        backgroundColor: 'rgba(26, 26, 26, 0.9)', // Dark pixel background
+        border: `2px solid ${theme.primaryColor}`,
+        boxShadow: features.hasGlowEffects 
+          ? `0 0 15px ${theme.primaryColor}60, inset 0 0 10px ${theme.primaryColor}20`
+          : `0 0 8px ${theme.primaryColor}40`,
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `linear-gradient(45deg, transparent 48%, ${theme.primaryColor}20 49%, ${theme.primaryColor}20 51%, transparent 52%)`,
+          backgroundSize: '8px 8px',
+          pointerEvents: 'none',
+        }
+      },
+      gothic: {
+        backgroundColor: 'rgba(20, 20, 20, 0.95)', // Very dark background
+        border: `1px solid ${theme.borderColor}`,
+        borderTop: `2px solid ${theme.primaryColor}30`,
+        boxShadow: features.hasGlowEffects 
+          ? `0 4px 20px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(139, 21, 56, 0.2)`
+          : `0 4px 15px rgba(0, 0, 0, 0.6)`,
+        background: `linear-gradient(145deg, rgba(20, 20, 20, 0.95), rgba(10, 10, 10, 0.98))`,
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '2px',
+          background: `linear-gradient(90deg, transparent, ${theme.primaryColor}60, transparent)`,
+          opacity: 0.3,
+        }
+      },
     },
     
     // Button styles
@@ -258,6 +325,21 @@ export const generateStyles = (theme) => {
           position: 'relative',
           overflow: 'hidden',
         },
+        gothic: {
+          background: `linear-gradient(145deg, ${theme.primaryColor}, rgba(139, 21, 56, 0.8))`,
+          color: '#ffffff',
+          border: `1px solid ${theme.primaryColor}`,
+          boxShadow: features.hasGlowEffects 
+            ? `0 4px 15px rgba(139, 21, 56, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)`
+            : `0 4px 10px rgba(139, 21, 56, 0.3)`,
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            background: `linear-gradient(145deg, rgba(139, 21, 56, 0.9), ${theme.primaryColor})`,
+            boxShadow: features.hasGlowEffects 
+              ? `0 6px 20px rgba(139, 21, 56, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2)`
+              : `0 6px 15px rgba(139, 21, 56, 0.5)`,
+          }
+        },
       },
       secondary: {
         default: {
@@ -274,6 +356,46 @@ export const generateStyles = (theme) => {
           backgroundColor: 'transparent',
           color: theme.secondaryColor,
           border: `1px solid ${theme.secondaryColor}`,
+        },
+        pixel: {
+          backgroundColor: 'transparent',
+          color: theme.primaryColor,
+          border: `2px solid ${theme.primaryColor}`,
+          boxShadow: features.hasGlowEffects 
+            ? `0 0 10px ${theme.primaryColor}40, inset 0 0 5px ${theme.primaryColor}20`
+            : 'none',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: '-100%',
+            width: '100%',
+            height: '100%',
+            background: `linear-gradient(90deg, transparent, ${theme.primaryColor}30, transparent)`,
+            transition: 'left 0.5s ease',
+          },
+          '&:hover::before': {
+            left: '100%',
+          }
+        },
+        gothic: {
+          backgroundColor: 'rgba(10, 10, 10, 0.8)',
+          color: theme.textPrimary,
+          border: `1px solid ${theme.borderColor}`,
+          borderTop: `1px solid ${theme.primaryColor}40`,
+          boxShadow: features.hasGlowEffects 
+            ? `0 2px 10px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(139, 21, 56, 0.3)`
+            : `0 2px 8px rgba(0, 0, 0, 0.6)`,
+          background: `linear-gradient(145deg, rgba(15, 15, 15, 0.9), rgba(5, 5, 5, 0.95))`,
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            borderTopColor: theme.primaryColor,
+            boxShadow: features.hasGlowEffects 
+              ? `0 4px 15px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(139, 21, 56, 0.5)`
+              : `0 4px 12px rgba(0, 0, 0, 0.8)`,
+          }
         },
       }
     },
@@ -293,10 +415,22 @@ export const generateStyles = (theme) => {
       } : {},
       
       background: features.hasGridBackground ? {
-        backgroundImage: `
-          linear-gradient(to bottom, rgba(10, 10, 16, 0.95), rgba(10, 10, 16, 0.98)),
-          repeating-linear-gradient(45deg, rgba(30, 30, 41, 0.2) 0px, rgba(30, 30, 41, 0.2) 1px, transparent 1px, transparent 10px)
-        `
+        backgroundImage: theme.id === 'dark-fantasy' 
+          ? `
+            linear-gradient(to bottom, rgba(10, 10, 10, 0.98), rgba(5, 5, 5, 0.99)),
+            radial-gradient(ellipse at center, rgba(139, 21, 56, 0.05) 0%, transparent 70%),
+            repeating-linear-gradient(45deg, rgba(20, 20, 20, 0.3) 0px, rgba(20, 20, 20, 0.3) 1px, transparent 1px, transparent 20px)
+          `
+          : theme.id === 'dark-fantasy-pixel' 
+          ? `
+            linear-gradient(to bottom, rgba(15, 15, 15, 0.95), rgba(10, 10, 10, 0.98)),
+            repeating-linear-gradient(0deg, rgba(139, 92, 246, 0.1) 0px, rgba(139, 92, 246, 0.1) 1px, transparent 1px, transparent 8px),
+            repeating-linear-gradient(90deg, rgba(139, 92, 246, 0.1) 0px, rgba(139, 92, 246, 0.1) 1px, transparent 1px, transparent 8px)
+          `
+          : `
+            linear-gradient(to bottom, rgba(10, 10, 16, 0.95), rgba(10, 10, 16, 0.98)),
+            repeating-linear-gradient(45deg, rgba(30, 30, 41, 0.2) 0px, rgba(30, 30, 41, 0.2) 1px, transparent 1px, transparent 10px)
+          `
       } : {},
     },
 

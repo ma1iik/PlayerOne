@@ -1,6 +1,6 @@
 // src/pages/Home.jsx
 import React, { useState } from "react";
-import ProfilePanel from "../components/layout/ProfilePanel";
+// import ProfilePanel from "../components/layout/ProfilePanel";
 import MainContent from "../components/MainContent";
 import AddItemModal from "../components/modals/AddItemModal";
 import { useThemeStyles } from "../context/ThemeProvider";
@@ -9,7 +9,7 @@ import ProjectDetail from "../components/projects/ProjectDetail";
 const Home = () => {
   const { theme } = useThemeStyles();
 
-  const [isCollapsed, setIsCollapsed] = useState(false); // Keep panel expanded by default
+  // const [isCollapsed, setIsCollapsed] = useState(false); // No longer needed - ProfilePanel removed
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -270,12 +270,12 @@ const handleUpdateProject = (updatedProject) => {
       className="flex h-full w-full overflow-hidden" 
       style={{ backgroundColor: theme.bgPrimary }}
     >
-      {/* Profile Panel */}
-      <ProfilePanel
+      {/* Profile Panel - Commented out, now using ProfileSection in MainContent */}
+      {/* <ProfilePanel
         profile={profile}
         isCollapsed={isCollapsed}
         toggleCollapse={() => setIsCollapsed(!isCollapsed)}
-      />
+      /> */}
 
       {/* Main Content */}
       <MainContent
@@ -288,8 +288,6 @@ const handleUpdateProject = (updatedProject) => {
         setHabits={setHabits}
         setTasks={setTasks}
         setProjects={setProjects}
-        isCollapsed={isCollapsed}
-        toggleCollapse={() => setIsCollapsed(!isCollapsed)}
         setEditingItem={setEditingItem}
         setSelectedProject={setSelectedProject}
       />

@@ -80,7 +80,7 @@ const ItemList = ({
         <motion.div 
           key={item.id}
           variants={itemVariants}
-          className="grid grid-cols-12 gap-4 px-4 py-3 items-center cursor-pointer transition-all duration-200"
+          className="grid grid-cols-12 gap-4 px-4 py-3 items-center cursor-pointer transition-all duration-100"
           style={{ 
             backgroundColor: currentTheme.bgSecondary,
             borderRadius: currentTheme.radius,

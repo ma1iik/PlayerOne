@@ -56,121 +56,56 @@ const Settings = () => {
     return styles.shouldTransform(text);
   };
 
-  // Get theme-aware border radius
-  const getBorderRadius = () => {
-    return theme.features?.hasSharpCorners ? '0' : '12px';
-  };
-
-  // Get theme-aware button styles
-  const getButtonStyles = (isPrimary = false) => {
-    const baseStyles = {
-      borderRadius: theme.features?.hasSharpCorners ? '0' : '6px',
-      fontFamily: theme.font,
-      transition: 'all 0.2s ease',
-      border: 'none',
-      cursor: 'pointer'
-    };
-
-    if (isPrimary) {
-      const isCyberpunk = theme.id === 'cyberpunk';
-      const isNeonTheme = theme.id && theme.id.includes('neon');
-      
-      if (isCyberpunk || isNeonTheme) {
-        // Use gradient background for cyberpunk and neon themes like the add item button
-        return {
-          ...baseStyles,
-          background: `linear-gradient(135deg, ${theme.primaryColor}, ${theme.secondaryColor})`,
-          color: '#ffffff',
-          boxShadow: theme.features?.hasGlowEffects ? `0 0 12px ${theme.primaryColor}40` : '0 2px 4px rgba(0,0,0,0.1)'
-        };
-      } else {
-        // Standard styling for light theme
-        return {
-          ...baseStyles,
-          backgroundColor: theme.primaryColor,
-          color: '#ffffff',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        };
-      }
-    }
-
-    return baseStyles;
-  };
-
-  // Get theme-aware input styles
-  const getInputStyles = () => {
-    return {
-      borderRadius: theme.features?.hasSharpCorners ? '0' : '6px',
-      border: `1px solid ${theme.borderColor}`,
-      backgroundColor: theme.bgTertiary,
-      color: theme.textPrimary,
-      fontFamily: theme.font,
-      outline: 'none',
-      transition: 'border-color 0.2s ease'
-    };
-  };
 
   return (
-    <div style={{ backgroundColor: theme.bgPrimary, minHeight: '100vh', padding: '24px' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+    <div className="flex flex-col flex-1 font-sans p-6 overflow-y-auto"
+         style={{ 
+           backgroundColor: theme.bgPrimary,
+           backgroundImage: theme.features?.hasGradientBackground ? 
+             `linear-gradient(135deg, ${theme.bgPrimary}, ${theme.bgSecondary})` : 'none'
+         }}>
+      <div className="w-full max-w-7xl mx-auto">
         
-        {/* Simple Header */}
-        <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ 
-            fontSize: '28px', 
-            fontWeight: '600', 
+        {/* Modern Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2" style={{ 
             color: theme.textPrimary,
-            margin: '0 0 8px 0',
             fontFamily: theme.font,
             textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
           }}>
             {getThemedText('Settings')}
           </h1>
-          <p style={{ 
-            fontSize: '14px', 
-            color: theme.textSecondary,
-            margin: '0'
-          }}>
-            Manage your account preferences
+          <p className="text-base" style={{ color: theme.textSecondary }}>
+            Manage your account preferences and customize your experience
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '24px' }}>
+        <div className="flex gap-6">
           
-          {/* Simple Sidebar */}
-          <div>
-            <div style={{ 
-              backgroundColor: theme.bgSecondary,
-              borderRadius: getBorderRadius(),
-              padding: '8px',
-              border: `1px solid ${theme.borderColor}`,
-              boxShadow: theme.features?.hasGlowEffects ? `0 0 8px ${theme.primaryColor}20` : '0 2px 4px rgba(0,0,0,0.05)'
-            }}>
+          {/* Modern Sidebar */}
+          <div className="w-64 flex-shrink-0">
+            <div className="p-4 rounded-lg"
+                 style={{
+                   backgroundColor: theme.bgSecondary,
+                   border: `1px solid ${theme.borderColor}`,
+                   borderRadius: theme.radius
+                 }}>
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    activeTab === tab.id ? 'text-white' : 'hover:bg-opacity-10'
+                  }`}
                   style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '12px 16px',
-                    borderRadius: theme.features?.hasSharpCorners ? '0' : '8px',
-                    border: 'none',
                     backgroundColor: activeTab === tab.id ? theme.primaryColor : 'transparent',
                     color: activeTab === tab.id ? '#ffffff' : theme.textPrimary,
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
                     fontFamily: theme.font,
-                    textAlign: 'left',
                     textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none',
-                    boxShadow: activeTab === tab.id && theme.features?.hasGlowEffects ? `0 0 8px ${theme.primaryColor}40` : 'none'
+                    marginBottom: '4px'
                   }}
                 >
-                  <tab.icon style={{ width: '18px', height: '18px' }} />
+                  <tab.icon className="w-5 h-5" />
                   {getThemedText(tab.title)}
                 </button>
               ))}
@@ -178,33 +113,25 @@ const Settings = () => {
           </div>
 
           {/* Main Content */}
-          <div>
-            <div style={{ 
-              backgroundColor: theme.bgSecondary,
-              borderRadius: getBorderRadius(),
-              padding: '32px',
-              border: `1px solid ${theme.borderColor}`,
-              boxShadow: theme.features?.hasGlowEffects ? `0 0 8px ${theme.primaryColor}20` : '0 2px 4px rgba(0,0,0,0.05)'
-            }}>
+          <div className="flex-1">
+            <div className="p-6 rounded-lg"
+                 style={{ 
+                   backgroundColor: theme.bgSecondary,
+                   borderRadius: theme.radius,
+                   border: `1px solid ${theme.borderColor}`
+                 }}>
               
               {/* Theme Settings */}
               {activeTab === "theme" && (
                 <div>
-                  <h2 style={{ 
-                    fontSize: '20px', 
-                    fontWeight: '600', 
+                  <h2 className="text-2xl font-bold mb-2" style={{ 
                     color: theme.textPrimary,
-                    margin: '0 0 8px 0',
                     fontFamily: theme.font,
                     textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
                   }}>
                     {getThemedText('Appearance')}
                   </h2>
-                  <p style={{ 
-                    fontSize: '14px', 
-                    color: theme.textSecondary,
-                    margin: '0 0 24px 0'
-                  }}>
+                  <p className="text-base mb-6" style={{ color: theme.textSecondary }}>
                     Customize your visual experience
                   </p>
                   <ThemeSettings />
@@ -214,62 +141,43 @@ const Settings = () => {
               {/* Profile Settings */}
               {activeTab === "account" && (
                 <div>
-                  <h2 style={{ 
-                    fontSize: '20px', 
-                    fontWeight: '600', 
+                  <h2 className="text-2xl font-bold mb-2" style={{ 
                     color: theme.textPrimary,
-                    margin: '0 0 8px 0',
                     fontFamily: theme.font,
                     textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
                   }}>
                     {getThemedText('Profile')}
                   </h2>
-                  <p style={{ 
-                    fontSize: '14px', 
-                    color: theme.textSecondary,
-                    margin: '0 0 24px 0'
-                  }}>
+                  <p className="text-base mb-6" style={{ color: theme.textSecondary }}>
                     Manage your account information
                   </p>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <div className="flex flex-col gap-6">
                     
                     {/* Profile Info */}
-                    <div style={{ 
-                      backgroundColor: theme.bgTertiary,
-                      borderRadius: theme.features?.hasSharpCorners ? '0' : '8px',
-                      padding: '20px',
-                      border: `1px solid ${theme.borderColor}`
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                        <div style={{ 
-                          width: '48px', 
-                          height: '48px', 
-                          borderRadius: theme.features?.hasSharpCorners ? '0' : '50%', 
-                          backgroundColor: theme.primaryColor + '20',
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center',
-                          border: `2px solid ${theme.primaryColor}`
-                        }}>
-                          <UserIcon style={{ width: '24px', height: '24px', color: theme.primaryColor }} />
+                    <div className="p-5 rounded-lg"
+                         style={{ 
+                           backgroundColor: theme.bgTertiary,
+                           borderRadius: theme.radius,
+                           border: `1px solid ${theme.borderColor}`
+                         }}>
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center"
+                             style={{ 
+                               backgroundColor: theme.primaryColor + '20',
+                               border: `2px solid ${theme.primaryColor}`
+                             }}>
+                          <UserIcon className="w-6 h-6" style={{ color: theme.primaryColor }} />
                         </div>
                         <div>
-                          <h3 style={{ 
-                            fontSize: '16px', 
-                            fontWeight: '600', 
+                          <h3 className="text-lg font-semibold mb-1" style={{ 
                             color: theme.textPrimary,
-                            margin: '0 0 4px 0',
                             fontFamily: theme.font,
                             textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
                           }}>
                             {getThemedText('Sarah Chen')}
                           </h3>
-                          <p style={{ 
-                            fontSize: '13px', 
-                            color: theme.textSecondary,
-                            margin: '0'
-                          }}>
+                          <p className="text-sm" style={{ color: theme.textSecondary }}>
                             Level 28 • 4,850 XP
                           </p>
                         </div>
@@ -277,14 +185,10 @@ const Settings = () => {
                     </div>
 
                     {/* Form Fields */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
-                        <label style={{ 
-                          display: 'block', 
-                          fontSize: '13px', 
-                          fontWeight: '500', 
+                        <label className="block text-sm font-medium mb-2" style={{ 
                           color: theme.textPrimary,
-                          marginBottom: '8px',
                           fontFamily: theme.font,
                           textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
                         }}>
@@ -293,11 +197,13 @@ const Settings = () => {
                         <input 
                           type="text" 
                           defaultValue="PlayerOne"
+                          className="w-full px-4 py-3 text-sm rounded-lg border transition-colors focus:outline-none"
                           style={{ 
-                            width: '100%',
-                            padding: '12px',
-                            fontSize: '14px',
-                            ...getInputStyles()
+                            backgroundColor: theme.bgTertiary,
+                            borderColor: theme.borderColor,
+                            color: theme.textPrimary,
+                            fontFamily: theme.font,
+                            borderRadius: theme.radius
                           }}
                           onFocus={(e) => e.target.style.borderColor = theme.primaryColor}
                           onBlur={(e) => e.target.style.borderColor = theme.borderColor}
@@ -305,12 +211,8 @@ const Settings = () => {
                       </div>
                       
                       <div>
-                        <label style={{ 
-                          display: 'block', 
-                          fontSize: '13px', 
-                          fontWeight: '500', 
+                        <label className="block text-sm font-medium mb-2" style={{ 
                           color: theme.textPrimary,
-                          marginBottom: '8px',
                           fontFamily: theme.font,
                           textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
                         }}>
@@ -319,24 +221,22 @@ const Settings = () => {
                         <input 
                           type="text" 
                           defaultValue="Sarah Chen"
+                          className="w-full px-4 py-3 text-sm rounded-lg border transition-colors focus:outline-none"
                           style={{ 
-                            width: '100%',
-                            padding: '12px',
-                            fontSize: '14px',
-                            ...getInputStyles()
+                            backgroundColor: theme.bgTertiary,
+                            borderColor: theme.borderColor,
+                            color: theme.textPrimary,
+                            fontFamily: theme.font,
+                            borderRadius: theme.radius
                           }}
                           onFocus={(e) => e.target.style.borderColor = theme.primaryColor}
                           onBlur={(e) => e.target.style.borderColor = theme.borderColor}
                         />
                       </div>
 
-                      <div style={{ gridColumn: '1 / -1' }}>
-                        <label style={{ 
-                          display: 'block', 
-                          fontSize: '13px', 
-                          fontWeight: '500', 
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium mb-2" style={{ 
                           color: theme.textPrimary,
-                          marginBottom: '8px',
                           fontFamily: theme.font,
                           textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
                         }}>
@@ -345,11 +245,13 @@ const Settings = () => {
                         <input 
                           type="email" 
                           defaultValue="sarah@example.com"
+                          className="w-full px-4 py-3 text-sm rounded-lg border transition-colors focus:outline-none"
                           style={{ 
-                            width: '100%',
-                            padding: '12px',
-                            fontSize: '14px',
-                            ...getInputStyles()
+                            backgroundColor: theme.bgTertiary,
+                            borderColor: theme.borderColor,
+                            color: theme.textPrimary,
+                            fontFamily: theme.font,
+                            borderRadius: theme.radius
                           }}
                           onFocus={(e) => e.target.style.borderColor = theme.primaryColor}
                           onBlur={(e) => e.target.style.borderColor = theme.borderColor}
@@ -358,18 +260,16 @@ const Settings = () => {
                     </div>
 
                     {/* Save Button */}
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                      <button style={{ 
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '12px 20px',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none',
-                        ...getButtonStyles(true)
-                      }}>
-                        <CheckIcon style={{ width: '16px', height: '16px' }} />
+                    <div className="flex justify-end">
+                      <button className="flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 hover:opacity-90"
+                              style={{ 
+                                backgroundColor: theme.primaryColor,
+                                color: '#ffffff',
+                                fontFamily: theme.font,
+                                textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none',
+                                borderRadius: theme.radius
+                              }}>
+                        <CheckIcon className="w-4 h-4" />
                         {getThemedText('Save Changes')}
                       </button>
                     </div>
@@ -380,25 +280,18 @@ const Settings = () => {
               {/* Notifications */}
               {activeTab === "notifications" && (
                 <div>
-                  <h2 style={{ 
-                    fontSize: '20px', 
-                    fontWeight: '600', 
+                  <h2 className="text-2xl font-bold mb-2" style={{ 
                     color: theme.textPrimary,
-                    margin: '0 0 8px 0',
                     fontFamily: theme.font,
                     textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
                   }}>
                     {getThemedText('Notifications')}
                   </h2>
-                  <p style={{ 
-                    fontSize: '14px', 
-                    color: theme.textSecondary,
-                    margin: '0 0 24px 0'
-                  }}>
+                  <p className="text-base mb-6" style={{ color: theme.textSecondary }}>
                     Configure your notification preferences
                   </p>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div className="flex flex-col gap-3">
                     {[
                       { title: "Task Reminders", description: "Get notified about upcoming deadlines", enabled: true },
                       { title: "Achievement Unlocked", description: "Celebrate when you unlock achievements", enabled: true },
@@ -408,59 +301,39 @@ const Settings = () => {
                     ].map((notification, index) => (
                       <div 
                         key={index}
+                        className="flex items-center justify-between p-4 rounded-lg"
                         style={{ 
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          padding: '16px',
-                          borderRadius: theme.features?.hasSharpCorners ? '0' : '8px',
                           backgroundColor: theme.bgTertiary,
+                          borderRadius: theme.radius,
                           border: `1px solid ${theme.borderColor}`
                         }}
                       >
                         <div>
-                          <h3 style={{ 
-                            fontSize: '14px', 
-                            fontWeight: '500', 
+                          <h3 className="text-sm font-medium mb-1" style={{ 
                             color: theme.textPrimary,
-                            margin: '0 0 4px 0',
                             fontFamily: theme.font,
                             textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
                           }}>
                             {getThemedText(notification.title)}
                           </h3>
-                          <p style={{ 
-                            fontSize: '13px', 
-                            color: theme.textSecondary,
-                            margin: '0'
-                          }}>
+                          <p className="text-xs" style={{ color: theme.textSecondary }}>
                             {notification.description}
                           </p>
                         </div>
-                        <label style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}>
+                        <label className="relative inline-flex items-center cursor-pointer">
                           <input 
                             type="checkbox" 
                             defaultChecked={notification.enabled}
-                            style={{ display: 'none' }}
+                            className="sr-only"
                           />
-                          <div style={{ 
-                            width: '44px',
-                            height: '24px',
-                            backgroundColor: notification.enabled ? theme.primaryColor : theme.borderColor,
-                            borderRadius: theme.features?.hasSharpCorners ? '0' : '12px',
-                            position: 'relative',
-                            transition: 'background-color 0.2s ease'
-                          }}>
-                            <div style={{ 
-                              width: '20px',
-                              height: '20px',
-                              backgroundColor: '#ffffff',
-                              borderRadius: theme.features?.hasSharpCorners ? '0' : '50%',
-                              position: 'absolute',
-                              top: '2px',
-                              left: notification.enabled ? '22px' : '2px',
-                              transition: 'left 0.2s ease'
-                            }} />
+                          <div className="w-11 h-6 rounded-full relative transition-colors"
+                               style={{ 
+                                 backgroundColor: notification.enabled ? theme.primaryColor : theme.borderColor
+                               }}>
+                            <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all duration-200"
+                                 style={{ 
+                                   left: notification.enabled ? '1.25rem' : '0.125rem'
+                                 }} />
                           </div>
                         </label>
                       </div>
@@ -472,70 +345,58 @@ const Settings = () => {
               {/* Security */}
               {activeTab === "security" && (
                 <div>
-                  <h2 style={{ 
-                    fontSize: '20px', 
-                    fontWeight: '600', 
+                  <h2 className="text-2xl font-bold mb-2" style={{ 
                     color: theme.textPrimary,
-                    margin: '0 0 8px 0',
                     fontFamily: theme.font,
                     textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
                   }}>
                     {getThemedText('Security')}
                   </h2>
-                  <p style={{ 
-                    fontSize: '14px', 
-                    color: theme.textSecondary,
-                    margin: '0 0 24px 0'
-                  }}>
+                  <p className="text-base mb-6" style={{ color: theme.textSecondary }}>
                     Manage your password and account security
                   </p>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <div className="flex flex-col gap-6">
                     
                     {/* Change Password */}
-                    <div style={{ 
-                      backgroundColor: theme.bgTertiary,
-                      borderRadius: theme.features?.hasSharpCorners ? '0' : '8px',
-                      padding: '20px',
-                      border: `1px solid ${theme.borderColor}`
-                    }}>
-                      <h3 style={{ 
-                        fontSize: '16px', 
-                        fontWeight: '600', 
+                    <div className="p-5 rounded-lg"
+                         style={{ 
+                           backgroundColor: theme.bgTertiary,
+                           borderRadius: theme.radius,
+                           border: `1px solid ${theme.borderColor}`
+                         }}>
+                      <h3 className="text-lg font-semibold mb-4" style={{ 
                         color: theme.textPrimary,
-                        margin: '0 0 16px 0',
                         fontFamily: theme.font,
                         textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
                       }}>
                         {getThemedText('Change Password')}
                       </h3>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <div className="flex flex-col gap-4">
                         {[
                           { key: 'current', label: 'Current Password', placeholder: 'Enter current password' },
                           { key: 'new', label: 'New Password', placeholder: 'Enter new password' },
                           { key: 'confirm', label: 'Confirm Password', placeholder: 'Confirm new password' }
                         ].map((field) => (
                           <div key={field.key}>
-                            <label style={{ 
-                              display: 'block', 
-                              fontSize: '13px', 
-                              fontWeight: '500', 
+                            <label className="block text-sm font-medium mb-2" style={{ 
                               color: theme.textPrimary,
-                              marginBottom: '8px',
                               fontFamily: theme.font,
                               textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
                             }}>
                               {getThemedText(field.label)}
                             </label>
-                            <div style={{ position: 'relative' }}>
+                            <div className="relative">
                               <input 
                                 type={showPassword[field.key] ? "text" : "password"}
                                 placeholder={field.placeholder}
+                                className="w-full px-4 py-3 pr-12 text-sm rounded-lg border transition-colors focus:outline-none"
                                 style={{ 
-                                  width: '100%',
-                                  padding: '12px 40px 12px 12px',
-                                  fontSize: '14px',
-                                  ...getInputStyles()
+                                  backgroundColor: theme.bgSecondary,
+                                  borderColor: theme.borderColor,
+                                  color: theme.textPrimary,
+                                  fontFamily: theme.font,
+                                  borderRadius: theme.radius
                                 }}
                                 onFocus={(e) => e.target.style.borderColor = theme.primaryColor}
                                 onBlur={(e) => e.target.style.borderColor = theme.borderColor}
@@ -543,90 +404,66 @@ const Settings = () => {
                               <button
                                 type="button"
                                 onClick={() => togglePasswordVisibility(field.key)}
-                                style={{ 
-                                  position: 'absolute',
-                                  right: '12px',
-                                  top: '50%',
-                                  transform: 'translateY(-50%)',
-                                  border: 'none',
-                                  background: 'none',
-                                  cursor: 'pointer',
-                                  padding: '0'
-                                }}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-opacity-10 rounded"
+                                style={{ color: theme.textSecondary }}
                               >
                                 {showPassword[field.key] ? (
-                                  <EyeOffIcon style={{ width: '18px', height: '18px', color: theme.textSecondary }} />
+                                  <EyeOffIcon className="w-5 h-5" />
                                 ) : (
-                                  <EyeIcon style={{ width: '18px', height: '18px', color: theme.textSecondary }} />
+                                  <EyeIcon className="w-5 h-5" />
                                 )}
                               </button>
                             </div>
                           </div>
                         ))}
-                        <button style={{ 
-                          padding: '12px 20px',
-                          fontSize: '14px',
-                          fontWeight: '500',
-                          alignSelf: 'flex-start',
-                          textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none',
-                          ...getButtonStyles(true)
-                        }}>
+                        <button className="px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 hover:opacity-90 self-start"
+                                style={{ 
+                                  backgroundColor: theme.primaryColor,
+                                  color: '#ffffff',
+                                  fontFamily: theme.font,
+                                  textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none',
+                                  borderRadius: theme.radius
+                                }}>
                           {getThemedText('Update Password')}
                         </button>
                       </div>
                     </div>
 
                     {/* Danger Zone */}
-                    <div style={{ 
-                      backgroundColor: '#fef2f2',
-                      borderRadius: theme.features?.hasSharpCorners ? '0' : '8px',
-                      padding: '20px',
-                      border: '2px dashed #fca5a5'
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                        <ExclamationIcon style={{ width: '20px', height: '20px', color: '#ef4444', flexShrink: 0, marginTop: '2px' }} />
+                    <div className="p-5 rounded-lg border-2 border-dashed"
+                         style={{ 
+                           backgroundColor: '#fef2f2',
+                           borderRadius: theme.radius,
+                           borderColor: '#fca5a5'
+                         }}>
+                      <div className="flex items-start gap-3">
+                        <ExclamationIcon className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                         <div>
-                          <h3 style={{ 
-                            fontSize: '16px', 
-                            fontWeight: '600', 
-                            color: '#991b1b',
-                            margin: '0 0 8px 0',
+                          <h3 className="text-lg font-semibold mb-2 text-red-800" style={{ 
                             textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
                           }}>
                             {getThemedText('Danger Zone')}
                           </h3>
-                          <p style={{ 
-                            fontSize: '13px', 
-                            color: '#b91c1c',
-                            margin: '0 0 16px 0'
-                          }}>
+                          <p className="text-sm text-red-700 mb-4">
                             These actions cannot be undone. Please proceed with caution.
                           </p>
-                          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                            <button style={{ 
-                              padding: '10px 16px',
-                              borderRadius: theme.features?.hasSharpCorners ? '0' : '6px',
-                              border: 'none',
-                              backgroundColor: '#dc2626',
-                              color: '#ffffff',
-                              fontSize: '13px',
-                              fontWeight: '500',
-                              cursor: 'pointer',
-                              textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
-                            }}>
+                          <div className="flex gap-3 flex-wrap">
+                            <button className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:opacity-90"
+                                    style={{ 
+                                      backgroundColor: '#dc2626',
+                                      color: '#ffffff',
+                                      textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none',
+                                      borderRadius: theme.radius
+                                    }}>
                               {getThemedText('Log Out All Devices')}
                             </button>
-                            <button style={{ 
-                              padding: '10px 16px',
-                              borderRadius: theme.features?.hasSharpCorners ? '0' : '6px',
-                              border: 'none',
-                              backgroundColor: '#dc2626',
-                              color: '#ffffff',
-                              fontSize: '13px',
-                              fontWeight: '500',
-                              cursor: 'pointer',
-                              textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none'
-                            }}>
+                            <button className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:opacity-90"
+                                    style={{ 
+                                      backgroundColor: '#dc2626',
+                                      color: '#ffffff',
+                                      textTransform: theme.features?.useUppercaseText ? 'uppercase' : 'none',
+                                      borderRadius: theme.radius
+                                    }}>
                               {getThemedText('Delete Account')}
                             </button>
                           </div>

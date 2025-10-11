@@ -1,6 +1,6 @@
 // src/components/MainContent.jsx
 import React, { useState } from "react";
-import { PlusIcon, SearchIcon, ChevronRightIcon } from "@heroicons/react/outline";
+import { PlusIcon, SearchIcon, ChevronRightIcon, CheckIcon } from "@heroicons/react/outline";
 import HabitItem from "./habits/HabitItem";
 import TaskItem from "./tasks/TaskItem";
 import ProjectItem from "./projects/ProjectItem";
@@ -187,6 +187,387 @@ const Section = ({
   );
   };
 
+const ProfileSection = () => {
+  const { theme: currentTheme } = useThemeStyles();
+  
+  if (!currentTheme) {
+    return <div>Loading...</div>;
+  }
+
+  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
+  
+  // Profile data
+  const profile = {
+    username: "ma1iik",
+    handle: "@ma1iik",
+    level: 12,
+    class: "Warrior",
+    xp: 2850,
+    maxXP: 5000,
+    health: 8,
+    maxHealth: 50,
+    streak: 7,
+    tasksToday: 6,
+    totalTasksToday: 10,
+    coinsEarned: 80,
+    xpGained: 150
+  };
+
+  const hasCheckedIn = true;
+
+  return (
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Unique Profile Header - Stands out from task cards */}
+      <div className="p-5 border-b" style={{
+        background: `linear-gradient(135deg, ${currentTheme.primaryColor}08, ${currentTheme.secondaryColor}08)`,
+        borderColor: currentTheme.borderColor,
+        borderTopLeftRadius: currentTheme.radius,
+        borderTopRightRadius: currentTheme.radius,
+      }}>
+        <div className="flex items-center justify-between">
+          {/* User Info */}
+          <div>
+            <h3 className="text-base font-bold" style={{ 
+              color: currentTheme.textPrimary,
+              fontFamily: currentTheme.font,
+              lineHeight: '1.2'
+            }}>
+              {profile.username}
+            </h3>
+            <p className="text-xs" style={{ 
+              color: currentTheme.textSecondary,
+              fontFamily: currentTheme.font,
+              marginTop: '2px'
+            }}>
+              {profile.handle} • Level {profile.level} {profile.class}
+            </p>
+          </div>
+
+          {/* Streak Badge - Just number x fire emoji */}
+          <div 
+            className="flex items-center gap-1 px-2.5 py-1.5"
+            style={{
+              background: `linear-gradient(135deg, #f59e0b15, #f59e0b10)`,
+              borderRadius: currentTheme.radius,
+              border: `1px solid #f59e0b30`
+            }}
+          >
+            <span className="text-sm font-bold" style={{ 
+              color: '#f59e0b',
+              fontFamily: currentTheme.font
+            }}>
+              {profile.streak}
+            </span>
+            <span className="text-base">🔥</span>
+          </div>
+        </div>
+      </div>
+      
+      {/* Content */}
+      <div className="flex-1 flex flex-col overflow-hidden" style={{
+        backgroundColor: currentTheme.bgPrimary,
+        borderBottomLeftRadius: currentTheme.radius,
+        borderBottomRightRadius: currentTheme.radius,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+        borderLeft: `1px solid ${currentTheme.borderColor}`,
+        borderRight: `1px solid ${currentTheme.borderColor}`,
+        borderBottom: `1px solid ${currentTheme.borderColor}`
+      }}>
+        <div className="p-4 space-y-3 overflow-y-auto">
+          
+          {/* Character Image - Right under header */}
+          <div className="w-full" style={{ height: '210px' }}>
+            <div 
+              className="w-full h-full flex items-center justify-center"
+              style={{
+                background: `linear-gradient(135deg, ${currentTheme.primaryColor}10, ${currentTheme.secondaryColor}10)`,
+                borderRadius: currentTheme.radius,
+                border: `1px solid ${currentTheme.borderColor}`
+              }}
+            >
+              <div className="text-center">
+                <div className="text-5xl mb-2">🎮</div>
+                <div 
+                  className="text-xs font-medium"
+                  style={{ 
+                    color: currentTheme.textSecondary,
+                    fontFamily: currentTheme.font
+                  }}
+                >
+                  Character Image
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Health Bar */}
+          <div>
+            <div className="flex justify-between text-sm mb-1">
+              <span 
+                className="flex items-center gap-1.5"
+                style={{ 
+                  color: currentTheme.textPrimary,
+                  fontFamily: currentTheme.font
+                }}
+              >
+                <span>❤️</span>
+                Health
+              </span>
+              <span 
+                style={{ 
+                  color: currentTheme.textSecondary,
+                  fontFamily: currentTheme.font
+                }}
+              >
+                {profile.health}/{profile.maxHealth}
+              </span>
+            </div>
+            <div 
+              className="h-4 overflow-hidden"
+              style={{
+                backgroundColor: currentTheme.bgTertiary,
+                borderRadius: currentTheme.radius,
+                border: `1px solid ${currentTheme.borderColor}`
+              }}
+            >
+              <div
+                className="h-full transition-all duration-500"
+                style={{ 
+                  background: currentTheme.id === 'cyberpunk' ? 
+                    'linear-gradient(90deg, #ff0040, #cc0033)' :
+                    currentTheme.id === 'neon' ? 
+                    'linear-gradient(90deg, #ff0080, #ff0066)' :
+                    'linear-gradient(90deg, #E74C3C, #C0392B)',
+                  width: `${(profile.health / profile.maxHealth) * 100}%`,
+                  boxShadow: currentTheme.features?.hasGlowEffects ? 
+                    `0 0 6px ${currentTheme.id === 'cyberpunk' ? '#ff0040' : 
+                     currentTheme.id === 'neon' ? '#ff0080' : '#E74C3C'}60` : 
+                    'none'
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Experience Bar */}
+          <div>
+            <div className="flex justify-between text-sm mb-1">
+              <span 
+                className="flex items-center gap-1.5"
+                style={{ 
+                  color: currentTheme.textPrimary,
+                  fontFamily: currentTheme.font
+                }}
+              >
+                <span>⭐</span>
+                Experience
+              </span>
+              <span 
+                style={{ 
+                  color: currentTheme.textSecondary,
+                  fontFamily: currentTheme.font
+                }}
+              >
+                {profile.xp}/{profile.maxXP} XP
+              </span>
+            </div>
+            <div 
+              className="h-4 overflow-hidden"
+              style={{
+                backgroundColor: currentTheme.bgTertiary,
+                borderRadius: currentTheme.radius,
+                border: `1px solid ${currentTheme.borderColor}`
+              }}
+            >
+              <div
+                className="h-full transition-all duration-500"
+                style={{ 
+                  background: `linear-gradient(to right, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
+                  width: `${(profile.xp / profile.maxXP) * 100}%`,
+                  boxShadow: currentTheme.features?.hasGlowEffects ? `0 0 6px ${currentTheme.primaryColor}60` : 'none'
+                }}
+              />
+            </div>
+          </div>
+          
+          {/* Daily Check-in - Dopamine Trigger */}
+          <button
+            className="w-full px-4 py-3 transition-all duration-200"
+            style={{
+              background: hasCheckedIn ? 
+                `linear-gradient(135deg, ${currentTheme.bgTertiary}, ${currentTheme.bgSecondary})` :
+                `linear-gradient(135deg, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
+              borderRadius: currentTheme.radius,
+              border: hasCheckedIn ? `1px solid ${currentTheme.borderColor}` : 'none',
+              boxShadow: hasCheckedIn ? 
+                '0 1px 2px rgba(0,0,0,0.05)' :
+                currentTheme.features?.hasGlowEffects ? 
+                  `0 0 16px ${currentTheme.primaryColor}40` : 
+                  '0 2px 8px rgba(0,0,0,0.15)',
+              cursor: hasCheckedIn ? 'default' : 'pointer'
+            }}
+          >
+            <div className="flex items-center justify-center gap-2">
+              {hasCheckedIn ? (
+                <>
+                  <div 
+                    className="w-5 h-5 flex items-center justify-center rounded-full"
+                    style={{
+                      backgroundColor: '#10b981',
+                      color: '#ffffff'
+                    }}
+                  >
+                    <CheckIcon className="w-3.5 h-3.5" />
+                  </div>
+                  <span 
+                    className="text-sm font-semibold"
+                    style={{ 
+                      color: currentTheme.textPrimary,
+                      fontFamily: currentTheme.font
+                    }}
+                  >
+                    {isNeonTheme ? 'CHECKED IN TODAY!' : 'Checked in today!'}
+                  </span>
+                </>
+              ) : (
+                <span 
+                  className="text-sm font-semibold"
+                  style={{ 
+                    color: '#ffffff',
+                    fontFamily: currentTheme.font
+                  }}
+                >
+                  {isNeonTheme ? 'DAILY CHECK-IN' : 'Daily Check-in'}
+                </span>
+              )}
+            </div>
+          </button>
+
+          {/* Today's Progress - Like the image */}
+          <div 
+            className="p-4"
+            style={{
+              backgroundColor: currentTheme.bgTertiary,
+              borderRadius: currentTheme.radius,
+              border: `1px solid ${currentTheme.borderColor}`
+            }}
+          >
+            {/* Header */}
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-lg">📊</span>
+              <h4 className="text-sm font-bold" style={{ 
+                color: currentTheme.primaryColor,
+                fontFamily: currentTheme.font
+              }}>
+                Today's Progress
+              </h4>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-3 gap-2">
+              {/* Tasks */}
+              <div 
+                className="p-2.5 rounded-lg"
+                style={{
+                  backgroundColor: currentTheme.bgSecondary,
+                  border: `1px solid ${currentTheme.borderColor}`
+                }}
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <div 
+                    className="w-5 h-5 rounded flex items-center justify-center"
+                    style={{
+                      backgroundColor: '#10b98120'
+                    }}
+                  >
+                    <span className="text-xs">✓</span>
+                  </div>
+                  <span className="text-xs font-medium" style={{ 
+                    color: currentTheme.textSecondary,
+                    fontFamily: currentTheme.font
+                  }}>
+                    Tasks
+                  </span>
+                </div>
+                <div className="text-base font-bold" style={{ 
+                  color: currentTheme.textPrimary,
+                  fontFamily: currentTheme.font
+                }}>
+                  {profile.tasksToday}/{profile.totalTasksToday}
+                </div>
+              </div>
+
+              {/* Coins Earned */}
+              <div 
+                className="p-2.5 rounded-lg"
+                style={{
+                  backgroundColor: currentTheme.bgSecondary,
+                  border: `1px solid ${currentTheme.borderColor}`
+                }}
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <div 
+                    className="w-5 h-5 rounded flex items-center justify-center"
+                    style={{
+                      backgroundColor: '#f59e0b20'
+                    }}
+                  >
+                    <span className="text-xs">🪙</span>
+                  </div>
+                  <span className="text-xs font-medium" style={{ 
+                    color: currentTheme.textSecondary,
+                    fontFamily: currentTheme.font
+                  }}>
+                    Earned
+                  </span>
+                </div>
+                <div className="text-base font-bold" style={{ 
+                  color: currentTheme.textPrimary,
+                  fontFamily: currentTheme.font
+                }}>
+                  {profile.coinsEarned}
+                </div>
+              </div>
+
+              {/* XP Gained */}
+              <div 
+                className="p-2.5 rounded-lg"
+                style={{
+                  backgroundColor: currentTheme.bgSecondary,
+                  border: `1px solid ${currentTheme.borderColor}`
+                }}
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <div 
+                    className="w-5 h-5 rounded flex items-center justify-center"
+                    style={{
+                      backgroundColor: `${currentTheme.primaryColor}20`
+                    }}
+                  >
+                    <span className="text-xs">⭐</span>
+                  </div>
+                  <span className="text-xs font-medium" style={{ 
+                    color: currentTheme.textSecondary,
+                    fontFamily: currentTheme.font
+                  }}>
+                    XP
+                  </span>
+                </div>
+                <div className="text-base font-bold" style={{ 
+                  color: currentTheme.textPrimary,
+                  fontFamily: currentTheme.font
+                }}>
+                  +{profile.xpGained}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const MainContent = ({
   setShowAddModal,
   searchQuery,
@@ -197,8 +578,6 @@ const MainContent = ({
   setHabits,
   setTasks,
   setProjects,
-  isCollapsed,
-  toggleCollapse,
   setEditingItem,
   setSelectedProject
 }) => {
@@ -361,21 +740,6 @@ const MainContent = ({
       <div className="z-10 px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            {isCollapsed && (
-              <button
-                onClick={toggleCollapse}
-                className="mr-4 p-2 rounded transition-colors"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: currentTheme.textSecondary,
-                  border: `1px solid ${currentTheme.borderColor}`,
-                  borderRadius: currentTheme.radius,
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                }}
-              >
-                <ChevronRightIcon className="w-5 h-5" />
-              </button>
-            )}
           </div>
 
           <div className="flex justify-center flex-1">
@@ -432,8 +796,11 @@ const MainContent = ({
       </div>
 
       <div className="flex-1 overflow-hidden pt-4 pb-6 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full">
-          <Section
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
+          <ProfileSection />
+
+          <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Section
             title="Habits"
             icon={habitIcon}
             count={filteredHabits.length}
@@ -521,6 +888,7 @@ const MainContent = ({
             onDragEnd={handleItemDragEnd}
             itemType="project"
           />
+          </div>
         </div>
       </div>
     </div>

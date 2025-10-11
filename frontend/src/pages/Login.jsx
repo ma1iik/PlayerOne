@@ -7,10 +7,12 @@ import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const { theme, styles } = useThemeStyles();
-  const { login, loading, error } = useAuth();
+  const { login, loading, error, resendConfirmation } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -26,6 +28,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setResendMessage("");
     
     try {
       await login(formData.email, formData.password, false);
@@ -35,6 +38,25 @@ const Login = () => {
       // Error is handled by AuthContext
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!formData.email) {
+      setResendMessage("Please enter your email address first.");
+      return;
+    }
+
+    setIsResending(true);
+    setResendMessage("");
+    
+    try {
+      await resendConfirmation(formData.email);
+      setResendMessage("Confirmation email sent! Please check your inbox and spam folder.");
+    } catch (err) {
+      setResendMessage("Failed to send confirmation email. Please try again.");
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -95,7 +117,37 @@ const Login = () => {
                 border: '1px solid #fecaca'
               }}
             >
-              {error}
+              <div className="mb-2">{error}</div>
+              {error.includes('confirmation link') && (
+                <button
+                  type="button"
+                  onClick={handleResendConfirmation}
+                  disabled={isResending}
+                  className="mt-2 px-3 py-1 text-xs rounded transition-colors"
+                  style={{
+                    backgroundColor: '#dc2626',
+                    color: 'white',
+                    opacity: isResending ? 0.6 : 1,
+                    cursor: isResending ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {isResending ? 'Sending...' : 'Resend Confirmation Email'}
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Resend Message Display */}
+          {resendMessage && (
+            <div 
+              className="mb-4 p-3 rounded-lg text-sm"
+              style={{ 
+                backgroundColor: resendMessage.includes('sent') ? '#d1fae5' : '#fee2e2',
+                color: resendMessage.includes('sent') ? '#059669' : '#dc2626',
+                border: resendMessage.includes('sent') ? '1px solid #a7f3d0' : '1px solid #fecaca'
+              }}
+            >
+              {resendMessage}
             </div>
           )}
 

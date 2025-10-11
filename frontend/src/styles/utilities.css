@@ -221,3 +221,89 @@
 	  transform: translateY(-5px);
 	}
   }
+
+  /* Pixel theme animations */
+  @keyframes pixel-glow {
+    0%, 100% { 
+      box-shadow: 0 0 5px var(--primaryColor), inset 0 0 5px var(--primaryColor);
+    }
+    50% { 
+      box-shadow: 0 0 20px var(--primaryColor), inset 0 0 10px var(--primaryColor);
+    }
+  }
+
+  @keyframes pixel-scan {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes pixel-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+  }
+
+  .pixel-glow {
+    animation: pixel-glow 2s infinite alternate;
+  }
+
+  .pixel-scan {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pixel-scan::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, var(--primaryColor)30, transparent);
+    animation: pixel-scan 3s infinite;
+  }
+
+  .pixel-flicker {
+    animation: pixel-flicker 0.1s infinite alternate;
+  }
+
+  /* Gothic theme animations */
+  @keyframes gothic-glow {
+    0%, 100% { 
+      box-shadow: 0 0 10px rgba(139, 21, 56, 0.3), inset 0 1px 0 rgba(139, 21, 56, 0.2);
+    }
+    50% { 
+      box-shadow: 0 0 20px rgba(139, 21, 56, 0.5), inset 0 1px 0 rgba(139, 21, 56, 0.4);
+    }
+  }
+
+  @keyframes blood-drip {
+    0% { 
+      transform: translateY(-2px);
+      opacity: 0.8;
+    }
+    100% { 
+      transform: translateY(2px);
+      opacity: 1;
+    }
+  }
+
+  @keyframes shadow-flicker {
+    0%, 100% { 
+      text-shadow: 0 0 5px rgba(139, 21, 56, 0.5);
+    }
+    50% { 
+      text-shadow: 0 0 15px rgba(139, 21, 56, 0.8), 0 0 25px rgba(139, 21, 56, 0.3);
+    }
+  }
+
+  .gothic-glow {
+    animation: gothic-glow 3s infinite alternate;
+  }
+
+  .blood-drip {
+    animation: blood-drip 2s infinite alternate;
+  }
+
+  .shadow-flicker {
+    animation: shadow-flicker 4s infinite alternate;
+  }

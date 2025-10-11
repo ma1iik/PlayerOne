@@ -3,9 +3,6 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   SearchIcon, 
-  FilterIcon, 
-  ViewGridIcon, 
-  ViewListIcon,
   CogIcon,
   UserIcon,
   ShieldCheckIcon,
@@ -13,13 +10,11 @@ import {
   SparklesIcon
 } from "@heroicons/react/outline";
 import ItemDetail from "../components/inventory/ItemDetail";
-import ItemList from "../components/shared/ItemList";
 import { useThemeStyles } from "../context/ThemeProvider";
 import { sampleInventoryItems } from "../data/inventoryData";
 import { 
   filterItems, 
-  sortItems,
-  filterOptions
+  sortItems
 } from "../utils/itemUtils";
 
 const ShieldIcon = ({ className }) => (
@@ -621,36 +616,6 @@ const CharacterStats = () => {
   );
 };
 
-const FilterButton = ({ active, onClick, children }) => {
-  const { theme: currentTheme } = useThemeStyles();
-  
-  // Add null checks to prevent React Error #31
-  if (!currentTheme) {
-    return <div>Loading...</div>;
-  }
-  
-  const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
-  const isCyberpunk = currentTheme.id === 'cyberpunk';
-  
-  return (
-    <button
-      onClick={onClick}
-      className="px-3 py-1.5 text-sm font-medium transition-colors"
-      style={{
-        backgroundColor: active 
-          ? (isNeonTheme || isCyberpunk ? 'rgba(255, 255, 255, 0.1)' : `${currentTheme.primaryColor}15`) 
-          : (isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.bgTertiary),
-        color: active ? currentTheme.primaryColor : currentTheme.textSecondary,
-        borderRadius: currentTheme.radius,
-        border: isNeonTheme || isCyberpunk 
-          ? `1px solid ${active ? currentTheme.primaryColor : currentTheme.borderColor}` 
-          : 'none'
-      }}
-    >
-      {isNeonTheme ? children.toUpperCase() : children}
-    </button>
-  );
-};
 
 const Inventory = () => {
   const { theme: currentTheme } = useThemeStyles();
@@ -667,10 +632,8 @@ const Inventory = () => {
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState("grid");
   const [activeFilter, setActiveFilter] = useState("");
   const [showStats, setShowStats] = useState(true);
-  const [showFilters, setShowFilters] = useState(false);
   const [activeFilters, setActiveFilters] = useState({
     type: "",
     rarity: "",
@@ -805,16 +768,6 @@ const Inventory = () => {
     }
   };
 
-  // Reset filters
-  const resetFilters = () => {
-    setActiveFilters({
-      type: "",
-      rarity: "",
-      showEquipped: false
-    });
-    setActiveFilter("");
-    setSearchQuery("");
-  };
 
   // Apply filters and sorting
   const filteredItems = sortItems(
@@ -860,57 +813,6 @@ const Inventory = () => {
                 />
               </div>
               
-              {/* View toggle and filters */}
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex border rounded"
-                     style={{ 
-                       backgroundColor: currentTheme.bgTertiary,
-                       borderColor: currentTheme.borderColor,
-                       borderRadius: currentTheme.radius
-                     }}>
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    className="p-2 transition-colors"
-                    style={{ 
-                      backgroundColor: viewMode === "grid" ? currentTheme.primaryColor : 'transparent',
-                      color: viewMode === "grid" ? '#ffffff' : currentTheme.textSecondary,
-                      borderTopLeftRadius: currentTheme.radius,
-                      borderBottomLeftRadius: currentTheme.radius
-                    }}
-                    title="Grid View"
-                  >
-                    <ViewGridIcon className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("list")}
-                    className="p-2 transition-colors"
-                    style={{ 
-                      backgroundColor: viewMode === "list" ? currentTheme.primaryColor : 'transparent',
-                      color: viewMode === "list" ? '#ffffff' : currentTheme.textSecondary,
-                      borderTopRightRadius: currentTheme.radius,
-                      borderBottomRightRadius: currentTheme.radius
-                    }}
-                    title="List View"
-                  >
-                    <ViewListIcon className="h-5 w-5" />
-                  </button>
-                </div>
-                
-                {/* Filter toggle button */}
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded transition-colors ${isNeonTheme ? 'sl-glow-text' : ''}`}
-                  style={{ 
-                    backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : 
-                      showFilters ? currentTheme.primaryColor : `${currentTheme.primaryColor}20`,
-                    color: showFilters ? (isNeonTheme || isCyberpunk ? currentTheme.primaryColor : '#ffffff') : currentTheme.primaryColor,
-                    borderRadius: currentTheme.radius,
-                    border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.primaryColor}` : 'none'
-                  }}
-                >
-                  <FilterIcon className="w-4 h-4" />
-                  {isNeonTheme ? 'FILTER' : 'Filter'}
-                </button>
                 
                 {/* Character stats toggle on mobile */}
                 <button
@@ -929,7 +831,6 @@ const Inventory = () => {
             </div>
           </div>
         </div>
-      </div>
 
       {/* Main content area - Fixed height and internal scrolling */}
       <div className="flex-1 min-h-0 px-4 md:px-6 pb-4 md:pb-6">
@@ -970,7 +871,7 @@ const Inventory = () => {
                  }}>
               
               {/* Filters panel - positioned over inventory only */}
-              {showFilters && (
+              {false && (
                 <div className="absolute top-0 left-0 right-0 z-10 p-4 m-4"
                      style={{ 
                        backgroundColor: currentTheme.bgSecondary,
@@ -1047,26 +948,13 @@ const Inventory = () => {
                 {filteredItems.length > 0 ? (
                   <div>
                     {/* Grid View - Sectioned */}
-                    {viewMode === "grid" && (
-                      <SectionedInventoryGrid 
-                        filteredItems={filteredItems}
-                        setSelectedItem={setSelectedItem}
-                        toggleEquip={toggleEquip}
-                        currentTheme={currentTheme}
-                        isNeonTheme={isNeonTheme}
-                      />
-                    )}
-
-                    {/* List View */}
-                    {viewMode === "list" && (
-                      <ItemList 
-                        items={filteredItems}
-                        viewMode={viewMode}
-                        onSelectItem={setSelectedItem}
-                        toggleEquip={toggleEquip}
-                        mode="inventory"
-                      />
-                    )}
+                    <SectionedInventoryGrid 
+                      filteredItems={filteredItems}
+                      setSelectedItem={setSelectedItem}
+                      toggleEquip={toggleEquip}
+                      currentTheme={currentTheme}
+                      isNeonTheme={isNeonTheme}
+                    />
                   </div>
                 ) : (
                   // Empty state
@@ -1088,18 +976,6 @@ const Inventory = () => {
                         ? 'TRY ADJUSTING YOUR SEARCH OR FILTERS'
                         : 'Try adjusting your search or filters to find what you\'re looking for'}
                     </p>
-                    <button
-                      onClick={resetFilters}
-                      className="mt-4 px-4 py-2 text-sm font-medium"
-                      style={{ 
-                        backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : currentTheme.primaryColor,
-                        color: isNeonTheme || isCyberpunk ? currentTheme.primaryColor : '#ffffff',
-                        border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.primaryColor}` : 'none',
-                        borderRadius: currentTheme.radius
-                      }}
-                    >
-                      {isNeonTheme ? 'RESET FILTERS' : 'Reset Filters'}
-                    </button>
                   </div>
                 )}
               </div>

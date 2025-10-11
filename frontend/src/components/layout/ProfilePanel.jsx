@@ -1,3 +1,4 @@
+/*
 import React, { useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon, CheckIcon } from "@heroicons/react/outline";
 import { useThemeStyles } from "../../context/ThemeProvider";
@@ -484,3 +485,4 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
 };
 
 export default ProfilePanel;
+*/
