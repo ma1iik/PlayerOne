@@ -2,6 +2,8 @@ import React from "react";
 import { motion } from "framer-motion";
 import { PlusIcon, ShoppingCartIcon, EyeIcon } from "@heroicons/react/outline";
 import { useThemeStyles } from "../../context/ThemeProvider";
+import CoinIcon from '../common/CoinIcon';
+import GemIcon from '../common/GemIcon';
 
 const ItemList = ({ 
   items, 
@@ -137,9 +139,11 @@ const ItemList = ({
           <div className="col-span-1 text-center">
             {mode === 'shop' ? (
               <div className="flex items-center justify-center gap-1">
-                <span className="text-sm">
-                  {item.currency === 'gems' ? '💎' : '🪙'}
-                </span>
+                {item.currency === 'gems' ? (
+                  <GemIcon size="w-4 h-4" />
+                ) : (
+                  <CoinIcon size="w-4 h-4" />
+                )}
                 <span className="font-medium" style={{ color: currentTheme.textPrimary }}>
                   {item.price}
                 </span>

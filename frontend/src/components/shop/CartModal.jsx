@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { XIcon, CurrencyDollarIcon, ShoppingCartIcon } from "@heroicons/react/outline";
 import { useThemeStyles } from "../../context/ThemeProvider";
 import CartItem from "./CartItem";
+import CoinIcon from '../common/CoinIcon';
+import GemIcon from '../common/GemIcon';
 
 const CartModal = ({ showCart, setShowCart, cart, updateCartQuantity, removeFromCart, getCartTotal }) => {
   const { theme: currentTheme } = useThemeStyles();
@@ -131,9 +133,7 @@ const CartModal = ({ showCart, setShowCart, cart, updateCartQuantity, removeFrom
                     {isNeonTheme ? 'SUBTOTAL:' : isCyberpunk ? 'SUBTOTAL:' : 'Subtotal:'}
                   </span>
                   <div className="flex items-center gap-1">
-                    <span role="img" aria-label="Currency" className="text-sm">
-                      🪙
-                    </span>
+                    <CoinIcon size="w-4 h-4" />
                     <span className="font-semibold" style={{ color: currentTheme.textPrimary }}>
                       {getCartTotal()}
                     </span>
@@ -145,9 +145,7 @@ const CartModal = ({ showCart, setShowCart, cart, updateCartQuantity, removeFrom
                     {isNeonTheme ? 'TAX:' : isCyberpunk ? 'TAX:' : 'Tax:'}
                   </span>
                   <div className="flex items-center gap-1">
-                    <span role="img" aria-label="Currency" className="text-sm">
-                      🪙
-                    </span>
+                    <CoinIcon size="w-4 h-4" />
                     <span className="font-semibold" style={{ color: currentTheme.textPrimary }}>
                       {Math.round(getCartTotal() * 0.1)}
                     </span>
@@ -159,9 +157,7 @@ const CartModal = ({ showCart, setShowCart, cart, updateCartQuantity, removeFrom
                     {isNeonTheme ? 'TOTAL:' : isCyberpunk ? 'TOTAL:' : 'Total:'}
                   </span>
                   <div className="flex items-center gap-1">
-                    <span role="img" aria-label="Currency" className="text-xl">
-                      🪙
-                    </span>
+                    <CoinIcon size="w-6 h-6" />
                     <span className="text-xl font-bold" style={{ color: currentTheme.textPrimary }}>
                       {Math.round(getCartTotal() * 1.1)}
                     </span>

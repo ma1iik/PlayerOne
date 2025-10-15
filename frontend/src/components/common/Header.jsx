@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useThemeStyles } from "../../context/ThemeProvider";
 import { BellIcon, UserIcon } from "@heroicons/react/outline";
+import CoinIcon from "./CoinIcon";
+import GemIcon from "./GemIcon";
 
 const Header = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -116,7 +118,7 @@ const Header = () => {
                   fontFamily: currentTheme.font
                 }}
               >
-                <span role="img" aria-label="Coin" title="Coins" className="text-base">🪙</span>
+                <CoinIcon size="w-5 h-5" title="Coins" />
                 <span className="font-medium">1250</span>
               </div>
               <div 
@@ -129,7 +131,7 @@ const Header = () => {
                   fontFamily: currentTheme.font
                 }}
               >
-                <span role="img" aria-label="Gem" title="Gems" className="text-base">💎</span>
+                <GemIcon size="w-5 h-5" title="Gems" />
                 <span className="font-medium">75</span>
               </div>
             </div>

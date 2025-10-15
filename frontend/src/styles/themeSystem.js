@@ -46,7 +46,7 @@ export const THEMES = {
     name: "Light Mode",
     primaryColor: "#6d28d9",
     secondaryColor: "#8b5cf6",
-    bgPrimary: "#f9fafb",
+    bgPrimary: "#FCFAFA",
     bgSecondary: "#ffffff",
     bgTertiary: "#f3f4f6",
     textPrimary: "#1f2937",
@@ -54,6 +54,7 @@ export const THEMES = {
     borderColor: "#e5e7eb",
     radius: "0.1875rem",
     font: "'Inter', sans-serif",
+    testColor: "#FFF5FF",
     features: {
       // Default theme, no special features
     }

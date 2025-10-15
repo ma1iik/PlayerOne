@@ -8,6 +8,8 @@ import {
   ShoppingCartIcon 
 } from "@heroicons/react/outline";
 import { useThemeStyles } from "../../context/ThemeProvider";
+import CoinIcon from '../common/CoinIcon';
+import GemIcon from '../common/GemIcon';
 import { getRarityColor } from "../../utils/itemUtils.js";
 
 const ItemDetail = ({ 
@@ -144,9 +146,11 @@ const ItemDetail = ({
             
             {/* Price display */}
             <div className="flex items-center gap-2 mb-3">
-              <span role="img" aria-label="Currency" className="text-xl">
-                {item.currency === 'gems' ? '💎' : '🪙'}
-              </span>
+              {item.currency === 'gems' ? (
+                <GemIcon size="w-6 h-6" />
+              ) : (
+                <CoinIcon size="w-6 h-6" />
+              )}
               <span className="text-xl font-bold" style={{ color: currentTheme.textPrimary }}>
                 {item.discounted ? (
                   <span>

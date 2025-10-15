@@ -16,6 +16,7 @@ import {
   filterItems, 
   sortItems 
 } from "../utils/itemUtils";
+import bannerGif from "../assets/P_2NNp.gif";
 
 const Shop = () => {
   const { theme: currentTheme } = useThemeStyles();
@@ -272,21 +273,18 @@ const Shop = () => {
             <div className="mb-6">
               <div className="relative h-60 overflow-hidden"
                    style={{
-                     background: `linear-gradient(135deg, ${currentTheme.primaryColor}20, ${currentTheme.secondaryColor}20)`,
                      border: `1px solid ${currentTheme.borderColor}`,
                      borderRadius: '3px'
                    }}>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-6xl mb-4">🎮</div>
-                    <h3 className="text-2xl font-bold mb-2" style={{ color: currentTheme.textPrimary, fontFamily: currentTheme.font }}>
-                      {shopTypes.find(s => s.id === activeShopType)?.label} Shop
-                    </h3>
-                    <p className="text-lg" style={{ color: currentTheme.textSecondary, fontFamily: currentTheme.font }}>
-                      {shopTypes.find(s => s.id === activeShopType)?.description}
-                    </p>
-                  </div>
-                </div>
+                <img 
+                  src={bannerGif} 
+                  alt="Shop Banner"
+                  className="w-full h-full object-cover"
+                  style={{
+                    borderRadius: '3px',
+                    objectPosition: 'center 86%'
+                  }}
+                />
               </div>
             </div>
 

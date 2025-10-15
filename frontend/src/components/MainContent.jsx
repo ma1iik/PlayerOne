@@ -9,6 +9,11 @@ import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortableItem from './dnd/SortableItem';
 import { useDrag } from "../context/DragContext";
+import CoinIcon from "./common/CoinIcon";
+import StarIcon from "./common/StarIcon";
+import HeartIcon from "./common/HeartIcon";
+import FireIcon from "./common/FireIcon";
+import natureBackground from "../assets/backgrounds/nature_4.png";
 
 const Section = ({ 
   title, 
@@ -39,7 +44,10 @@ const Section = ({
   const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden" style={{
+      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+      borderRadius: currentTheme.radius
+    }}>
       <div className="flex items-center justify-between p-4 border-b" style={{
         backgroundColor: currentTheme.bgSecondary,
         borderColor: currentTheme.borderColor,
@@ -216,7 +224,10 @@ const ProfileSection = () => {
   const hasCheckedIn = true;
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden" style={{
+      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+      borderRadius: currentTheme.radius
+    }}>
       {/* Unique Profile Header - Stands out from task cards */}
       <div className="p-5 border-b" style={{
         background: `linear-gradient(135deg, ${currentTheme.primaryColor}08, ${currentTheme.secondaryColor}08)`,
@@ -258,7 +269,7 @@ const ProfileSection = () => {
             }}>
               {profile.streak}
             </span>
-            <span className="text-base">🔥</span>
+            <FireIcon size="w-4 h-4" />
           </div>
         </div>
       </div>
@@ -278,25 +289,20 @@ const ProfileSection = () => {
           {/* Character Image - Right under header */}
           <div className="w-full" style={{ height: '210px' }}>
             <div 
-              className="w-full h-full flex items-center justify-center"
+              className="w-full h-full flex items-center justify-center relative overflow-hidden"
               style={{
-                background: `linear-gradient(135deg, ${currentTheme.primaryColor}10, ${currentTheme.secondaryColor}10)`,
                 borderRadius: currentTheme.radius,
                 border: `1px solid ${currentTheme.borderColor}`
               }}
             >
-              <div className="text-center">
-                <div className="text-5xl mb-2">🎮</div>
-                <div 
-                  className="text-xs font-medium"
-                  style={{ 
-                    color: currentTheme.textSecondary,
-                    fontFamily: currentTheme.font
-                  }}
-                >
-                  Character Image
-                </div>
-              </div>
+              <img 
+                src={natureBackground} 
+                alt="Character Background"
+                className="w-full h-full object-cover"
+                style={{
+                  borderRadius: currentTheme.radius
+                }}
+              />
             </div>
           </div>
 
@@ -310,7 +316,7 @@ const ProfileSection = () => {
                   fontFamily: currentTheme.font
                 }}
               >
-                <span>❤️</span>
+                <HeartIcon size="w-4 h-4" />
                 Health
               </span>
               <span 
@@ -358,7 +364,7 @@ const ProfileSection = () => {
                   fontFamily: currentTheme.font
                 }}
               >
-                <span>⭐</span>
+                <StarIcon size="w-4 h-4" />
                 Experience
               </span>
               <span 
@@ -511,7 +517,7 @@ const ProfileSection = () => {
                       backgroundColor: '#f59e0b20'
                     }}
                   >
-                    <span className="text-xs">🪙</span>
+                    <CoinIcon size="w-3 h-3" />
                   </div>
                   <span className="text-xs font-medium" style={{ 
                     color: currentTheme.textSecondary,
@@ -543,7 +549,7 @@ const ProfileSection = () => {
                       backgroundColor: `${currentTheme.primaryColor}20`
                     }}
                   >
-                    <span className="text-xs">⭐</span>
+                    <StarIcon size="w-3 h-3" />
                   </div>
                   <span className="text-xs font-medium" style={{ 
                     color: currentTheme.textSecondary,
