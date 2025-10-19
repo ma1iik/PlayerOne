@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { CheckIcon, PencilIcon, CalendarIcon } from "@heroicons/react/outline";
+import { CheckIcon, CalendarIcon } from "@heroicons/react/outline";
 import { useThemeStyles } from "../../context/ThemeProvider";
 
 const TaskItem = ({ task, onComplete, onEdit }) => {
@@ -125,8 +125,9 @@ const TaskItem = ({ task, onComplete, onEdit }) => {
   return (
     <div 
       ref={containerRef}
-      className={`group relative transition-all duration-300 hover:translate-y-[-2px] ${displayAsCompleted ? 'opacity-75' : ''}`}
+      className={`group relative transition-all duration-300 hover:translate-y-[-2px] ${displayAsCompleted ? 'opacity-75' : ''} cursor-pointer`}
       style={getStyles()}
+      onClick={() => onEdit()}
     >
       {/* Drag handle indicator */}
       <div 
@@ -148,44 +149,22 @@ const TaskItem = ({ task, onComplete, onEdit }) => {
         <div className="flex-1 pl-7 pr-3 py-3">
           <div className="flex items-center">
             <h3 
-              className="text-sm font-medium transition-all duration-300" 
+              className="font-medium transition-all duration-300" 
               style={{ 
                 color: displayAsCompleted ? currentTheme.textSecondary : currentTheme.textPrimary,
-                textDecoration: displayAsCompleted ? 'line-through' : 'none'
+                textDecoration: displayAsCompleted ? 'line-through' : 'none',
+                fontSize: currentTheme.fontSizes.sm
               }}
             >
               {isNeonTheme ? task.title.toUpperCase() : task.title}
             </h3>
 
-            {/* Edit button */}
-            <div 
-              className="ml-2 opacity-0 group-hover:opacity-40 transition-opacity"
-            >
-              <button 
-                className="p-1 rounded-sm transition-opacity"
-                style={{ 
-                  color: currentTheme.textSecondary
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.opacity = "1";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.opacity = "";
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit();
-                }}
-              >
-                <PencilIcon className="h-3.5 w-3.5" />
-              </button>
-            </div>
             
             {/* Add flex-1 to push the stars to the right */}
             <div className="flex-1"></div>
             
             {/* Difficulty stars - positioned at the right */}
-            <div className="text-xs mr-2">
+            <div className="mr-2" style={{ fontSize: currentTheme.fontSizes.xs }}>
               {getDifficultyIndicator(task.difficulty || 1)}
             </div>
           </div>
@@ -193,10 +172,11 @@ const TaskItem = ({ task, onComplete, onEdit }) => {
           {/* Description */}
           {task.description && (
             <p 
-              className="text-xs mt-1 mb-1.5 transition-all duration-300" 
+              className="mt-1 mb-1.5 transition-all duration-300" 
               style={{ 
                 color: currentTheme.textSecondary,
-                opacity: displayAsCompleted ? 0.7 : 1
+                opacity: displayAsCompleted ? 0.7 : 1,
+                fontSize: currentTheme.fontSizes.xs
               }}
             >
               {task.description}
@@ -208,13 +188,14 @@ const TaskItem = ({ task, onComplete, onEdit }) => {
             {/* Status badge - Added for completed task */}
             {displayAsCompleted && (
               <span 
-                className="text-xs font-medium px-1.5 py-0.5 mr-2 transition-all duration-300" 
+                className="font-medium px-1.5 py-0.5 mr-2 transition-all duration-300" 
                 style={{
                   backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : 'rgba(16, 185, 129, 0.1)',
                   color: '#10b981', // green color
                   borderRadius: currentTheme.radius,
                   border: isNeonTheme || isCyberpunk ? `1px solid #10b981` : 'none',
-                  opacity: 0.8
+                  opacity: 0.8,
+                  fontSize: currentTheme.fontSizes.xs
                 }}
               >
                 {isNeonTheme ? 'COMPLETED' : 'Completed'}
@@ -223,13 +204,14 @@ const TaskItem = ({ task, onComplete, onEdit }) => {
             
             {/* Recurrence type */}
             <span 
-              className="text-xs font-medium px-1.5 py-0.5 transition-all duration-300" 
+              className="font-medium px-1.5 py-0.5 transition-all duration-300" 
               style={{
                 backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : 'rgba(139, 92, 246, 0.1)',
                 color: currentTheme.primaryColor,
                 borderRadius: currentTheme.radius,
                 border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.primaryColor}` : 'none',
-                opacity: displayAsCompleted ? 0.6 : 1
+                opacity: displayAsCompleted ? 0.6 : 1,
+                fontSize: currentTheme.fontSizes.xs
               }}
             >
               {isNeonTheme ? task.recurrence?.toUpperCase() : task.recurrence}
@@ -238,10 +220,11 @@ const TaskItem = ({ task, onComplete, onEdit }) => {
             {/* Due date with color coding */}
             {task.due && (
               <span 
-                className="ml-3 text-xs transition-all duration-300"
+                className="ml-3 transition-all duration-300"
                 style={{ 
                   color: isOverdue() ? '#ef4444' : isDueSoon() ? '#f59e0b' : '#3b82f6',
-                  opacity: displayAsCompleted ? 0.6 : 1
+                  opacity: displayAsCompleted ? 0.6 : 1,
+                  fontSize: currentTheme.fontSizes.xs
                 }}
               >
                 {formatDueDate()}

@@ -16,12 +16,12 @@ import {
   filterItems, 
   sortItems
 } from "../utils/itemUtils";
+import SkeletonIcon from "../components/common/SkeletonIcon";
+import ShieldIcon from "../components/common/ShieldIcon";
+import HeartIcon from "../components/common/HeartIcon";
+import CommonStarIcon from "../components/common/StarIcon";
 
-const ShieldIcon = ({ className }) => (
-  <svg className={className} fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-    <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-  </svg>
-);
+// ShieldIcon component is now imported from common components
 
 // Enhanced Equipment Slot component - with shared borders
 const EquipmentSlot = ({ item, onSelect, hasEquipped, slotType, borderConfig, adjacentEquipped = {} }) => {
@@ -95,7 +95,7 @@ const EquipmentSlot = ({ item, onSelect, hasEquipped, slotType, borderConfig, ad
 
   return (
     <div 
-      className={`w-20 h-20 md:w-24 md:h-24 flex flex-col items-center justify-center cursor-pointer transition-all duration-200`}
+      className={`w-24 h-24 md:w-28 md:h-28 flex flex-col items-center justify-center cursor-pointer transition-all duration-200`}
       style={{
         ...getBorderStyles(),
         boxShadow: hasEquipped ? `0 0 8px ${isNeonTheme || isCyberpunk ? currentTheme.primaryColor + '70' : 'rgba(0,0,0,0.1)'}` : 'none',
@@ -120,13 +120,15 @@ const EquipmentSlot = ({ item, onSelect, hasEquipped, slotType, borderConfig, ad
         <img 
           src={item.image} 
           alt={item.name}
-          className="w-4/5 h-4/5 object-contain"
+          className="w-5/6 h-5/6 object-contain"
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center">
-          <span className="text-xs text-center px-1" style={{ color: currentTheme.textSecondary }}>
-            {isNeonTheme ? getSlotLabel(slotType).toUpperCase() : getSlotLabel(slotType)}
-          </span>
+          <SkeletonIcon 
+            slotType={slotType} 
+            size="w-12 h-12" 
+            className="opacity-60"
+          />
         </div>
       )}
     </div>
@@ -141,13 +143,13 @@ const CharacterEquipmentSection = ({ equippedItems, setSelectedItem, currentThem
   );
 
   return (
-    <div className="flex-shrink-0 p-3 border-b" style={{ borderColor: currentTheme.borderColor }}>
-      <h3 className={`text-lg font-semibold mb-3 text-center ${isNeonTheme ? 'sl-glow-text' : ''}`}
+    <div className="flex-shrink-0 p-4 border-b" style={{ borderColor: currentTheme.borderColor }}>
+      <h3 className={`text-xl font-semibold mb-4 text-center ${isNeonTheme ? 'sl-glow-text' : ''}`}
           style={{ color: currentTheme.textPrimary }}>
         {isNeonTheme ? 'EQUIPMENT' : 'Equipment'}
       </h3>
       
-      <div className="flex">
+      <div className="flex gap-2">
         {/* Left side equipment slots - shared borders */}
         <div className="w-1/4 flex flex-col justify-center items-center">
           <EquipmentSlot 
@@ -208,9 +210,23 @@ const CharacterEquipmentSection = ({ equippedItems, setSelectedItem, currentThem
                minHeight: "200px",
                backgroundColor: currentTheme.bgSecondary
              }}>
-          <p className="text-sm text-center" style={{ color: currentTheme.textSecondary }}>
-            {isNeonTheme ? 'CHARACTER' : 'Character'}
+          <p className="text-xs text-center mb-2" style={{ color: currentTheme.textSecondary }}>
+            {isNeonTheme ? 'CHARACTER' : ''}
           </p>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+            <img 
+              src={`/ma1ik99.png?v=${Date.now()}`} 
+              alt="Character"
+              style={{
+                width: '240px',
+                height: '240px',
+                objectFit: 'contain',
+                transform: 'scale(2.5)',
+                transformOrigin: 'center',
+                marginTop: '-90px'
+              }}
+            />
+          </div>
         </div>
         
         {/* Right side equipment slots - shared borders */}
@@ -389,9 +405,9 @@ const InventoryCard = ({ item, onClick, toggleEquip }) => {
     if (item.equipped && isButtonHovered) {
       return <ShieldCheckIcon className="w-5 h-5 text-white" />;
     } else if (item.equipped) {
-      return <ShieldIcon className="w-5 h-5 text-white" />;
+      return <ShieldIcon size="w-5 h-5" />;
     } else {
-      return <ShieldCheckIcon className="w-5 h-5 text-white" />;
+      return <ShieldIcon size="w-5 h-5" />;
     }
   };
 
@@ -559,7 +575,7 @@ const CharacterStats = () => {
   const stats = {
     level: 28,
     hp: { current: 240, max: 240 },
-    mp: { current: 100, max: 120 },
+    exp: { current: 2850, max: 5000 },
     attack: 75,
     defense: 62,
     speed: 45,
@@ -578,23 +594,64 @@ const CharacterStats = () => {
     </div>
   );
   
-  const StatLine = ({ label, value, max = null, color = currentTheme.primaryColor }) => (
-    <div className="mb-3">
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-sm" style={{ color: currentTheme.textSecondary }}>
+  const StatLine = ({ label, value, max = null, color = currentTheme.primaryColor, icon = null }) => (
+    <div className="mb-4">
+      <div className="flex justify-between text-base mb-2">
+        <span 
+          className="flex items-center gap-2"
+          style={{ 
+            color: currentTheme.textPrimary,
+            fontFamily: currentTheme.font
+          }}
+        >
+          {icon}
           {isNeonTheme ? label.toUpperCase() : label}
         </span>
-        <span className="text-sm font-medium" style={{ color: currentTheme.textPrimary }}>
+        <span 
+          style={{ 
+            color: currentTheme.textSecondary,
+            fontFamily: currentTheme.font
+          }}
+        >
           {max ? `${value}/${max}` : value}
         </span>
       </div>
-      {max && <ProgressBar value={value} max={max} color={color} />}
+      {max && (
+        <div 
+          className="h-5 overflow-hidden"
+          style={{
+            backgroundColor: currentTheme.bgTertiary,
+            borderRadius: currentTheme.radius,
+            border: `1px solid ${currentTheme.borderColor}`
+          }}
+        >
+          <div
+            className="h-full transition-all duration-500"
+            style={{ 
+              background: label === 'Health' ? 
+                (currentTheme.id === 'cyberpunk' ? 
+                  'linear-gradient(90deg, #ff0040, #cc0033)' :
+                  currentTheme.id === 'neon' ? 
+                  'linear-gradient(90deg, #ff0080, #ff0066)' :
+                  'linear-gradient(90deg, #E74C3C, #C0392B)') :
+                `linear-gradient(to right, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
+              width: `${(value / max) * 100}%`,
+              boxShadow: currentTheme.features?.hasGlowEffects ? 
+                (label === 'Health' ? 
+                  `0 0 6px ${currentTheme.id === 'cyberpunk' ? '#ff0040' : 
+                   currentTheme.id === 'neon' ? '#ff0080' : '#E74C3C'}60` : 
+                  `0 0 6px ${currentTheme.primaryColor}60`) : 
+                'none'
+            }}
+          />
+        </div>
+      )}
     </div>
   );
   
   return (
-    <div className="p-4">
-      <h3 className={`text-lg font-semibold mb-4 pb-2 text-center ${isNeonTheme ? 'sl-glow-text' : ''}`}
+    <div className="p-5">
+      <h3 className={`text-xl font-semibold mb-5 pb-3 text-center ${isNeonTheme ? 'sl-glow-text' : ''}`}
           style={{ 
             color: currentTheme.textPrimary,
             borderBottom: `1px solid ${currentTheme.borderColor}`
@@ -603,10 +660,20 @@ const CharacterStats = () => {
       </h3>
       
       <StatLine label="Level" value={stats.level} />
-      <StatLine label="HP" value={stats.hp.current} max={stats.hp.max} color="#ef4444" />
-      <StatLine label="MP" value={stats.mp.current} max={stats.mp.max} color="#3b82f6" />
+      <StatLine 
+        label="Health" 
+        value={stats.hp.current} 
+        max={stats.hp.max} 
+        icon={<HeartIcon size="w-5 h-5" />}
+      />
+      <StatLine 
+        label="Experience" 
+        value={stats.exp.current} 
+        max={stats.exp.max} 
+        icon={<CommonStarIcon size="w-5 h-5" />}
+      />
       
-      <div className="h-px w-full my-3" style={{ backgroundColor: currentTheme.borderColor }}></div>
+      <div className="h-px w-full my-4" style={{ backgroundColor: currentTheme.borderColor }}></div>
       
       <StatLine label="Attack" value={stats.attack} />
       <StatLine label="Defense" value={stats.defense} />
@@ -825,7 +892,7 @@ const Inventory = () => {
                   }}
                   onClick={() => setShowStats(!showStats)}
                 >
-                  <ShieldCheckIcon className="w-5 h-5" />
+                  <ShieldIcon size="w-5 h-5" />
                 </button>
               </div>
             </div>
@@ -966,7 +1033,7 @@ const Inventory = () => {
                          borderRadius: currentTheme.radius,
                          border: `1px solid ${currentTheme.borderColor}`
                        }}>
-                    <ShieldCheckIcon className="w-12 h-12 mb-4" style={{ color: currentTheme.textSecondary }} />
+                    <ShieldIcon size="w-12 h-12" className="mb-4" />
                     <p className={`text-lg mb-2 ${isNeonTheme ? 'sl-glow-text' : ''}`}
                        style={{ color: currentTheme.textPrimary }}>
                       {isNeonTheme ? 'NO ITEMS FOUND' : 'No items found'}

@@ -178,7 +178,7 @@ const SubtaskSection = ({ formData, setFormData }) => {
   return (
     <div>
       <div className="mb-2">
-        <FormLabel htmlFor="subtasks">Subtasks</FormLabel>
+        <FormLabel htmlFor="subtasks">Tasks</FormLabel>
       </div>
       
       {/* Add new subtask form */}
@@ -418,15 +418,27 @@ const SubtaskSection = ({ formData, setFormData }) => {
                     ) : (
                       <>
                         <div className="flex-1">
-                          <span 
-                            className="text-sm font-medium transition-all duration-200"
-                            style={{ 
-                              color: subtask.completed ? currentTheme.textSecondary : currentTheme.textPrimary,
-                              textDecoration: subtask.completed ? 'line-through' : 'none'
-                            }}
-                          >
-                            {subtask.title}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span 
+                              className="text-sm font-medium transition-all duration-200"
+                              style={{ 
+                                color: subtask.completed ? currentTheme.textSecondary : currentTheme.textPrimary,
+                                textDecoration: subtask.completed ? 'line-through' : 'none'
+                              }}
+                            >
+                              {subtask.title}
+                            </span>
+                            
+                            {/* Checklist progress - only show when not expanded */}
+                            {subtask.checklist && subtask.checklist.length > 0 && !expandedSubtasks.has(subtask.id) && (
+                              <span 
+                                className="text-sm" 
+                                style={{ color: currentTheme.textSecondary }}
+                              >
+                                {subtask.checklist.filter(item => item.completed).length}/{subtask.checklist.length}
+                              </span>
+                            )}
+                          </div>
                           
                           {/* Description preview */}
                           {subtask.description && (
@@ -444,27 +456,6 @@ const SubtaskSection = ({ formData, setFormData }) => {
                               </span>
                             </div>
                           )}
-                          
-                          {/* Checklist progress */}
-                          {subtask.checklist && subtask.checklist.length > 0 && (
-                            <div className="mt-2">
-                              <div className="flex items-center justify-between text-xs mb-1">
-                                <span style={{ color: currentTheme.textSecondary }}>Checklist</span>
-                                <span style={{ color: currentTheme.primaryColor }}>
-                                  {getChecklistProgress(subtask.checklist)}%
-                                </span>
-                              </div>
-                              <div className="w-full bg-gray-200 rounded-full h-1.5" style={{ backgroundColor: `${currentTheme.primaryColor}20` }}>
-                                <div 
-                                  className="h-1.5 rounded-full" 
-                                  style={{ 
-                                    width: `${getChecklistProgress(subtask.checklist)}%`, 
-                                    backgroundColor: currentTheme.primaryColor 
-                                  }}
-                                ></div>
-                              </div>
-                            </div>
-                          )}
                         </div>
                         
                         {/* Enhanced Action buttons */}
@@ -477,7 +468,7 @@ const SubtaskSection = ({ formData, setFormData }) => {
                               color: currentTheme.textSecondary,
                               backgroundColor: 'transparent'
                             }}
-                            title="Edit subtask"
+                            title="Edit task"
                           >
                             <PencilIcon className="w-4 h-4" />
                           </button>
@@ -490,7 +481,7 @@ const SubtaskSection = ({ formData, setFormData }) => {
                               color: '#ef4444',
                               backgroundColor: 'transparent'
                             }}
-                            title="Delete subtask"
+                            title="Delete task"
                           >
                             <TrashIcon className="w-4 h-4" />
                           </button>
@@ -506,7 +497,7 @@ const SubtaskSection = ({ formData, setFormData }) => {
                     {/* Checklist section */}
                     <div className="mb-3">
                       <h4 className="text-xs font-medium mb-2" style={{ color: currentTheme.textPrimary }}>
-                        Checklist Items
+                        Subtasks
                       </h4>
                       
                       {/* Add new checklist item */}
@@ -579,7 +570,7 @@ const SubtaskSection = ({ formData, setFormData }) => {
                 onClick={() => setIsAddingSubtask(true)}
               >
                 <PlusIcon className="w-5 h-5" />
-                <span className="font-medium">Add a Subtask</span>
+                <span className="font-medium">Add a Task</span>
               </div>
             )}
           </ul>
@@ -597,7 +588,7 @@ const SubtaskSection = ({ formData, setFormData }) => {
             onClick={() => setIsAddingSubtask(true)}
           >
             <PlusIcon className="w-5 h-5" />
-            <span className="font-medium">Add a Subtask</span>
+            <span className="font-medium">Add a Task</span>
           </div>
         )}
       </div>

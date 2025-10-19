@@ -1,0 +1,10 @@
+
+@font-face {
+    font-family: 'm5x7';
+    src: url('m5x7.woff2') format('woff2'),
+        url('m5x7.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+

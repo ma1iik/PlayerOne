@@ -132,7 +132,10 @@ const ProjectItem = ({ project, onEdit, onClick }) => {
       <div className="flex items-start">
         <div className="ml-1 flex-1">
           <div className="flex items-center">
-            <h3 className="text-sm font-medium" style={{ color: currentTheme.textPrimary }}>
+            <h3 className="font-medium" style={{ 
+              color: currentTheme.textPrimary,
+              fontSize: currentTheme.fontSizes.sm
+            }}>
               {isNeonTheme ? project.title.toUpperCase() : project.title}
             </h3>
             
@@ -166,7 +169,7 @@ const ProjectItem = ({ project, onEdit, onClick }) => {
             <div className="flex-1"></div>
             
             {/* Difficulty stars - positioned at the right */}
-            <div className="text-xs mr-2">
+            <div className="mr-2" style={{ fontSize: currentTheme.fontSizes.xs }}>
               {getDifficultyIndicator(project.difficulty || 1)}
             </div>
           </div>
@@ -174,8 +177,11 @@ const ProjectItem = ({ project, onEdit, onClick }) => {
           {/* Description - Added */}
           {project.description && (
             <p 
-              className="text-xs mt-1 mb-1.5" 
-              style={{ color: currentTheme.textSecondary }}
+              className="mt-1 mb-1.5" 
+              style={{ 
+                color: currentTheme.textSecondary,
+                fontSize: currentTheme.fontSizes.xs
+              }}
             >
               {project.description}
             </p>
@@ -185,12 +191,18 @@ const ProjectItem = ({ project, onEdit, onClick }) => {
             {/* Dynamic segmented progress bar */}
             <SegmentedProgressBar project={project} currentTheme={currentTheme} />
             <div className="flex justify-between mt-1">
-              <span className="text-xs" style={{ color: currentTheme.textSecondary }}>
+              <span style={{ 
+                color: currentTheme.textSecondary,
+                fontSize: currentTheme.fontSizes.xs
+              }}>
                 {completedSubtasks}/{totalSubtasks} {isNeonTheme ? 'SUBTASKS' : 'subtasks'}
               </span>
               <span 
-                className="text-xs font-medium" 
-                style={{ color: currentTheme.primaryColor }}
+                className="font-medium" 
+                style={{ 
+                  color: currentTheme.primaryColor,
+                  fontSize: currentTheme.fontSizes.xs
+                }}
               >
                 {project.progress}%
               </span>
@@ -202,9 +214,9 @@ const ProjectItem = ({ project, onEdit, onClick }) => {
             {/* Due date with color coding - Added */}
             {project.due && (
               <span 
-                className="text-xs"
                 style={{ 
-                  color: isOverdue() ? '#ef4444' : isDueSoon() ? '#f59e0b' : '#3b82f6'
+                  color: isOverdue() ? '#ef4444' : isDueSoon() ? '#f59e0b' : '#3b82f6',
+                  fontSize: currentTheme.fontSizes.xs
                 }}
               >
                 {formatDueDate()}
@@ -214,12 +226,13 @@ const ProjectItem = ({ project, onEdit, onClick }) => {
             {/* Due soon badge - Added */}
             {isDueSoon() && !isOverdue() && (
               <span 
-                className="ml-2 text-xs px-1.5 py-0.5 font-medium"
+                className="ml-2 px-1.5 py-0.5 font-medium"
                 style={{
                   backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : 'rgba(251, 191, 36, 0.1)',
                   color: '#f59e0b', // amber-500
                   borderRadius: currentTheme.radius,
-                  border: isNeonTheme || isCyberpunk ? '1px solid #f59e0b' : 'none'
+                  border: isNeonTheme || isCyberpunk ? '1px solid #f59e0b' : 'none',
+                  fontSize: currentTheme.fontSizes.xs
                 }}
               >
                 {isNeonTheme ? '[ DUE SOON ]' : isCyberpunk ? 'DUE SOON' : 'Due Soon'}
@@ -229,12 +242,13 @@ const ProjectItem = ({ project, onEdit, onClick }) => {
             {/* Overdue badge - Added */}
             {isOverdue() && (
               <span 
-                className="ml-2 text-xs px-1.5 py-0.5 font-medium"
+                className="ml-2 px-1.5 py-0.5 font-medium"
                 style={{
                   backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : 'rgba(239, 68, 68, 0.1)',
                   color: '#ef4444', // red-500
                   borderRadius: currentTheme.radius,
-                  border: isNeonTheme || isCyberpunk ? '1px solid #ef4444' : 'none'
+                  border: isNeonTheme || isCyberpunk ? '1px solid #ef4444' : 'none',
+                  fontSize: currentTheme.fontSizes.xs
                 }}
               >
                 {isNeonTheme ? '[ OVERDUE ]' : isCyberpunk ? 'OVERDUE' : 'Overdue'}

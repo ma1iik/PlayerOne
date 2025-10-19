@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { PlusIcon, MinusIcon, PencilIcon } from "@heroicons/react/outline";
+import { PlusIcon, MinusIcon } from "@heroicons/react/outline";
 import { useThemeStyles } from "../../context/ThemeProvider";
+import FireIcon from "../common/FireIcon";
 
 const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
   const { theme: currentTheme } = useThemeStyles();
@@ -104,8 +105,9 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
   return (
     <div 
       ref={containerRef}
-      className={`group relative transition-all duration-300 hover:translate-y-[-2px] ${displayAsCompleted ? 'opacity-75' : ''}`}
+      className={`group relative transition-all duration-300 hover:translate-y-[-2px] ${displayAsCompleted ? 'opacity-75' : ''} cursor-pointer`}
       style={getStyles()}
+      onClick={() => onEdit()}
     >
       <div 
         className="absolute left-1 top-0 bottom-0 flex items-center justify-center opacity-0 group-hover:opacity-30 transition-opacity cursor-grab active:cursor-grabbing"
@@ -125,51 +127,31 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
         <div className="flex-1 pl-7 pr-3 py-3">
           <div className="flex items-center">
             <h3 
-              className="text-sm font-medium transition-all duration-300" 
+              className="font-medium transition-all duration-300" 
               style={{ 
                 color: displayAsCompleted ? currentTheme.textSecondary : currentTheme.textPrimary,
-                textDecoration: displayAsCompleted ? 'line-through' : 'none'
+                textDecoration: displayAsCompleted ? 'line-through' : 'none',
+                fontSize: currentTheme.fontSizes.sm
               }}
             >
               {isNeonTheme ? habit.title.toUpperCase() : habit.title}
             </h3>
             
-            <div 
-              className="ml-2 opacity-0 group-hover:opacity-40 transition-opacity"
-            >
-              <button 
-                className="p-1 rounded-sm transition-opacity"
-                style={{ 
-                  color: currentTheme.textSecondary
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.opacity = "1";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.opacity = "";
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit();
-                }}
-              >
-                <PencilIcon className="h-3.5 w-3.5" />
-              </button>
-            </div>
             
             <div className="flex-1"></div>
             
-            <div className="text-xs mr-2">
+            <div className="mr-2" style={{ fontSize: currentTheme.fontSizes.xs }}>
               {getDifficultyIndicator(habit.difficulty || 1)}
             </div>
           </div>
           
           {habit.description && (
             <p 
-              className="text-xs mt-1 mb-1.5 transition-all duration-300" 
+              className="mt-1 mb-1.5 transition-all duration-300" 
               style={{ 
                 color: currentTheme.textSecondary,
-                opacity: displayAsCompleted ? 0.7 : 1
+                opacity: displayAsCompleted ? 0.7 : 1,
+                fontSize: currentTheme.fontSizes.xs
               }}
             >
               {habit.description}
@@ -179,41 +161,41 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
           <div className="flex items-center justify-between mt-1">
             <div className="flex items-center gap-2">
               <span 
-                className="text-xs font-medium px-1.5 py-0.5 transition-all duration-300" 
+                className="font-medium px-1.5 py-0.5 transition-all duration-300" 
                 style={{
                   backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : 'rgba(139, 92, 246, 0.1)',  
                   color: currentTheme.primaryColor,
                   borderRadius: currentTheme.radius,
                   border: isNeonTheme || isCyberpunk ? `1px solid ${currentTheme.primaryColor}` : 'none',
-                  opacity: displayAsCompleted ? 0.6 : 1
+                  opacity: displayAsCompleted ? 0.6 : 1,
+                  fontSize: currentTheme.fontSizes.xs
                 }}
               >
                 {isNeonTheme ? habit.recurrence.toUpperCase() : habit.recurrence}
               </span>
               
               <div 
-                className="flex items-center text-xs px-1.5 py-0.5 font-medium transition-all duration-300" 
+                className="flex items-center px-1.5 py-0.5 font-medium transition-all duration-300" 
                 style={{
                   backgroundColor: isNeonTheme || isCyberpunk ? 'transparent' : 'rgba(251, 191, 36, 0.1)',
                   color: '#f59e0b', // amber-500
                   borderRadius: currentTheme.radius,
                   border: isNeonTheme || isCyberpunk ? '1px solid #f59e0b' : 'none',
-                  opacity: displayAsCompleted ? 0.6 : 1
+                  opacity: displayAsCompleted ? 0.6 : 1,
+                  fontSize: currentTheme.fontSizes.xs
                 }}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
-                </svg>
+                <FireIcon size="w-3 h-3" className="mr-0.5" />
                 <span>{habit.streak}</span>
               </div>
             </div>
             
             <span 
-              className="text-xs mr-2 transition-all duration-300" 
+              className="mr-2 transition-all duration-300" 
               style={{ 
                 color: currentTheme.textSecondary,
-                opacity: displayAsCompleted ? 0.7 : 1
+                opacity: displayAsCompleted ? 0.7 : 1,
+                fontSize: currentTheme.fontSizes.xs
               }}
             >
               {getProgress()}

@@ -46,7 +46,7 @@ export const THEMES = {
     name: "Light Mode",
     primaryColor: "#6d28d9",
     secondaryColor: "#8b5cf6",
-    bgPrimary: "#f9fafb",
+    bgPrimary: "#FCFAFA",
     bgSecondary: "#ffffff",
     bgTertiary: "#f3f4f6",
     textPrimary: "#1f2937",
@@ -54,6 +54,27 @@ export const THEMES = {
     borderColor: "#e5e7eb",
     radius: "0.1875rem",
     font: "'Inter', sans-serif",
+    fontSizes: {
+      xs: '0.75rem',      // 12px - small text, badges
+      sm: '0.875rem',     // 14px - body text, descriptions
+      base: '1rem',       // 16px - default text
+      lg: '1.125rem',     // 18px - larger text
+      xl: '1.25rem',      // 20px - headers
+      '2xl': '1.5rem',    // 24px - main headers
+      '3xl': '1.875rem',  // 30px - large headers
+      header: '1.5rem',   // 24px - section headers
+      body: '1rem',       // 16px - body text
+      badge: '0.75rem',   // 12px - count badges
+      tab: '0.75rem',     // 12px - tab buttons
+      button: '0.875rem', // 14px - button text
+      footer: '0.75rem',  // 12px - footer text
+      username: '1rem',   // 16px - username
+      subtitle: '0.75rem', // 12px - user subtitle
+      streak: '0.875rem', // 14px - streak number
+      emptyTitle: '0.875rem', // 14px - empty state title
+      emptyDesc: '0.75rem',   // 12px - empty state description
+    },
+    testColor: "#FFF5FF",
     features: {
       // Default theme, no special features
     }
@@ -72,6 +93,26 @@ export const THEMES = {
     borderColor: "#e2e8f0", // Lighter grey borders
     radius: "0.1875rem",
     font: "'Inter', sans-serif",
+    fontSizes: {
+      xs: '0.75rem',      // 12px - small text, badges
+      sm: '0.875rem',     // 14px - body text, descriptions
+      base: '1rem',       // 16px - default text
+      lg: '1.125rem',     // 18px - larger text
+      xl: '1.25rem',      // 20px - headers
+      '2xl': '1.5rem',    // 24px - main headers
+      '3xl': '1.875rem',  // 30px - large headers
+      header: '1.5rem',   // 24px - section headers
+      body: '1rem',       // 16px - body text
+      badge: '0.75rem',   // 12px - count badges
+      tab: '0.75rem',     // 12px - tab buttons
+      button: '0.875rem', // 14px - button text
+      footer: '0.75rem',  // 12px - footer text
+      username: '1rem',   // 16px - username
+      subtitle: '0.75rem', // 12px - user subtitle
+      streak: '0.875rem', // 14px - streak number
+      emptyTitle: '0.875rem', // 14px - empty state title
+      emptyDesc: '0.75rem',   // 12px - empty state description
+    },
     features: {
       // Enhanced contrast for better accessibility
     }
@@ -145,7 +186,27 @@ export const THEMES = {
     textSecondary: "#9ca3af", // Muted light text
     borderColor: "#374151", // Dark borders
     radius: "0.1875rem", // Same radius as light theme
-    font: "'Inter', sans-serif", // Same font as light theme
+    font: "'Inter', sans-serif",
+    fontSizes: {
+      xs: '0.75rem',      // 12px - small text, badges
+      sm: '0.875rem',     // 14px - body text, descriptions
+      base: '1rem',       // 16px - default text
+      lg: '1.125rem',     // 18px - larger text
+      xl: '1.25rem',      // 20px - headers
+      '2xl': '1.5rem',    // 24px - main headers
+      '3xl': '1.875rem',  // 30px - large headers
+      header: '1.5rem',   // 24px - section headers
+      body: '1rem',       // 16px - body text
+      badge: '0.75rem',   // 12px - count badges
+      tab: '0.75rem',     // 12px - tab buttons
+      button: '0.875rem', // 14px - button text
+      footer: '0.75rem',  // 12px - footer text
+      username: '1rem',   // 16px - username
+      subtitle: '0.75rem', // 12px - user subtitle
+      streak: '0.875rem', // 14px - streak number
+      emptyTitle: '0.875rem', // 14px - empty state title
+      emptyDesc: '0.75rem',   // 12px - empty state description
+    }, // Same font as light theme
     features: {
       // Clean dark theme, no special effects
     },

@@ -9,6 +9,8 @@ import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortableItem from './dnd/SortableItem';
 import { useDrag } from "../context/DragContext";
+import natureBackground from "../assets/backgrounds/nature_4.png";
+import FireIcon from "./common/FireIcon";
 
 const Section = ({ 
   title, 
@@ -39,7 +41,10 @@ const Section = ({
   const isNeonTheme = currentTheme.id && currentTheme.id.includes('neon');
   
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden" style={{
+      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+      borderRadius: currentTheme.radius
+    }}>
       <div className="flex items-center justify-between p-4 border-b" style={{
         backgroundColor: currentTheme.bgSecondary,
         borderColor: currentTheme.borderColor,
@@ -50,13 +55,17 @@ const Section = ({
       }}>
         <div className="flex items-center gap-2">
           {icon}
-          <h2 className="text-base font-semibold" style={{ color: currentTheme.textPrimary }}>
+          <h2 className="font-semibold" style={{ 
+            color: currentTheme.textPrimary,
+            fontSize: currentTheme.fontSizes.base
+          }}>
             {isNeonTheme ? title.toUpperCase() : title}
           </h2>
-          <span className="text-xs font-medium px-2 py-0.5" style={{
+          <span className="font-medium px-2 py-0.5" style={{
             backgroundColor: `${currentTheme.primaryColor}15`,
             color: currentTheme.primaryColor,
-            borderRadius: `calc(${currentTheme.radius} / 2)`
+            borderRadius: `calc(${currentTheme.radius} / 2)`,
+            fontSize: currentTheme.fontSizes.xs
           }}>
             {count}
           </span>
@@ -71,12 +80,13 @@ const Section = ({
               <button
                 key={tab.value}
                 onClick={() => setActiveTab(tab.value)}
-                className="px-2.5 py-1 text-xs font-medium transition-colors"
+                className="px-2.5 py-1 font-medium transition-colors"
                 style={{
                   backgroundColor: activeTab === tab.value ? currentTheme.bgSecondary : 'transparent',
                   color: activeTab === tab.value ? currentTheme.primaryColor : currentTheme.textSecondary,
                   borderRadius: `calc(${currentTheme.radius} - 2px)`,
-                  boxShadow: activeTab === tab.value ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
+                  boxShadow: activeTab === tab.value ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+                  fontSize: currentTheme.fontSizes.tab
                 }}
               >
                 {isNeonTheme ? tab.label.toUpperCase() : tab.label}
@@ -98,12 +108,13 @@ const Section = ({
         <div className="p-4 pb-2">
           <button
             onClick={onAdd}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-all duration-200"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 font-medium transition-all duration-200"
             style={{
               border: `1px dashed ${currentTheme.borderColor}`,
               backgroundColor: currentTheme.bgTertiary,
               color: currentTheme.textSecondary,
-              borderRadius: currentTheme.radius
+              borderRadius: currentTheme.radius,
+              fontSize: currentTheme.fontSizes.sm
             }}
             onMouseOver={(e) => {
               if ((currentTheme.id && currentTheme.id.includes('neon')) || currentTheme.id === 'cyberpunk') {
@@ -152,10 +163,16 @@ const Section = ({
                   className: "h-12 w-12 mx-auto mb-3",
                   style: { color: `${currentTheme.textSecondary}50` }
                 })}
-                <p className="text-sm font-medium mb-1" style={{ color: currentTheme.textPrimary }}>
+                <p className="font-medium mb-1" style={{ 
+                  color: currentTheme.textPrimary,
+                  fontSize: currentTheme.fontSizes.emptyTitle
+                }}>
                   {isNeonTheme ? emptyMessage.toUpperCase() : emptyMessage}
                 </p>
-                <p className="text-xs">{emptyDescription}</p>
+                <p style={{ 
+                  fontSize: currentTheme.fontSizes.emptyDesc,
+                  color: currentTheme.textSecondary
+                }}>{emptyDescription}</p>
               </div>
             </div>
           ) : (
@@ -178,7 +195,10 @@ const Section = ({
         </div>
         
         <div className="px-4 py-3 mt-auto border-t" style={{ borderColor: currentTheme.borderColor }}>
-          <p className="text-xs text-center" style={{ color: currentTheme.textSecondary }}>
+          <p className="text-center" style={{ 
+            color: currentTheme.textSecondary,
+            fontSize: currentTheme.fontSizes.footer
+          }}>
             {footerText}
           </p>
         </div>
@@ -216,7 +236,10 @@ const ProfileSection = () => {
   const hasCheckedIn = true;
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden" style={{
+      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+      borderRadius: currentTheme.radius
+    }}>
       {/* Unique Profile Header - Stands out from task cards */}
       <div className="p-5 border-b" style={{
         background: `linear-gradient(135deg, ${currentTheme.primaryColor}08, ${currentTheme.secondaryColor}08)`,
@@ -227,17 +250,19 @@ const ProfileSection = () => {
         <div className="flex items-center justify-between">
           {/* User Info */}
           <div>
-            <h3 className="text-base font-bold" style={{ 
+            <h3 className="font-bold" style={{ 
               color: currentTheme.textPrimary,
               fontFamily: currentTheme.font,
-              lineHeight: '1.2'
+              lineHeight: '1.2',
+              fontSize: currentTheme.fontSizes.username
             }}>
               {profile.username}
             </h3>
-            <p className="text-xs" style={{ 
+            <p style={{ 
               color: currentTheme.textSecondary,
               fontFamily: currentTheme.font,
-              marginTop: '2px'
+              marginTop: '2px',
+              fontSize: currentTheme.fontSizes.subtitle
             }}>
               {profile.handle} • Level {profile.level} {profile.class}
             </p>
@@ -252,13 +277,14 @@ const ProfileSection = () => {
               border: `1px solid #f59e0b30`
             }}
           >
-            <span className="text-sm font-bold" style={{ 
+            <span className="font-bold" style={{ 
               color: '#f59e0b',
-              fontFamily: currentTheme.font
+              fontFamily: currentTheme.font,
+              fontSize: currentTheme.fontSizes.streak
             }}>
               {profile.streak}
             </span>
-            <span className="text-base">🔥</span>
+            <FireIcon size="w-4 h-4" />
           </div>
         </div>
       </div>
@@ -278,31 +304,48 @@ const ProfileSection = () => {
           {/* Character Image - Right under header */}
           <div className="w-full" style={{ height: '210px' }}>
             <div 
-              className="w-full h-full flex items-center justify-center"
+              className="w-full h-full flex items-center justify-center relative overflow-hidden"
               style={{
-                background: `linear-gradient(135deg, ${currentTheme.primaryColor}10, ${currentTheme.secondaryColor}10)`,
                 borderRadius: currentTheme.radius,
                 border: `1px solid ${currentTheme.borderColor}`
               }}
             >
-              <div className="text-center">
-                <div className="text-5xl mb-2">🎮</div>
-                <div 
-                  className="text-xs font-medium"
-                  style={{ 
-                    color: currentTheme.textSecondary,
-                    fontFamily: currentTheme.font
+              {/* Background */}
+              <img 
+                src={natureBackground} 
+                alt="Character Background"
+                className="w-full h-full object-cover"
+                style={{
+                  borderRadius: currentTheme.radius
+                }}
+              />
+              
+              {/* Character overlay */}
+              <div 
+                className="absolute inset-0 flex items-center justify-center"
+                style={{
+                  borderRadius: currentTheme.radius
+                }}
+              >
+                <img 
+                  src={`/ma1ik99.png?v=${Date.now()}`} 
+                  alt="Character"
+                  style={{
+                    width: '150px',
+                    height: '150px',
+                    objectFit: 'contain',
+                    transform: 'scale(1.5)',
+                    transformOrigin: 'center',
+                    marginTop: '-30px'
                   }}
-                >
-                  Character Image
-                </div>
+                />
               </div>
             </div>
           </div>
 
           {/* Health Bar */}
           <div>
-            <div className="flex justify-between text-sm mb-1">
+            <div className="flex justify-between mb-1" style={{ fontSize: currentTheme.fontSizes.sm }}>
               <span 
                 className="flex items-center gap-1.5"
                 style={{ 
@@ -350,7 +393,7 @@ const ProfileSection = () => {
 
           {/* Experience Bar */}
           <div>
-            <div className="flex justify-between text-sm mb-1">
+            <div className="flex justify-between mb-1" style={{ fontSize: currentTheme.fontSizes.sm }}>
               <span 
                 className="flex items-center gap-1.5"
                 style={{ 
@@ -419,10 +462,11 @@ const ProfileSection = () => {
                     <CheckIcon className="w-3.5 h-3.5" />
                   </div>
                   <span 
-                    className="text-sm font-semibold"
+                    className="font-semibold"
                     style={{ 
                       color: currentTheme.textPrimary,
-                      fontFamily: currentTheme.font
+                      fontFamily: currentTheme.font,
+                      fontSize: currentTheme.fontSizes.sm
                     }}
                   >
                     {isNeonTheme ? 'CHECKED IN TODAY!' : 'Checked in today!'}
@@ -430,10 +474,11 @@ const ProfileSection = () => {
                 </>
               ) : (
                 <span 
-                  className="text-sm font-semibold"
+                  className="font-semibold"
                   style={{ 
                     color: '#ffffff',
-                    fontFamily: currentTheme.font
+                    fontFamily: currentTheme.font,
+                    fontSize: currentTheme.fontSizes.sm
                   }}
                 >
                   {isNeonTheme ? 'DAILY CHECK-IN' : 'Daily Check-in'}
@@ -453,10 +498,11 @@ const ProfileSection = () => {
           >
             {/* Header */}
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-lg">📊</span>
-              <h4 className="text-sm font-bold" style={{ 
+              <span style={{ fontSize: currentTheme.fontSizes.lg }}>📊</span>
+              <h4 className="font-bold" style={{ 
                 color: currentTheme.primaryColor,
-                fontFamily: currentTheme.font
+                fontFamily: currentTheme.font,
+                fontSize: currentTheme.fontSizes.sm
               }}>
                 Today's Progress
               </h4>
@@ -479,18 +525,20 @@ const ProfileSection = () => {
                       backgroundColor: '#10b98120'
                     }}
                   >
-                    <span className="text-xs">✓</span>
+                    <span style={{ fontSize: currentTheme.fontSizes.xs }}>✓</span>
                   </div>
-                  <span className="text-xs font-medium" style={{ 
+                  <span className="font-medium" style={{ 
                     color: currentTheme.textSecondary,
-                    fontFamily: currentTheme.font
+                    fontFamily: currentTheme.font,
+                    fontSize: currentTheme.fontSizes.xs
                   }}>
                     Tasks
                   </span>
                 </div>
-                <div className="text-base font-bold" style={{ 
+                <div className="font-bold" style={{ 
                   color: currentTheme.textPrimary,
-                  fontFamily: currentTheme.font
+                  fontFamily: currentTheme.font,
+                  fontSize: currentTheme.fontSizes.base
                 }}>
                   {profile.tasksToday}/{profile.totalTasksToday}
                 </div>
@@ -511,18 +559,20 @@ const ProfileSection = () => {
                       backgroundColor: '#f59e0b20'
                     }}
                   >
-                    <span className="text-xs">🪙</span>
+                    <span style={{ fontSize: currentTheme.fontSizes.xs }}>🪙</span>
                   </div>
-                  <span className="text-xs font-medium" style={{ 
+                  <span className="font-medium" style={{ 
                     color: currentTheme.textSecondary,
-                    fontFamily: currentTheme.font
+                    fontFamily: currentTheme.font,
+                    fontSize: currentTheme.fontSizes.xs
                   }}>
                     Earned
                   </span>
                 </div>
-                <div className="text-base font-bold" style={{ 
+                <div className="font-bold" style={{ 
                   color: currentTheme.textPrimary,
-                  fontFamily: currentTheme.font
+                  fontFamily: currentTheme.font,
+                  fontSize: currentTheme.fontSizes.base
                 }}>
                   {profile.coinsEarned}
                 </div>
@@ -543,18 +593,20 @@ const ProfileSection = () => {
                       backgroundColor: `${currentTheme.primaryColor}20`
                     }}
                   >
-                    <span className="text-xs">⭐</span>
+                    <span style={{ fontSize: currentTheme.fontSizes.xs }}>⭐</span>
                   </div>
-                  <span className="text-xs font-medium" style={{ 
+                  <span className="font-medium" style={{ 
                     color: currentTheme.textSecondary,
-                    fontFamily: currentTheme.font
+                    fontFamily: currentTheme.font,
+                    fontSize: currentTheme.fontSizes.xs
                   }}>
                     XP
                   </span>
                 </div>
-                <div className="text-base font-bold" style={{ 
+                <div className="font-bold" style={{ 
                   color: currentTheme.textPrimary,
-                  fontFamily: currentTheme.font
+                  fontFamily: currentTheme.font,
+                  fontSize: currentTheme.fontSizes.base
                 }}>
                   +{profile.xpGained}
                 </div>
@@ -781,12 +833,13 @@ const MainContent = ({
 
           <button
             onClick={() => handleAddItem("task")}
-            className="ml-4 flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all"
+            className="ml-4 flex items-center gap-2 px-4 py-2 font-medium transition-all"
             style={{
               background: `linear-gradient(135deg, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
               color: '#ffffff',
               borderRadius: currentTheme.radius,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              fontSize: currentTheme.fontSizes.button
             }}
           >
             <PlusIcon className="w-5 h-5" />

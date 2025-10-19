@@ -2,6 +2,8 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useThemeStyles } from "../../context/ThemeProvider";
 import { getRarityColor, getScanLineClass, getScanLineStyle } from "../../utils/itemUtils";
+import CoinIcon from '../common/CoinIcon';
+import GemIcon from '../common/GemIcon';
 
 const ItemCard = ({ 
   item, 
@@ -156,9 +158,11 @@ const ItemCard = ({
             </h3>
             {mode === "shop" && (
               <div className="flex items-center ml-2">
-                <span role="img" aria-label="Currency" className="mr-1 text-xs">
-                  {item.currency === 'gems' ? '💎' : '🪙'}
-                </span>
+                {item.currency === 'gems' ? (
+                  <GemIcon size="w-4 h-4" className="mr-1" />
+                ) : (
+                  <CoinIcon size="w-4 h-4" className="mr-1" />
+                )}
                 <span className="text-sm font-semibold" style={{ color: currentTheme.textPrimary }}>
                   {item.discounted ? (
                     <span>

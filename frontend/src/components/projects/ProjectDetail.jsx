@@ -40,9 +40,6 @@ const ProjectDetail = ({
   const [editingSubtaskDescription, setEditingSubtaskDescription] = useState("");
   const [editingSubtaskDueDate, setEditingSubtaskDueDate] = useState("");
   
-  // State for checklist items
-  const [newChecklistItem, setNewChecklistItem] = useState("");
-  const [addingChecklistTo, setAddingChecklistTo] = useState(null);
 
   // Calculate progress
   const totalSubtasks = project.subtasks?.length || 0;
@@ -92,57 +89,6 @@ const ProjectDetail = ({
     setEditingSubtaskDueDate(subtask.dueDate || "");
   };
 
-  const handleAddChecklistItem = (subtaskId, itemText) => {
-    if (!itemText.trim()) return;
-    
-    const newItem = {
-      id: Date.now(),
-      text: itemText,
-      completed: false
-    };
-    
-    const subtask = project.subtasks.find(s => s.id === subtaskId);
-    if (subtask) {
-      const updatedSubtask = {
-        ...subtask,
-        checklist: [...(subtask.checklist || []), newItem]
-      };
-      onEditSubtask(project.id, subtaskId, updatedSubtask);
-    }
-    
-    setNewChecklistItem("");
-    setAddingChecklistTo(null);
-  };
-
-  const handleToggleChecklistItem = (subtaskId, itemId) => {
-    const subtask = project.subtasks.find(s => s.id === subtaskId);
-    if (subtask) {
-      const updatedChecklist = (subtask.checklist || []).map(item => 
-        item.id === itemId ? { ...item, completed: !item.completed } : item
-      );
-      
-      const updatedSubtask = {
-        ...subtask,
-        checklist: updatedChecklist
-      };
-      
-      onEditSubtask(project.id, subtaskId, updatedSubtask);
-    }
-  };
-
-  const handleRemoveChecklistItem = (subtaskId, itemId) => {
-    const subtask = project.subtasks.find(s => s.id === subtaskId);
-    if (subtask) {
-      const updatedChecklist = (subtask.checklist || []).filter(item => item.id !== itemId);
-      
-      const updatedSubtask = {
-        ...subtask,
-        checklist: updatedChecklist
-      };
-      
-      onEditSubtask(project.id, subtaskId, updatedSubtask);
-    }
-  };
 
   const formatDueDate = (dateString) => {
     if (!dateString) return "";
@@ -171,9 +117,11 @@ const ProjectDetail = ({
     }
   };
 
+
   return (
     <motion.div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -197,10 +145,18 @@ const ProjectDetail = ({
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Colorful accent bar */}
+        <div 
+          className="h-1" 
+          style={{ 
+            background: `linear-gradient(to right, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})` 
+          }}
+        ></div>
+        
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 rounded-full hover:bg-black hover:bg-opacity-20 transition-colors"
+          className="absolute top-4 right-4 z-10 p-2 rounded-full hover:bg-gray-100 hover:text-gray-500 transition-colors"
           style={{ color: currentTheme.textSecondary }}
         >
           <XIcon className="w-5 h-5" />
@@ -264,7 +220,7 @@ const ProjectDetail = ({
         <div className="px-6 py-4 flex-shrink-0">
           <div className="flex justify-between items-center mb-3">
             <span className="text-sm font-medium" style={{ color: currentTheme.textPrimary }}>
-              Progress
+              Progress {completedSubtasks}/{totalSubtasks}
             </span>
             <span className="text-sm font-medium" style={{ color: currentTheme.primaryColor }}>
               {progressPercentage}%
@@ -290,15 +246,6 @@ const ProjectDetail = ({
               ));
             })()}
           </div>
-          
-          <div className="flex justify-between mt-1">
-            <span className="text-xs" style={{ color: currentTheme.textSecondary }}>
-              {completedSubtasks} of {totalSubtasks} subtasks
-            </span>
-            <span className="text-xs font-medium" style={{ color: currentTheme.primaryColor }}>
-              {progressPercentage}%
-            </span>
-          </div>
         </div>
 
         {/* Scrollable Content */}
@@ -311,198 +258,220 @@ const ProjectDetail = ({
                               isCyberpunk ? "'Audiowide', 'Rajdhani', sans-serif" : 
                               currentTheme.font
                 }}>
-              {isNeonTheme ? 'SUBTASKS' : isCyberpunk ? 'SUBTASKS' : 'Subtasks'}
+              {isNeonTheme ? 'TASKS' : isCyberpunk ? 'TASKS' : 'Tasks'}
             </h3>
           </div>
           
           {/* Add new subtask form */}
           {isAddingSubtask && (
-            <div className="mb-4 p-4 rounded-lg border-2 border-dashed"
+            <div className="mb-4 border rounded-lg overflow-hidden"
                  style={{ 
-                   backgroundColor: currentTheme.bgTertiary,
+                   backgroundColor: '#ffffff',
                    borderColor: currentTheme.borderColor,
                    borderRadius: currentTheme.radius
                  }}>
-              <div className="flex items-center gap-2 mb-3">
-                <input
-                  type="text"
-                  placeholder="Subtask title..."
-                  value={newSubtaskTitle}
-                  onChange={(e) => setNewSubtaskTitle(e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm rounded-lg"
-                  style={{ 
-                    backgroundColor: currentTheme.inputBg,
-                    color: currentTheme.textPrimary,
-                    border: `1px solid ${currentTheme.borderColor}`,
-                    borderRadius: currentTheme.radius
-                  }}
-                  autoFocus
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      handleAddSubtask();
-                    }
-                  }}
-                />
-                <button
-                  onClick={handleAddSubtask}
-                  className="px-3 py-2 text-sm rounded-lg"
-                  style={{ 
-                    backgroundColor: currentTheme.primaryColor,
-                    color: '#ffffff',
-                    borderRadius: currentTheme.radius
-                  }}
-                >
-                  Add
-                </button>
-                <button
-                  onClick={() => setIsAddingSubtask(false)}
-                  className="px-3 py-2 text-sm rounded-lg"
-                  style={{ 
-                    backgroundColor: currentTheme.bgTertiary,
-                    color: currentTheme.textSecondary,
-                    border: `1px solid ${currentTheme.borderColor}`,
-                    borderRadius: currentTheme.radius
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  placeholder="Description (optional)..."
-                  value={newSubtaskDescription}
-                  onChange={(e) => setNewSubtaskDescription(e.target.value)}
-                  className="px-3 py-2 text-sm rounded-lg"
-                  style={{ 
-                    backgroundColor: currentTheme.inputBg,
-                    color: currentTheme.textPrimary,
-                    border: `1px solid ${currentTheme.borderColor}`,
-                    borderRadius: currentTheme.radius
-                  }}
-                />
-                <input
-                  type="date"
-                  value={newSubtaskDueDate}
-                  onChange={(e) => setNewSubtaskDueDate(e.target.value)}
-                  className="px-3 py-2 text-sm rounded-lg"
-                  style={{ 
-                    backgroundColor: currentTheme.inputBg,
-                    color: currentTheme.textPrimary,
-                    border: `1px solid ${currentTheme.borderColor}`,
-                    borderRadius: currentTheme.radius
-                  }}
-                />
+              <div className="p-3">
+                <div className="flex-1">
+                  {/* First line: Title on left, Date on right */}
+                  <div className="flex items-center gap-3 mb-2">
+                    <input
+                      type="text"
+                      placeholder="Task title..."
+                      value={newSubtaskTitle}
+                      onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                      className="flex-1 px-3 py-2 text-sm rounded"
+                      style={{ 
+                        backgroundColor: currentTheme.inputBg,
+                        color: currentTheme.textPrimary,
+                        border: `1px solid ${currentTheme.borderColor}`,
+                        borderRadius: currentTheme.radius
+                      }}
+                      autoFocus
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleAddSubtask();
+                        }
+                      }}
+                    />
+                    
+                    <input
+                      type="date"
+                      value={newSubtaskDueDate}
+                      onChange={(e) => setNewSubtaskDueDate(e.target.value)}
+                      className="px-3 py-2 text-sm rounded"
+                      style={{ 
+                        backgroundColor: currentTheme.inputBg,
+                        color: currentTheme.textPrimary,
+                        border: `1px solid ${currentTheme.borderColor}`,
+                        borderRadius: currentTheme.radius
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Second line: Description */}
+                  <textarea
+                    placeholder="Description (optional)..."
+                    value={newSubtaskDescription}
+                    onChange={(e) => setNewSubtaskDescription(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded resize-none"
+                    rows="2"
+                    style={{ 
+                      backgroundColor: currentTheme.inputBg,
+                      color: currentTheme.textPrimary,
+                      border: `1px solid ${currentTheme.borderColor}`,
+                      borderRadius: currentTheme.radius
+                    }}
+                  />
+                  
+                  {/* Confirmation area with grey background */}
+                  <div 
+                    className="flex items-center justify-end gap-2 py-3 px-3 -mx-3 -mb-3"
+                    style={{ 
+                      backgroundColor: currentTheme.bgTertiary,
+                      borderRadius: `0 0 ${currentTheme.radius} ${currentTheme.radius}`
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingSubtask(false)}
+                      className="px-4 py-2 text-sm rounded transition-colors"
+                      style={{ 
+                        backgroundColor: currentTheme.bgSecondary,
+                        color: currentTheme.textSecondary,
+                        border: `1px solid ${currentTheme.borderColor}`,
+                        borderRadius: currentTheme.radius
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    
+                    <button
+                      type="button"
+                      onClick={handleAddSubtask}
+                      className="px-4 py-2 text-sm rounded transition-colors"
+                      style={{ 
+                        backgroundColor: currentTheme.primaryColor,
+                        color: 'white',
+                        borderRadius: currentTheme.radius
+                      }}
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
           
           {/* Subtasks list */}
-          <div className="space-y-3">
-            {project.subtasks?.map((subtask, index) => (
-              <div
-                key={subtask.id || index}
-                className="p-4 rounded-lg border group"
-                style={{ 
-                  backgroundColor: currentTheme.bgSecondary,
-                  borderColor: currentTheme.borderColor,
-                  borderRadius: currentTheme.radius
-                }}
-              >
-                <div className="flex items-start gap-3">
-                  {/* Number badge */}
-                  <div 
-                    className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+          <div className="max-h-96 overflow-y-auto">
+            {project.subtasks && project.subtasks.length > 0 ? (
+              <ul className="space-y-3">
+                {project.subtasks.map((subtask, index) => (
+                  <li 
+                    key={subtask.id || index}
+                    className="border rounded-lg overflow-hidden group"
                     style={{ 
-                      backgroundColor: subtask.completed ? '#10b981' : currentTheme.primaryColor,
-                      color: '#ffffff'
+                      backgroundColor: editingSubtask?.id === subtask.id 
+                        ? '#ffffff' 
+                        : subtask.completed 
+                          ? `${currentTheme.primaryColor}08` 
+                          : currentTheme.bgSecondary,
+                      borderColor: editingSubtask?.id === subtask.id 
+                        ? currentTheme.borderColor 
+                        : subtask.completed 
+                          ? `${currentTheme.primaryColor}30` 
+                          : currentTheme.borderColor,
+                      borderRadius: currentTheme.radius,
+                      opacity: editingSubtask?.id === subtask.id ? 1 : (subtask.completed ? 0.9 : 1)
                     }}
                   >
-                    {index + 1}
-                  </div>
-                  
-                  {/* Checkbox */}
-                  <button
-                    onClick={() => onToggleSubtask(project.id, subtask.id || index)}
-                    className="flex-shrink-0 mt-0.5"
-                  >
-                    <div 
-                      className="w-5 h-5 rounded-sm flex items-center justify-center transition-colors"
-                      style={{ 
-                        backgroundColor: subtask.completed ? '#10b981' : 'transparent',
-                        border: `2px solid ${subtask.completed ? '#10b981' : currentTheme.borderColor}`,
-                        borderRadius: `calc(${currentTheme.radius} / 2)`
-                      }}
-                    >
-                      {subtask.completed && (
-                        <CheckIcon className="w-3 w-3 text-white" />
-                      )}
-                    </div>
-                  </button>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
+                    {/* Subtask header */}
+                    <div className="p-3">
+                      <div className="flex items-center gap-3">
+                        {/* Enhanced Checkbox - hidden when editing */}
+                        {editingSubtask?.id !== subtask.id && (
+                          <div 
+                            className="w-5 h-5 rounded-lg flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110"
+                            style={{ 
+                              backgroundColor: subtask.completed ? currentTheme.primaryColor : 'transparent',
+                              border: `2px solid ${subtask.completed ? currentTheme.primaryColor : currentTheme.borderColor}`,
+                              borderRadius: `calc(${currentTheme.radius} / 2)`
+                            }}
+                            onClick={() => onToggleSubtask(project.id, subtask.id || index)}
+                          >
+                            {subtask.completed && (
+                              <CheckIcon className="w-3 h-3 text-white" />
+                            )}
+                          </div>
+                        )}
+                        
+                        
+                        {/* Subtask title - either display or edit mode */}
                         {editingSubtask?.id === subtask.id ? (
-                          <div className="space-y-2">
-                            <input
-                              type="text"
-                              value={editingSubtaskTitle}
-                              onChange={(e) => setEditingSubtaskTitle(e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-lg"
+                          <div className="flex-1">
+                            {/* First line: Title on left, Date on right */}
+                            <div className="flex items-center gap-3 mb-2">
+                              <input
+                                type="text"
+                                value={editingSubtaskTitle}
+                                onChange={(e) => setEditingSubtaskTitle(e.target.value)}
+                                className="flex-1 px-3 py-2 text-sm rounded"
+                                style={{ 
+                                  backgroundColor: currentTheme.inputBg,
+                                  color: currentTheme.textPrimary,
+                                  border: `1px solid ${currentTheme.borderColor}`,
+                                  borderRadius: currentTheme.radius
+                                }}
+                                placeholder="Task title..."
+                                autoFocus
+                              />
+                              <div className="flex items-center gap-2">
+                                <CalendarIcon className="w-4 h-4" style={{ color: currentTheme.textSecondary }} />
+                                <input
+                                  type="date"
+                                  value={editingSubtaskDueDate}
+                                  onChange={(e) => setEditingSubtaskDueDate(e.target.value)}
+                                  className="px-3 py-2 text-sm rounded"
+                                  style={{ 
+                                    backgroundColor: currentTheme.inputBg,
+                                    color: currentTheme.textPrimary,
+                                    border: `1px solid ${currentTheme.borderColor}`,
+                                    borderRadius: currentTheme.radius
+                                  }}
+                                />
+                              </div>
+                            </div>
+                            
+                            {/* Second line: Description */}
+                            <textarea
+                              placeholder="Description..."
+                              value={editingSubtaskDescription}
+                              onChange={(e) => setEditingSubtaskDescription(e.target.value)}
+                              className="w-full px-3 py-2 text-sm rounded resize-none"
+                              rows="2"
                               style={{ 
                                 backgroundColor: currentTheme.inputBg,
                                 color: currentTheme.textPrimary,
                                 border: `1px solid ${currentTheme.borderColor}`,
                                 borderRadius: currentTheme.radius
                               }}
-                              autoFocus
                             />
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                              <input
-                                type="text"
-                                placeholder="Description..."
-                                value={editingSubtaskDescription}
-                                onChange={(e) => setEditingSubtaskDescription(e.target.value)}
-                                className="px-3 py-2 text-sm rounded-lg"
-                                style={{ 
-                                  backgroundColor: currentTheme.inputBg,
-                                  color: currentTheme.textPrimary,
-                                  border: `1px solid ${currentTheme.borderColor}`,
-                                  borderRadius: currentTheme.radius
-                                }}
-                              />
-                              <input
-                                type="date"
-                                value={editingSubtaskDueDate}
-                                onChange={(e) => setEditingSubtaskDueDate(e.target.value)}
-                                className="px-3 py-2 text-sm rounded-lg"
-                                style={{ 
-                                  backgroundColor: currentTheme.inputBg,
-                                  color: currentTheme.textPrimary,
-                                  border: `1px solid ${currentTheme.borderColor}`,
-                                  borderRadius: currentTheme.radius
-                                }}
-                              />
-                            </div>
-                            <div className="flex gap-2">
+                            
+                            {/* Confirmation area with grey background */}
+                            <div 
+                              className="flex items-center justify-end gap-2 py-3 px-3 -mx-3 -mb-3"
+                              style={{ 
+                                backgroundColor: currentTheme.bgTertiary,
+                                borderRadius: `0 0 ${currentTheme.radius} ${currentTheme.radius}`
+                              }}
+                            >
                               <button
-                                onClick={() => handleSaveSubtaskEdit(subtask.id)}
-                                className="px-3 py-1 text-sm rounded-lg"
-                                style={{ 
-                                  backgroundColor: currentTheme.primaryColor,
-                                  color: '#ffffff',
-                                  borderRadius: currentTheme.radius
-                                }}
-                              >
-                                Save
-                              </button>
-                              <button
+                                type="button"
                                 onClick={() => setEditingSubtask(null)}
-                                className="px-3 py-1 text-sm rounded-lg"
+                                className="px-4 py-2 text-sm rounded transition-colors"
                                 style={{ 
-                                  backgroundColor: currentTheme.bgTertiary,
+                                  backgroundColor: currentTheme.bgSecondary,
                                   color: currentTheme.textSecondary,
                                   border: `1px solid ${currentTheme.borderColor}`,
                                   borderRadius: currentTheme.radius
@@ -510,197 +479,116 @@ const ProjectDetail = ({
                               >
                                 Cancel
                               </button>
+                              
+                              <button
+                                type="button"
+                                onClick={() => handleSaveSubtaskEdit(subtask.id)}
+                                className="px-4 py-2 text-sm rounded transition-colors"
+                                style={{ 
+                                  backgroundColor: currentTheme.primaryColor,
+                                  color: 'white',
+                                  borderRadius: currentTheme.radius
+                                }}
+                              >
+                                Save Changes
+                              </button>
                             </div>
                           </div>
                         ) : (
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h4 
-                                className={`text-sm font-medium transition-all duration-300 ${subtask.completed ? 'line-through' : ''}`}
-                                style={{ 
-                                  color: subtask.completed ? currentTheme.textSecondary : currentTheme.textPrimary
-                                }}
-                              >
-                                {subtask.title}
-                              </h4>
-                              <button
-                                onClick={() => startEditingSubtask(subtask)}
-                                className="p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                                style={{ color: currentTheme.textSecondary }}
-                              >
-                                <PencilIcon className="w-3 h-3" />
-                              </button>
-                            </div>
-                            
-                            {(subtask.description || subtask.dueDate) && (
-                              <div className="mt-2 space-y-1">
-                                {subtask.description && (
-                                  <p className="text-xs" style={{ color: currentTheme.textSecondary }}>
-                                    {subtask.description}
-                                  </p>
-                                )}
-                                {subtask.dueDate && (
-                                  <div className="flex items-center gap-1 text-xs" style={{ color: currentTheme.textSecondary }}>
-                                    <CalendarIcon className="w-3 h-3" />
-                                    <span>{formatDueDate(subtask.dueDate)}</span>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                            
-                            {/* Checklist section */}
-                            <div className="mt-3">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-medium" style={{ color: currentTheme.textPrimary }}>
-                                  Checklist
-                                </span>
-                                <span className="text-xs" style={{ color: currentTheme.textSecondary }}>
-                                  {getChecklistProgress(subtask.checklist || [])}
-                                </span>
-                              </div>
-                              
-                              {subtask.checklist && subtask.checklist.length > 0 && (
-                                <div className="space-y-1 mb-2">
-                                  {subtask.checklist.map((item, itemIndex) => (
-                                    <div key={itemIndex} className="flex items-center gap-2">
-                                      <button
-                                        onClick={() => handleToggleChecklistItem(subtask.id, item.id)}
-                                        className="flex-shrink-0"
-                                      >
-                                        <div 
-                                          className="w-4 h-4 rounded-sm flex items-center justify-center transition-colors"
-                                          style={{ 
-                                            backgroundColor: item.completed ? '#10b981' : 'transparent',
-                                            border: `1px solid ${item.completed ? '#10b981' : currentTheme.borderColor}`,
-                                            borderRadius: `calc(${currentTheme.radius} / 2)`
-                                          }}
-                                        >
-                                          {item.completed && (
-                                            <CheckIcon className="w-2.5 h-2.5 text-white" />
-                                          )}
-                                        </div>
-                                      </button>
-                                      <span 
-                                        className={`text-xs flex-1 ${item.completed ? 'line-through' : ''}`}
-                                        style={{ 
-                                          color: item.completed ? currentTheme.textSecondary : currentTheme.textPrimary
-                                        }}
-                                      >
-                                        {item.text}
-                                      </span>
-                                      <button
-                                        onClick={() => handleRemoveChecklistItem(subtask.id, item.id)}
-                                        className="p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                                        style={{ color: '#ef4444' }}
-                                      >
-                                        <XIcon className="w-3 h-3" />
-                                      </button>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                              
-                              {/* Add checklist item */}
-                              {addingChecklistTo === subtask.id ? (
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="text"
-                                    placeholder="Enter checklist item..."
-                                    value={newChecklistItem}
-                                    onChange={(e) => setNewChecklistItem(e.target.value)}
-                                    className="flex-1 px-3 py-2 text-sm rounded-lg"
-                                    style={{ 
-                                      backgroundColor: currentTheme.inputBg,
-                                      color: currentTheme.textPrimary,
-                                      border: `1px solid ${currentTheme.borderColor}`,
-                                      borderRadius: currentTheme.radius
-                                    }}
-                                    autoFocus
-                                    onKeyPress={(e) => {
-                                      if (e.key === 'Enter') {
-                                        handleAddChecklistItem(subtask.id, newChecklistItem);
-                                      }
-                                    }}
-                                  />
-                                  <button
-                                    onClick={() => handleAddChecklistItem(subtask.id, newChecklistItem)}
-                                    className="p-2 rounded-lg"
-                                    style={{ 
-                                      backgroundColor: currentTheme.primaryColor,
-                                      color: '#ffffff',
-                                      borderRadius: currentTheme.radius
-                                    }}
-                                  >
-                                    <CheckIcon className="w-4 h-4" />
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      setAddingChecklistTo(null);
-                                      setNewChecklistItem("");
-                                    }}
-                                    className="p-2 rounded-lg"
-                                    style={{ 
-                                      backgroundColor: currentTheme.bgTertiary,
-                                      color: currentTheme.textSecondary,
-                                      border: `1px solid ${currentTheme.borderColor}`,
-                                      borderRadius: currentTheme.radius
-                                    }}
-                                  >
-                                    <XIcon className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              ) : (
-                                <button
-                                  onClick={() => setAddingChecklistTo(subtask.id)}
-                                  className="flex items-center gap-2 text-sm px-3 py-2 rounded border-2 border-dashed transition-all duration-200 hover:bg-gray-100"
+                          <>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span 
+                                  className="text-sm font-medium transition-all duration-200"
                                   style={{ 
-                                    backgroundColor: currentTheme.bgTertiary,
-                                    color: currentTheme.textSecondary,
-                                    borderColor: currentTheme.borderColor,
-                                    borderRadius: currentTheme.radius
+                                    color: subtask.completed ? currentTheme.textSecondary : currentTheme.textPrimary,
+                                    textDecoration: subtask.completed ? 'line-through' : 'none'
                                   }}
                                 >
-                                  <PlusIcon className="w-4 h-4" />
-                                  <span>Add checklist item</span>
-                                </button>
+                                  {subtask.title}
+                                </span>
+                                
+                              </div>
+                              
+                              {/* Description preview */}
+                              {subtask.description && (
+                                <p className="text-xs mt-1" style={{ color: currentTheme.textSecondary }}>
+                                  {subtask.description}
+                                </p>
+                              )}
+                              
+                              {/* Due date preview */}
+                              {subtask.dueDate && (
+                                <div className="flex items-center gap-1 mt-1">
+                                  <CalendarIcon className="w-3 h-3" style={{ color: currentTheme.textSecondary }} />
+                                  <span className="text-xs" style={{ color: currentTheme.textSecondary }}>
+                                    {formatDueDate(subtask.dueDate)}
+                                  </span>
+                                </div>
                               )}
                             </div>
-                          </div>
+                            
+                            {/* Enhanced Action buttons */}
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              <button
+                                type="button"
+                                onClick={() => startEditingSubtask(subtask)}
+                                className="p-1.5 rounded-lg transition-all duration-200 hover:scale-105 hover:bg-gray-100"
+                                style={{ 
+                                  color: currentTheme.textSecondary,
+                                  backgroundColor: 'transparent'
+                                }}
+                                title="Edit task"
+                              >
+                                <PencilIcon className="w-4 h-4" />
+                              </button>
+                              
+                              <button
+                                type="button"
+                                onClick={() => onDeleteSubtask(project.id, subtask.id || index)}
+                                className="p-1.5 rounded-lg transition-all duration-200 hover:scale-105 hover:bg-red-50"
+                                style={{ 
+                                  color: '#ef4444',
+                                  backgroundColor: 'transparent'
+                                }}
+                                title="Delete task"
+                              >
+                                <TrashIcon className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </>
                         )}
                       </div>
-                      
-                      <button
-                        onClick={() => onDeleteSubtask(project.id, subtask.id || index)}
-                        className="p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity ml-2"
-                        style={{ color: '#ef4444' }}
-                      >
-                        <TrashIcon className="w-4 h-4" />
-                      </button>
                     </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-            
-            {/* Add subtask button */}
-            {!isAddingSubtask && (
-              <div
-                className="flex items-center justify-center p-4 rounded-lg border-2 border-dashed cursor-pointer transition-all duration-200 hover:bg-gray-50 group"
-                style={{ 
-                  backgroundColor: currentTheme.bgTertiary,
-                  borderColor: currentTheme.borderColor,
-                  borderRadius: currentTheme.radius,
-                  minHeight: '45px',
-                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-                }}
-                onClick={() => setIsAddingSubtask(true)}
-              >
-                <PlusIcon className="w-5 h-5" />
-                <span className="font-medium">Add a Subtask</span>
-              </div>
-            )}
+                    
+                  </li>
+                ))}
+                
+              </ul>
+            ) : null}
           </div>
         </div>
+        
+        {/* Fixed Add Task button - always at bottom, outside scrollable area */}
+        {!isAddingSubtask && (
+          <div className="px-6 pb-6">
+            <div 
+              className="flex items-center justify-center gap-2 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-100"
+              style={{ 
+                backgroundColor: currentTheme.bgTertiary,
+                color: currentTheme.textSecondary,
+                borderRadius: currentTheme.radius,
+                border: `1px dashed ${currentTheme.borderColor}`,
+                minHeight: '45px',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+              }}
+              onClick={() => setIsAddingSubtask(true)}
+            >
+              <PlusIcon className="w-5 h-5" />
+              <span className="font-medium">Add a Task</span>
+            </div>
+          </div>
+        )}
       </motion.div>
     </motion.div>
   );

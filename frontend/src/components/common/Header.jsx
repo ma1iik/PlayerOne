@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useThemeStyles } from "../../context/ThemeProvider";
 import { BellIcon, UserIcon } from "@heroicons/react/outline";
+import CoinIcon from "./CoinIcon";
+import GemIcon from "./GemIcon";
 
 const Header = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -46,36 +48,39 @@ const Header = () => {
           <nav className="flex items-center gap-6">
             <Link
               to="/home"
-              className="text-base font-bold py-3 border-b-2 transition-colors"
+              className="font-bold py-3 border-b-2 transition-colors"
               style={{
                 borderColor: isActive('/home') ? currentTheme.primaryColor : 'transparent',
                 color: isActive('/home') ? currentTheme.primaryColor : currentTheme.textPrimary,
                 textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none',
-                fontFamily: currentTheme.font
+                fontFamily: currentTheme.font,
+                fontSize: currentTheme.fontSizes.base
               }}
             >
               {getThemedText('Home')}
             </Link>
             <Link
               to="/inventory"
-              className="text-base font-bold py-3 border-b-2 transition-colors"
+              className="font-bold py-3 border-b-2 transition-colors"
               style={{
                 borderColor: isActive('/inventory') ? currentTheme.primaryColor : 'transparent',
                 color: isActive('/inventory') ? currentTheme.primaryColor : currentTheme.textPrimary,
                 textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none',
-                fontFamily: currentTheme.font
+                fontFamily: currentTheme.font,
+                fontSize: currentTheme.fontSizes.base
               }}
             >
               {getThemedText('Inventory')}
             </Link>
             <Link
               to="/shop"
-              className="text-base font-bold py-3 border-b-2 transition-colors"
+              className="font-bold py-3 border-b-2 transition-colors"
               style={{
                 borderColor: isActive('/shop') ? currentTheme.primaryColor : 'transparent',
                 color: isActive('/shop') ? currentTheme.primaryColor : currentTheme.textPrimary,
                 textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none',
-                fontFamily: currentTheme.font
+                fontFamily: currentTheme.font,
+                fontSize: currentTheme.fontSizes.base
               }}
             >
               {getThemedText('Shop')}
@@ -84,20 +89,22 @@ const Header = () => {
           
           <div className="flex items-center flex-shrink-0">
             <div 
-              className="h-10 w-10 flex items-center justify-center text-white font-semibold text-lg"
+              className="h-10 w-10 flex items-center justify-center text-white font-semibold"
               style={{ 
                 background: `linear-gradient(to right, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
-                borderRadius: currentTheme.features?.hasSharpCorners ? '0' : '4px'
+                borderRadius: currentTheme.features?.hasSharpCorners ? '0' : '4px',
+                fontSize: currentTheme.fontSizes.lg
               }}
             >
               P1
             </div>
             <span 
-              className="ml-3 text-xl font-bold"
+              className="ml-3 font-bold"
               style={{ 
                 color: currentTheme.textPrimary,
                 fontFamily: currentTheme.font,
-                textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none',
+                fontSize: currentTheme.fontSizes.xl
               }}
             >
               {getThemedText('PlayerOne')}
@@ -107,29 +114,31 @@ const Header = () => {
           <div className="flex items-center gap-5">
             <div className="flex items-center gap-3">
               <div 
-                className="flex items-center gap-2 px-3 py-1.5 text-base"
+                className="flex items-center gap-2 px-3 py-1.5"
                 style={{ 
                   backgroundColor: currentTheme.bgTertiary,
                   color: currentTheme.textPrimary,
                   borderRadius: currentTheme.features?.hasSharpCorners ? '0' : '6px',
                   border: `1px solid ${currentTheme.borderColor}`,
-                  fontFamily: currentTheme.font
+                  fontFamily: currentTheme.font,
+                  fontSize: currentTheme.fontSizes.base
                 }}
               >
-                <span role="img" aria-label="Coin" title="Coins" className="text-base">🪙</span>
+                <CoinIcon size="w-5 h-5" title="Coins" />
                 <span className="font-medium">1250</span>
               </div>
               <div 
-                className="flex items-center gap-2 px-3 py-1.5 text-base"
+                className="flex items-center gap-2 px-3 py-1.5"
                 style={{ 
                   backgroundColor: currentTheme.bgTertiary,
                   color: currentTheme.textPrimary,
                   borderRadius: currentTheme.features?.hasSharpCorners ? '0' : '6px',
                   border: `1px solid ${currentTheme.borderColor}`,
-                  fontFamily: currentTheme.font
+                  fontFamily: currentTheme.font,
+                  fontSize: currentTheme.fontSizes.base
                 }}
               >
-                <span role="img" aria-label="Gem" title="Gems" className="text-base">💎</span>
+                <GemIcon size="w-5 h-5" title="Gems" />
                 <span className="font-medium">75</span>
               </div>
             </div>
@@ -181,11 +190,12 @@ const Header = () => {
                 >
                   <Link
                     to="/settings"
-                    className="block px-4 py-2 text-sm transition-colors"
+                    className="block px-4 py-2 transition-colors"
                     style={{ 
                       color: currentTheme.textPrimary,
                       fontFamily: currentTheme.font,
-                      textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                      textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none',
+                      fontSize: currentTheme.fontSizes.sm
                     }}
                     onMouseEnter={(e) => {
                       e.target.style.backgroundColor = currentTheme.bgTertiary;
@@ -200,11 +210,12 @@ const Header = () => {
                   </Link>
                   <button
                     onClick={logout}
-                    className="block w-full text-left px-4 py-2 text-sm transition-colors"
+                    className="block w-full text-left px-4 py-2 transition-colors"
                     style={{ 
                       color: currentTheme.textPrimary,
                       fontFamily: currentTheme.font,
-                      textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none'
+                      textTransform: currentTheme.features?.useUppercaseText ? 'uppercase' : 'none',
+                      fontSize: currentTheme.fontSizes.sm
                     }}
                     onMouseEnter={(e) => {
                       e.target.style.backgroundColor = currentTheme.bgTertiary;

@@ -3,6 +3,9 @@ import React, { useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon, CheckIcon } from "@heroicons/react/outline";
 import { useThemeStyles } from "../../context/ThemeProvider";
 import PixelCharacter from "../PixelCharacter";
+import CoinIcon from "../common/CoinIcon";
+import GemIcon from "../common/GemIcon";
+import FireIcon from "../common/FireIcon";
 
 const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
   const { theme: currentTheme, styles } = useThemeStyles();
@@ -175,7 +178,7 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                     }}
                   >
                     <div className="flex items-center">
-                      <span role="img" aria-label="Coins" className="mr-2">🪙</span>
+                      <CoinIcon size="w-4 h-4" className="mr-2" />
                       <span 
                         className="text-xs"
                         style={{ 
@@ -289,7 +292,7 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                     border: `1px solid ${currentTheme.borderColor}`
                   }}
                 >
-                  <div className="text-2xl mb-1">🔥</div>
+                  <FireIcon size="w-8 h-8" className="mb-1" />
                   <p 
                     className="text-xs font-medium mb-1"
                     style={{ 
@@ -351,7 +354,7 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                   }}
                 >
                   <div className="flex items-center">
-                    <span role="img" aria-label="Coin" className="mr-2">🪙</span>
+                    <CoinIcon size="w-4 h-4" className="mr-2" />
                     <p 
                       className="text-xs"
                       style={{ 
@@ -382,7 +385,7 @@ const ProfilePanel = ({ profile, isCollapsed, toggleCollapse }) => {
                   }}
                 >
                   <div className="flex items-center">
-                    <span role="img" aria-label="Gem" className="mr-2">💎</span>
+                    <GemIcon size="w-4 h-4" className="mr-2" />
                     <p 
                       className="text-xs"
                       style={{ 
