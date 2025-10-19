@@ -9,8 +9,11 @@ import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortableItem from './dnd/SortableItem';
 import { useDrag } from "../context/DragContext";
-import natureBackground from "../assets/backgrounds/nature_4.png";
+import CoinIcon from "./common/CoinIcon";
+import StarIcon from "./common/StarIcon";
+import HeartIcon from "./common/HeartIcon";
 import FireIcon from "./common/FireIcon";
+import natureBackground from "../assets/backgrounds/nature_4.png";
 
 const Section = ({ 
   title, 
@@ -310,7 +313,10 @@ const ProfileSection = () => {
                 border: `1px solid ${currentTheme.borderColor}`
               }}
             >
+<<<<<<< HEAD
               {/* Background */}
+=======
+>>>>>>> d27e837f531662ce380837316d2d761e03eddd0b
               <img 
                 src={natureBackground} 
                 alt="Character Background"
@@ -319,6 +325,7 @@ const ProfileSection = () => {
                   borderRadius: currentTheme.radius
                 }}
               />
+<<<<<<< HEAD
               
               {/* Character overlay */}
               <div 
@@ -340,6 +347,8 @@ const ProfileSection = () => {
                   }}
                 />
               </div>
+=======
+>>>>>>> d27e837f531662ce380837316d2d761e03eddd0b
             </div>
           </div>
 
@@ -353,7 +362,7 @@ const ProfileSection = () => {
                   fontFamily: currentTheme.font
                 }}
               >
-                <span>❤️</span>
+                <HeartIcon size="w-4 h-4" />
                 Health
               </span>
               <span 
@@ -401,7 +410,7 @@ const ProfileSection = () => {
                   fontFamily: currentTheme.font
                 }}
               >
-                <span>⭐</span>
+                <StarIcon size="w-4 h-4" />
                 Experience
               </span>
               <span 
@@ -559,7 +568,11 @@ const ProfileSection = () => {
                       backgroundColor: '#f59e0b20'
                     }}
                   >
+<<<<<<< HEAD
                     <span style={{ fontSize: currentTheme.fontSizes.xs }}>🪙</span>
+=======
+                    <CoinIcon size="w-3 h-3" />
+>>>>>>> d27e837f531662ce380837316d2d761e03eddd0b
                   </div>
                   <span className="font-medium" style={{ 
                     color: currentTheme.textSecondary,
@@ -593,7 +606,11 @@ const ProfileSection = () => {
                       backgroundColor: `${currentTheme.primaryColor}20`
                     }}
                   >
+<<<<<<< HEAD
                     <span style={{ fontSize: currentTheme.fontSizes.xs }}>⭐</span>
+=======
+                    <StarIcon size="w-3 h-3" />
+>>>>>>> d27e837f531662ce380837316d2d761e03eddd0b
                   </div>
                   <span className="font-medium" style={{ 
                     color: currentTheme.textSecondary,
