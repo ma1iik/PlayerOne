@@ -313,10 +313,7 @@ const ProfileSection = () => {
                 border: `1px solid ${currentTheme.borderColor}`
               }}
             >
-<<<<<<< HEAD
               {/* Background */}
-=======
->>>>>>> d27e837f531662ce380837316d2d761e03eddd0b
               <img 
                 src={natureBackground} 
                 alt="Character Background"
@@ -325,7 +322,6 @@ const ProfileSection = () => {
                   borderRadius: currentTheme.radius
                 }}
               />
-<<<<<<< HEAD
               
               {/* Character overlay */}
               <div 
@@ -347,8 +343,6 @@ const ProfileSection = () => {
                   }}
                 />
               </div>
-=======
->>>>>>> d27e837f531662ce380837316d2d761e03eddd0b
             </div>
           </div>
 
@@ -568,11 +562,7 @@ const ProfileSection = () => {
                       backgroundColor: '#f59e0b20'
                     }}
                   >
-<<<<<<< HEAD
-                    <span style={{ fontSize: currentTheme.fontSizes.xs }}>🪙</span>
-=======
                     <CoinIcon size="w-3 h-3" />
->>>>>>> d27e837f531662ce380837316d2d761e03eddd0b
                   </div>
                   <span className="font-medium" style={{ 
                     color: currentTheme.textSecondary,
@@ -606,11 +596,7 @@ const ProfileSection = () => {
                       backgroundColor: `${currentTheme.primaryColor}20`
                     }}
                   >
-<<<<<<< HEAD
-                    <span style={{ fontSize: currentTheme.fontSizes.xs }}>⭐</span>
-=======
                     <StarIcon size="w-3 h-3" />
->>>>>>> d27e837f531662ce380837316d2d761e03eddd0b
                   </div>
                   <span className="font-medium" style={{ 
                     color: currentTheme.textSecondary,
